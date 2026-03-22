@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI-EcoTrack Live Demo</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0F1E;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .text-eco-green { color: #00FF88; }
+        .text-eco-cyan { color: #00D4FF; }
+        .bg-eco-green { background-color: #00FF88; }
+        .bg-eco-cyan { background-color: #00D4FF; }
+        .bg-eco-red { background-color: #FF4A4A; }
+        .text-eco-red { color: #FF4A4A; }
+        
+        /* Circuit pattern */
+        .circuit-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L20 10 L20 20' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Cpath d='M80 80 L70 80 L70 90' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23374151'/%3E%3Ccircle cx='70' cy='90' r='1.5' fill='%23374151'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* Glow effects */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: 0;
+        }
+        
+        /* Mockup Container */
+        .mockup-window {
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            height: 420px;
+        }
+        
+        .mockup-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dot {
+            width: 10px; height: 10px; border-radius: 50%; margin-right: 6px;
+        }
+        
+        .mockup-body {
+            flex: 1;
+            padding: 16px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* Dashboard widgets */
+        .widget-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* Progress Circle */
+        .progress-circle {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: conic-gradient(#00FF88 85%, #374151 0);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .progress-inner {
+            width: 65px; height: 65px; border-radius: 50%;
+            background: #111827;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Scan Overlay */
+        .scan-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, rgba(0,0,0,0) 50%);
+            pointer-events: none;
+        }
+        .scan-line {
+            width: 100%; height: 2px; background: #00FF88;
+            position: absolute; top: 20%;
+            box-shadow: 0 0 10px #00FF88;
+            animation: scanMove 3s infinite linear;
+        }
+        @keyframes scanMove {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 80px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.03);
+            z-index: 0;
+            line-height: 1;
+        }
+
+        /* Photo card styles */
+        .photo-card {
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            height: 100%;
+            min-height: 0;
+        }
+        .photo-card:hover {
+            box-shadow: 0 30px 60px rgba(0, 255, 136, 0.15);
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+        .photo-wrapper {
+            flex: 1;
+            overflow: hidden;
+            background: #0d1117;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .photo-card-label {
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 10px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body style="">
+<div class="relative w-full h-full flex flex-col p-6 overflow-hidden" style="width: 100vw; height: 100vh;">
+<!-- Background Elements -->
+<div class="circuit-overlay"></div>
+<div class="glow-orb bg-eco-green" style="top: -100px; left: -100px; width: 600px; height: 600px; opacity: 0.1;"></div>
+<div class="glow-orb bg-eco-cyan" style="bottom: -100px; right: -100px; width: 600px; height: 600px; opacity: 0.1;"></div>
+<div class="slide-number">05</div>
+<!-- Header -->
+<header class="relative z-10 mb-3 flex justify-between items-end border-b border-gray-800 pb-3">
+<div>
+<h2 class="font-heading text-3xl font-bold text-white mb-1">
+                    See It In <span class="text-eco-green">Action</span>
+</h2>
+<p class="text-gray-400 font-light tracking-wide text-xs">
+                    LIVE SYSTEM DEMO • WEB DASHBOARD VIEW
+                </p>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-2 h-2 rounded-full bg-eco-green animate-pulse"></div>
+<p class="font-mono text-xs text-eco-green uppercase">System Online</p>
+</div>
+</header>
+<!-- Main Content: 3 Photo Cards -->
+<div class="flex-1 relative z-10 grid grid-cols-3 gap-6 px-2" style="min-height: 0; overflow: hidden;">
+
+    <!-- Photo 1 -->
+    <div class="photo-card">
+        <div class="photo-wrapper">
+            <img src="photo1.png" alt="Demo Photo 1">
+        </div>
+        <div class="photo-card-label">
+            <p class="font-heading text-sm font-bold text-white">IoT Sensor Monitor</p>
+            <p class="text-xs text-gray-400 mt-0.5 font-mono">Live bin fill · Air quality · Temp · Humidity</p>
+        </div>
+    </div>
+
+    <!-- Photo 2 -->
+    <div class="photo-card">
+        <div class="photo-wrapper">
+            <img src="photo2.png" alt="Demo Photo 2">
+        </div>
+        <div class="photo-card-label">
+            <p class="font-heading text-sm font-bold text-white">Multi-View AI Scan</p>
+            <p class="text-xs text-gray-400 mt-0.5 font-mono">ESP32-CAM trigger · Golden Thread flow</p>
+        </div>
+    </div>
+
+    <!-- Photo 3 -->
+    <div class="photo-card">
+        <div class="photo-wrapper">
+            <img src="photo3.png" alt="Demo Photo 3">
+        </div>
+        <div class="photo-card-label">
+            <p class="font-heading text-sm font-bold text-white">AI Part Identification</p>
+            <p class="text-xs text-gray-400 mt-0.5 font-mono">Valve · Carbon Steel · 80% confidence</p>
+        </div>
+    </div>
+
+</div>
+<!-- Caption -->
+<div class="mt-3 text-center relative z-10">
+<div class="inline-flex items-center bg-gray-800 bg-opacity-50 rounded-full px-6 py-2 border border-gray-700 backdrop-filter backdrop-blur-sm">
+<i class="fas fa-camera text-eco-green mr-3"></i>
+<p class="text-sm text-gray-300">
+                    Built, wired & tested — <span class="text-white font-bold">real hardware, real AI, real results</span>
+                </p>
+</div>
+</div>
+</div>
+
+</body></html>

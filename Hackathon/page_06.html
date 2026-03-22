@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI-EcoTrack Key Features</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0F1E;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .text-eco-green {
+            color: #00FF88;
+        }
+        .text-eco-cyan {
+            color: #00D4FF;
+        }
+        .bg-eco-green {
+            background-color: #00FF88;
+        }
+        .bg-eco-cyan {
+            background-color: #00D4FF;
+        }
+        
+        /* Circuit pattern */
+        .circuit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L20 10 L20 20' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Cpath d='M80 80 L70 80 L70 90' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23374151'/%3E%3Ccircle cx='70' cy='90' r='1.5' fill='%23374151'/%3E%3C/svg%3E");
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        /* Ambient Glow Orbs */
+        .glow-orb-1 {
+            position: absolute;
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background-color: #00D4FF;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.05;
+            z-index: 0;
+        }
+        .glow-orb-2 {
+            position: absolute;
+            bottom: -10%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background-color: #00FF88;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .icon-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Feature Card Hover Effect (simulated static style) */
+        .feature-accent-green {
+            border-top: 2px solid #00FF88;
+        }
+        .feature-accent-cyan {
+            border-top: 2px solid #00D4FF;
+        }
+        .feature-accent-purple {
+            border-top: 2px solid #A78BFA;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+    </style>
+</head>
+<body style="">
+<div class="relative flex flex-col w-full h-full overflow-hidden" style="width: 100vw; height: 100vh;">
+<!-- Background Elements -->
+<div class="circuit-overlay"></div>
+<div class="glow-orb-1"></div>
+<div class="glow-orb-2"></div>
+<!-- Header -->
+<div class="relative z-10 w-full px-12 pt-8 pb-4 flex justify-between items-end border-b border-gray-800">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<i class="fas fa-recycle text-eco-green"></i>
+<p class="font-mono text-xs text-eco-green tracking-widest uppercase">AI-EcoTrack</p>
+</div>
+<h2 class="font-heading text-4xl font-bold text-white tracking-tight">What Makes AI-EcoTrack Powerful</h2>
+</div>
+<div class="flex flex-col items-end">
+<p class="font-mono text-xs text-gray-500 mb-1">KEY FEATURES</p>
+<p class="font-heading text-4xl font-bold text-gray-700">06</p>
+</div>
+</div>
+<!-- Main Content: Feature Grid -->
+<div class="relative z-10 flex-1 p-12 flex items-center justify-center">
+<div class="grid-layout w-full h-full">
+<!-- Card 1: AI Part ID -->
+<div class="glass-card feature-accent-green rounded-xl p-6 flex flex-col justify-start relative group">
+<div class="absolute top-4 right-4 text-gray-700">
+<i class="fas fa-microchip fa-2x opacity-20"></i>
+</div>
+<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-green">
+<i class="fas fa-brain text-xl"></i>
+</div>
+<h3 class="font-heading text-xl font-bold text-white mb-2">AI Part ID</h3>
+<p class="text-gray-400 text-sm leading-relaxed">
+                        Llama 4 Scout identifies part type, material, and hazard level instantly from a single photo, eliminating manual sorting errors.
+                    </p>
+</div>
+<!-- Card 2: Digital Passport -->
+<div class="glass-card feature-accent-cyan rounded-xl p-6 flex flex-col justify-start relative">
+<div class="absolute top-4 right-4 text-gray-700">
+<i class="fas fa-file-code fa-2x opacity-20"></i>
+</div>
+<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-cyan">
+<i class="fas fa-passport text-xl"></i>
+</div>
+<h3 class="font-heading text-xl font-bold text-white mb-2">Digital Passport</h3>
+<p class="text-gray-400 text-sm leading-relaxed">
+                        Every scan generates a Digital Product Passport (DPP) ensuring full material traceability from bin to recycling center.
+                    </p>
+</div>
+<!-- Card 3: WRI Score -->
+<div class="glass-card feature-accent-green rounded-xl p-6 flex flex-col justify-start relative">
+<div class="absolute top-4 right-4 text-gray-700">
+<i class="fas fa-chart-bar fa-2x opacity-20"></i>
+</div>
+<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-green">
+<i class="fas fa-balance-scale text-xl"></i>
+</div>
+<h3 class="font-heading text-xl font-bold text-white mb-2">WRI Score</h3>
+<p class="text-gray-400 text-sm leading-relaxed">
+                        Calculates Weighted Recyclability Index automatically, assigning an A/B/C grade and estimating USD recovery value.
+                    </p>
+</div>
+<!-- Card 4: Live IoT -->
+<div class="glass-card feature-accent-cyan rounded-xl p-6 flex flex-col justify-start relative">
+<div class="absolute top-4 right-4 text-gray-700">
+<i class="fas fa-wifi fa-2x opacity-20"></i>
+</div>
+<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-cyan">
+<i class="fas fa-satellite-dish text-xl"></i>
+</div>
+<h3 class="font-heading text-xl font-bold text-white mb-2">Live IoT</h3>
+<p class="text-gray-400 text-sm leading-relaxed">
+                        Real-time telemetry for fill level, toxic gas (MQ-135), CO (MQ-7), and temp/humidity streamed directly to Firestore.
+                    </p>
+</div>
+<!-- Card 5: Multi-key AI -->
+<div class="glass-card feature-accent-purple rounded-xl p-6 flex flex-col justify-start relative">
+<div class="absolute top-4 right-4 text-gray-700">
+<i class="fas fa-server fa-2x opacity-20"></i>
+</div>
+<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="color: #A78BFA;">
+<i class="fas fa-key text-xl"></i>
+</div>
+<h3 class="font-heading text-xl font-bold text-white mb-2">Multi-key AI</h3>
+<p class="text-gray-400 text-sm leading-relaxed">
+                        Robust backend with automatic Groq API key rotation ensures the vision system never goes down due to rate limits.
+                    </p>
+</div>
+<!-- Card 6: Secure Architecture -->
+<div class="glass-card feature-accent-purple rounded-xl p-6 flex flex-col justify-start relative">
+<div class="absolute top-4 right-4 text-gray-700">
+<i class="fas fa-shield-alt fa-2x opacity-20"></i>
+</div>
+<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="color: #A78BFA;">
+<i class="fas fa-lock text-xl"></i>
+</div>
+<h3 class="font-heading text-xl font-bold text-white mb-2">Secure</h3>
+<p class="text-gray-400 text-sm leading-relaxed">
+                        Enterprise-grade security with strict Firestore rules, Admin SDK for writes, and anonymous auth for client-side reads.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="absolute bottom-0 w-full px-12 py-4 flex justify-between items-center text-xs text-gray-600 font-mono uppercase tracking-widest bg-opacity-20 bg-black">
+<p>Project: AI-EcoTrack</p>
+<p><span class="text-eco-green">●</span> Operational</p>
+</div>
+</div>
+
+</body></html>

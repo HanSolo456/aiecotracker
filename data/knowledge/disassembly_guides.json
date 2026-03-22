@@ -1,0 +1,2745 @@
+[
+    {
+        "id": "guide_gate_valve_dn100",
+        "part_class": "gate_valve",
+        "material_family": "stainless_steel",
+        "subtype": "wedge_gate_DN100",
+        "source": "OEM Service Manual — Crane Co. GV Series",
+        "part_number_tags": [
+            "DN100",
+            "PN16",
+            "ANSI_B16.5",
+            "GV-100-SS",
+            "crane_GV_series",
+            "wedge_gate"
+        ],
+        "required_tools": [
+            "calibrated pressure gauge (0–40 bar)",
+            "torque wrench 250 Nm",
+            "drain valve key",
+            "M20 socket set (24mm)",
+            "digital micrometer 0–25mm",
+            "brass drift + rubber mallet (non-sparking)",
+            "packing extractor",
+            "bore gauge + inspection torch + camera",
+            "lifting strap or hoist (SWL ≥ 20 kg)"
+        ],
+        "bolt_sizes": [
+            "Bonnet flange: 8× M20 × 90mm A2-70 hex bolt",
+            "Body-to-flange: 4× M16 × 60mm A2-70",
+            "Gland follower: 2× M12 × 40mm A2-70"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Isolate valve from process line. Affix lockout/tagout device to actuator. Verify zero pressure via calibrated gauge at bleed port before proceeding.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "Drain residual process fluid through drain port. Collect all fluid in a labelled HDPE container. Dispose per site SOP-HAZ-007 for hydrocarbon waste.",
+                "tool_required": "drain_valve_key",
+                "safety_ref": "NFPA_30_section_5.3",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Remove bonnet flange bolts (8× M20 × 90mm A2-70). Use cross-pattern torque release sequence across 3 passes at 250 Nm → 125 Nm → 0 Nm until zero resistance.",
+                "tool_required": "torque_wrench_250Nm",
+                "bolt_size": "8× M20 × 90mm A2-70",
+                "safety_ref": null,
+                "estimated_time_min": 12
+            },
+            {
+                "step": 4,
+                "action": "Lift bonnet assembly clear of body. Support using mechanical assist if bonnet mass > 10 kg (SWL ≥ 20 kg strap). Inspect bonnet gasket seating surface for pitting.",
+                "tool_required": "lifting_strap_or_hoist",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 5,
+                "action": "Extract wedge disc and stem assembly in a single upward motion. Measure stem diameter with digital micrometer at three points; record wear values against OEM tolerance ±0.05 mm.",
+                "tool_required": "digital_micrometer_0-25mm",
+                "safety_ref": null,
+                "estimated_time_min": 8
+            },
+            {
+                "step": 6,
+                "action": "Remove seat rings using non-sparking brass drift and rubber mallet (ATEX environment). Label PTFE seat rings as Class-C material for thermal recovery bin BIN-POLYMER-C.",
+                "tool_required": "brass_drift_rubber_mallet",
+                "safety_ref": "ATEX_Directive_2014_34_EU",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 7,
+                "action": "Separate stem packing (graphite/Inconel wire mesh) from gland follower. Place in labelled metal container — Class-B Nickel Alloy recovery bin BIN-NICKELALLOY-B.",
+                "tool_required": "packing_extractor",
+                "safety_ref": null,
+                "estimated_time_min": 6
+            },
+            {
+                "step": 8,
+                "action": "Clean valve body bore with approved solvent. Inspect for erosion, pitting, and cracks per ISO 14224. Photograph and log condition code to DPP service_history.",
+                "tool_required": "bore_gauge_torch_camera",
+                "safety_ref": null,
+                "estimated_time_min": 12
+            }
+        ]
+    },
+    {
+        "id": "guide_centrifugal_pump_SS",
+        "part_class": "centrifugal_pump",
+        "material_family": "stainless_steel",
+        "subtype": "end_suction_ANSI_B73",
+        "source": "Flowserve ANSI End Suction Pump Disassembly Procedure Rev. 4",
+        "part_number_tags": [
+            "ANSI_B73",
+            "B73.1",
+            "end_suction_pump",
+            "centrifugal",
+            "flowserve",
+            "316SS_pump"
+        ],
+        "required_tools": [
+            "non-contact voltage tester",
+            "pipe wrench 24-inch",
+            "coupling puller",
+            "laser alignment tool",
+            "torque wrench 150 Nm",
+            "impeller puller (no impact)",
+            "lint-free gloves",
+            "micrometer for wear ring clearance"
+        ],
+        "bolt_sizes": [
+            "Volute casing: 8× M16 × 70mm A2-70",
+            "Bearing frame: 4× M20 × 80mm A2-70",
+            "Impeller lock nut: M24 left-hand thread"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "De-energize motor at MCC panel. Apply LOTO procedure OSHA 1910.147. Verify motor is not energised using non-contact voltage tester.",
+                "tool_required": "non_contact_voltage_tester",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Close isolation valves on suction and discharge lines. Open casing drain plugs and allow liquid to drain completely.",
+                "tool_required": "pipe_wrench",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Disconnect coupling between motor and pump shaft. Remove coupling guard. Mark shaft coupling alignment reference before disassembly.",
+                "tool_required": "coupling_puller_alignment_tools",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Remove volute casing bolts (8× M16 × 70mm) in cross-pattern at 150 Nm. Separate casing from bearing frame. Inspect impeller wear ring clearance — log to DPP.",
+                "tool_required": "torque_wrench_150Nm",
+                "bolt_size": "8× M16 × 70mm A2-70",
+                "safety_ref": null,
+                "estimated_time_min": 18
+            },
+            {
+                "step": 5,
+                "action": "Remove impeller lock nut (M24 left-hand thread on most ANSI pumps). Extract impeller using puller — never impact tools on stainless impellers.",
+                "tool_required": "impeller_puller_no_impact",
+                "bolt_size": "M24 LH impeller lock nut",
+                "safety_ref": null,
+                "estimated_time_min": 12
+            },
+            {
+                "step": 6,
+                "action": "Remove mechanical seal cartridge. Handle seal faces with lint-free gloves. Segregate seal components by material: elastomers (Class C), carbon faces (Class C), SS hardware (Class A).",
+                "tool_required": "lint_free_gloves",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            }
+        ]
+    },
+    {
+        "id": "guide_heat_exchanger_shell_tube",
+        "part_class": "heat_exchanger",
+        "material_family": "carbon_steel",
+        "subtype": "shell_and_tube_TEMA_R",
+        "source": "TEMA R Standards — Shell and Tube Heat Exchanger Disassembly",
+        "part_number_tags": [
+            "TEMA_R",
+            "shell_and_tube",
+            "heat_exchanger",
+            "ASME_VIII",
+            "CS_HX",
+            "bundle_puller"
+        ],
+        "required_tools": [
+            "blind flanges + LOTO set",
+            "drain hose + HDPE container",
+            "crane or chain block (SWL ≥ 200 kg)",
+            "torque wrench 300 Nm",
+            "bundle puller tool",
+            "paint marker",
+            "XRF material test kit",
+            "hazmat assessment swab kit"
+        ],
+        "bolt_sizes": [
+            "Channel cover: 12× M24 × 120mm A193-B7 studs",
+            "Shell flange: 16× M20 × 100mm A193-B7",
+            "Nozzle flange: 4× M16 × 80mm A193-B7"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Depressurize both shell-side and tube-side circuits. LOTO all connected piping. Install blinds on all nozzles per P&ID isolation plan.",
+                "tool_required": "blind_flanges_loto_set",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 2,
+                "action": "Open vent valves on highest points of both circuits to confirm zero pressure. Drain shell-side fluid via drain nozzle.",
+                "tool_required": "drain_hose_hdpe_container",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 3,
+                "action": "Remove channel cover bolting (12× M24 × 120mm A193-B7) at 300 Nm in cross-pattern. Extract channel cover using lifting lugs — typically 50–200 kg. Inspect tube sheet face and tube end condition.",
+                "tool_required": "crane_or_chain_block_torque_wrench",
+                "bolt_size": "12× M24 × 120mm A193-B7 stud bolts",
+                "safety_ref": null,
+                "estimated_time_min": 35
+            },
+            {
+                "step": 4,
+                "action": "Number each tube row using paint marker before extracting tube bundle. Extract bundle using bundle puller tool — do not use flame cutting.",
+                "tool_required": "bundle_puller_paint_marker",
+                "safety_ref": null,
+                "estimated_time_min": 60
+            },
+            {
+                "step": 5,
+                "action": "Separate tube bundle materials. Segregate: shell (carbon steel → Class B), tubes (Cu/SS/Ti by grade using XRF), baffles (CS). Check for scale or fouling deposits for hazmat assessment.",
+                "tool_required": "material_test_kit_xrf",
+                "safety_ref": null,
+                "estimated_time_min": 40
+            }
+        ]
+    },
+    {
+        "id": "guide_ball_valve_dn50",
+        "part_class": "ball_valve",
+        "material_family": "stainless_steel",
+        "subtype": "full_bore_flanged_DN50",
+        "source": "OEM Service Manual — Valtek Mark 1 Series",
+        "part_number_tags": [
+            "DN50",
+            "PN40",
+            "ANSI_B16.34",
+            "full_bore",
+            "ball_valve"
+        ],
+        "required_tools": [
+            "torque wrench 150 Nm",
+            "M16 socket set (24mm)",
+            "seal extractor pick",
+            "PTFE tape and stem packing kit",
+            "pressure gauge 0–100 bar",
+            "disposable nitrile gloves"
+        ],
+        "bolt_sizes": [
+            "Body bolts: 4× M16 × 70mm A2-70 hex",
+            "End cap: 4× M12 × 50mm A2-70 stud"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Stroke valve to fully OPEN position. Lock actuator. Apply lockout/tagout. Verify zero pressure at body bleed/vent port with calibrated gauge.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Drain residual fluid via body drain port. Collect and label waste fluid per site SOP-HAZ-007.",
+                "tool_required": "drain_valve_key",
+                "safety_ref": "NFPA_30_section_5.3",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Remove end cap bolts (4× M12). Carefully withdraw end cap and seat ring assembly.",
+                "tool_required": "torque_wrench_150Nm",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Rotate and extract ball from body cavity. Inspect ball for pitting and erosion. Photograph before cleaning.",
+                "tool_required": "lifting_sling",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 5,
+                "action": "Remove stem nut and carefully withdraw stem upward. Remove stem O-rings and packing. Inspect stem for scoring.",
+                "tool_required": "seal_extractor",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 6,
+                "action": "Segregate ball (likely SS 316L), seats (PTFE or Delrin), stem (SS/Monel), body into appropriate grade bins. XRF verify ball alloy grade.",
+                "tool_required": "xrf_analyser",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            }
+        ]
+    },
+    {
+        "id": "guide_globe_valve_dn80",
+        "part_class": "globe_valve",
+        "material_family": "carbon_steel",
+        "subtype": "bolted_bonnet_DN80",
+        "source": "OEM Service Manual — Crane Co. DA Series",
+        "part_number_tags": [
+            "DN80",
+            "PN25",
+            "ASME_B16.34",
+            "globe_valve",
+            "bolted_bonnet"
+        ],
+        "required_tools": [
+            "torque wrench 200 Nm",
+            "M20 socket set",
+            "packing extractor",
+            "valve stem puller",
+            "pressure gauge 0–60 bar",
+            "LOTO locks"
+        ],
+        "bolt_sizes": [
+            "Bonnet studs: 6× M20 × 100mm B7/2H",
+            "Yoke bolts: 4× M16 × 65mm"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Drive valve to fully closed. Apply LOTO. Vent body cavity to zero pressure via upstream bleed. Confirm with gauge.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Remove handwheel and yoke locknut. Withdraw handwheel/yoke assembly.",
+                "tool_required": "M16_socket",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 3,
+                "action": "Remove bonnet studs in cross-pattern (6× M20 B7). Lift bonnet with stem and disc as unified assembly. Weigh before segregation.",
+                "tool_required": "torque_wrench_200Nm",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 4,
+                "action": "Extract packing rings and lantern ring from stuffing box. Dispose per halide/oxidiser waste SOP if service was chlorine.",
+                "tool_required": "packing_extractor",
+                "safety_ref": "OSHA_1910.1025",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 5,
+                "action": "Separate: body (carbon steel A216 WCB — Grade B scrap), bonnet+stem (carbon steel), disc/plug (may be SS 316 or hardface Stellite — Grade A). XRF disc.",
+                "tool_required": "xrf_analyser",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            }
+        ]
+    },
+    {
+        "id": "guide_butterfly_valve_dn150",
+        "part_class": "butterfly_valve",
+        "material_family": "stainless_steel",
+        "subtype": "wafer_type_DN150",
+        "source": "OEM Manual — Bray Series 30/31",
+        "part_number_tags": [
+            "DN150",
+            "PN16",
+            "wafer_type",
+            "butterfly_valve",
+            "EPDM_seat"
+        ],
+        "required_tools": [
+            "M12 socket set",
+            "hex key set 5–10mm",
+            "seal pick",
+            "rubber mallet"
+        ],
+        "bolt_sizes": [
+            "Actuator mounting: 4× M10 × 40mm hex bolt",
+            "Lug-type thru-bolts: 8× M16 × 120mm (supplied by pipe flange)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Verify valve is isolated and depressurised. Apply LOTO to actuator. Inspect for residual media behind disc.",
+                "tool_required": null,
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Remove actuator mounting bolts (4× M10). Lift actuator clear of bracket — may weigh up to 15 kg, use lifting aid.",
+                "tool_required": "M10_socket",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Drive out disc shaft square drive key. Withdraw shaft from body (pull toward actuator side). PTFE/EPDM bearings will slide free.",
+                "tool_required": "drift_punch",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Peel out elastomer seat from body groove using seal pick. Do NOT use sharp metal tools — seat surface damages easily.",
+                "tool_required": "seal_pick",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 5,
+                "action": "Segregate: disc (likely SS 316L Grade A), body (ductile iron or CS — Grade B), seat (EPDM rubber — Class C polymer waste), shaft (SS — Grade A).",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 15
+            }
+        ]
+    },
+    {
+        "id": "guide_check_valve_dn80",
+        "part_class": "check_valve",
+        "material_family": "stainless_steel",
+        "subtype": "swing_check_flanged_DN80",
+        "source": "API 594 / OEM Manual — Flowserve Check Valve Series",
+        "part_number_tags": [
+            "DN80",
+            "PN16",
+            "swing_check",
+            "API_594",
+            "check_valve"
+        ],
+        "required_tools": [
+            "torque wrench 120 Nm",
+            "M16 socket 24mm",
+            "hinge pin extractor",
+            "soft wire brush"
+        ],
+        "bolt_sizes": [
+            "Cover bolts: 4× M16 × 60mm A2-70"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Confirm valve is isolated from both upstream and downstream process lines. Check valves can trap fluid in both directions. LOTO both sides.",
+                "tool_required": null,
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Remove cover plate bolts (4× M16). Lower cover carefully — disc may swing free when cover is removed. Support disc with hand.",
+                "tool_required": "torque_wrench_120Nm",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Extract hinge pin using pin punch. Remove disc and arm assembly. Inspect hinge seat for erosion grooving.",
+                "tool_required": "hinge_pin_extractor",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 4,
+                "action": "Inspect body seat ring. Remove with seat extractor tool if damaged/worn. Record condition in dismantling report.",
+                "tool_required": "seat_extractor",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 5,
+                "action": "Segregate: body (SS or CS per XRF), disc (SS 316L — Grade A), hinge pin (SS), soft seat (PTFE — Class C). Log recovery values.",
+                "tool_required": "xrf_analyser",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            }
+        ]
+    },
+    {
+        "id": "guide_gear_pump_small",
+        "part_class": "gear_pump",
+        "material_family": "cast_iron",
+        "subtype": "external_gear_pump_DN25",
+        "source": "OEM Manual — Viking Pump Series K/KK",
+        "part_number_tags": [
+            "gear_pump",
+            "Viking_K_series",
+            "DN25",
+            "external_gear"
+        ],
+        "required_tools": [
+            "torque wrench 80 Nm",
+            "M10 socket set",
+            "circlip pliers",
+            "gear puller",
+            "soft-face hammer"
+        ],
+        "bolt_sizes": [
+            "Casing bolts: 6× M10 × 40mm",
+            "Relief valve cap: 1× M20 hex plug"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "LOTO motor and close all isolation valves. Drain pump casing via lowest drain plug — collect all process fluid. Confirm ZERO residual pressure.",
+                "tool_required": "M20_socket",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "Remove coupling guard. Mark coupling alignment before disconnection. Disconnect flexible coupling from motor shaft.",
+                "tool_required": "hex_key_set",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 3,
+                "action": "Remove casing bolts (6× M10). Split pump halves. Do NOT pry metal-to-metal — use soft mallet or release bolts.",
+                "tool_required": "torque_wrench_80Nm",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 4,
+                "action": "Extract drive and idler gears. Measure gear clearances with feeler gauge and record for condition assessment. ",
+                "tool_required": "feeler_gauge",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 5,
+                "action": "Remove shaft seals and bearings. Extract relief valve spring/ball assembly. Segregate: body (CI Grade B), gears (hardened steel Grade B), seals (Class C polymer).",
+                "tool_required": "circlip_pliers",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            }
+        ]
+    },
+    {
+        "id": "guide_electric_motor_7kw",
+        "part_class": "motor",
+        "material_family": "aluminium_alloy",
+        "subtype": "TEFC_4_pole_7.5kW",
+        "source": "IEC 60034 / OEM Manual — WEG W22 Series",
+        "part_number_tags": [
+            "motor",
+            "7.5kW",
+            "IE3",
+            "TEFC",
+            "WEG_W22",
+            "4_pole_1450rpm"
+        ],
+        "required_tools": [
+            "torque wrench 100 Nm",
+            "M12 Allen key set",
+            "bearing puller",
+            "insulation resistance tester (megger)",
+            "lifting gear SWL ≥ 60 kg",
+            "demagnetiser"
+        ],
+        "bolt_sizes": [
+            "End shield bolts: 4× M12 × 75mm",
+            "Terminal box: 2× M8 × 20mm",
+            "Foot mounting: 4× M16 × 80mm"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "De-energise and LOTO all three phases plus earthing conductor. Measure residual voltage on all phases with CAT IV multimeter. Discharge any VFD capacitors per manufacturer procedure.",
+                "tool_required": "CAT_IV_multimeter",
+                "safety_ref": "NFPA_70E_Article_120",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "Disconnect motor leads at terminal box. Label each conductor (U/V/W). Test winding insulation resistance — record megger reading at 500V DC. < 1 MΩ indicates winding damage.",
+                "tool_required": "insulation_resistance_tester",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Remove coupling/belt. Detach motor from baseplate (4× M16 foot bolts). Use lifting gear — motor is ~42 kg. Transport to disassembly bench.",
+                "tool_required": "lifting_gear",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Remove end shields (4× M12 each end). Withdraw rotor (with shaft) from stator bore using rotor puller or steady manual extraction — do not tilt.",
+                "tool_required": "bearing_puller",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 5,
+                "action": "Press bearings off shaft using hydraulic press — do not hammer directly on bearing. Bearings are Grade B steel; fan is Grade A aluminium alloy; shaft is forged steel Grade B.",
+                "tool_required": "hydraulic_press",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 6,
+                "action": "Segregate: frame/end shields (aluminium 6061 — Grade A, $2.10/kg), copper windings (Grade A, $8.80/kg — strip insulation), rotor core (laminated steel — Grade B), shaft (steel Grade B). Copper windings are highest value item.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 30
+            }
+        ]
+    },
+    {
+        "id": "guide_pressure_vessel_small",
+        "part_class": "pressure_vessel",
+        "material_family": "carbon_steel",
+        "subtype": "horizontal_accumulator_200L",
+        "source": "ASME Boiler & Pressure Vessel Code Sec VIII Div 1 / PED 2014/68/EU",
+        "part_number_tags": [
+            "pressure_vessel",
+            "ASME_VIII",
+            "PED",
+            "accumulator",
+            "carbon_steel"
+        ],
+        "required_tools": [
+            "calibrated pressure gauge 0–25 bar",
+            "nitrogen purge kit",
+            "M24 socket set (torque 500 Nm)",
+            "grinding angle grinder for nozzle removal",
+            "confined space equipment",
+            "gas detector (O2, H2S, LEL)"
+        ],
+        "bolt_sizes": [
+            "Manway bolts: 12× M24 × 100mm B7/2H stud",
+            "Nozzle flanges: 8× M20 × 90mm per nozzle"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "CRITICAL: Obtain pressure vessel entry permit. Isolate ALL nozzles with spectacle blinds. Vent and purge to zero pressure. Gas test for H2S, LEL, and O2 before any personnel approach.",
+                "tool_required": "gas_detector",
+                "safety_ref": "OSHA_1910.146_confined_space",
+                "estimated_time_min": 60
+            },
+            {
+                "step": 2,
+                "action": "Remove drain plug — collect all residual process fluid. Perform internal inspection through manway: photograph internal corrosion/lining condition.",
+                "tool_required": "inspection_camera",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 3,
+                "action": "Remove all nozzle flanges (8× M20 each). Angle grind nozzle stub ends flush with shell only if vessel is scrapped — do NOT cut if refurbishment is possible.",
+                "tool_required": "angle_grinder",
+                "safety_ref": "OSHA_1910.243",
+                "estimated_time_min": 60
+            },
+            {
+                "step": 4,
+                "action": "Plasma cut saddle supports from shell. Remove insulation cladding — CHECK FOR ASBESTOS LAGGING on older vessels (pre-1990). Send sample for analysis before any insulation removal.",
+                "tool_required": "plasma_cutter",
+                "safety_ref": "OSHA_1926.1101_asbestos",
+                "estimated_time_min": 90
+            },
+            {
+                "step": 5,
+                "action": "Shell and heads are heavy melting scrap (HMS). Weigh and route: carbon steel shell (Grade B ~$0.25/kg), SS nozzles if any (Grade A ~$1.42/kg), support steelwork (Grade B).",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 30
+            }
+        ]
+    },
+    {
+        "id": "guide_weld_neck_flange_dn100",
+        "part_class": "flange",
+        "material_family": "carbon_steel",
+        "subtype": "weld_neck_ANSI_B16.5_DN100_PN40",
+        "source": "ASME B16.5 / ASTM A105",
+        "part_number_tags": [
+            "flange",
+            "weld_neck",
+            "DN100",
+            "PN40",
+            "ANSI_B16.5",
+            "A105"
+        ],
+        "required_tools": [
+            "angle grinder",
+            "grinding disc (stainless compatible)",
+            "M20 socket 30mm",
+            "torque wrench 350 Nm",
+            "magnetic particle inspection kit"
+        ],
+        "bolt_sizes": [
+            "Flange bolts: 8× M20 × 80mm B7/2H stud — tighten in cross pattern"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Verify pipeline is fully isolated and depressurised. LOTO. Loosen flange bolts (8× M20) in cross-pattern — never loosen one side fully first; risk of spring-back and spray.",
+                "tool_required": "torque_wrench_350Nm",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "Insert two jacking bolts into tapped holes to spread flanges if they are stuck. Extract gasket — check gasket type (spiral wound, ring joint, soft gasket). Log and discard gasket.",
+                "tool_required": "jacking_bolts",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 3,
+                "action": "If flanges are to be cut and scrapped: angle grind weld neck. If refurbishment: MPI test flange face for cracks before any further work.",
+                "tool_required": "angle_grinder",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Segregate: Carbon Steel A105 flange (Grade B — $0.27/kg). Stainless B16.5 flanges (Grade A — $1.42/kg). Bolts (B7 alloy steel — Grade B). Do not mix grades.",
+                "tool_required": "xrf_analyser",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            }
+        ]
+    },
+    {
+        "id": "guide_circuit_breaker_mv",
+        "part_class": "circuit_breaker",
+        "material_family": "unknown",
+        "subtype": "MV_vacuum_circuit_breaker",
+        "source": "IEC 62271-100 / OEM Manual — ABB VD4 Series",
+        "part_number_tags": [
+            "circuit_breaker",
+            "MV",
+            "vacuum",
+            "ABB_VD4",
+            "11kV"
+        ],
+        "required_tools": [
+            "insulated tools (CAT IV 11kV rated)",
+            "multimeter CAT IV",
+            "vacuum bottle tester (hipot tester)",
+            "contact resistance meter (micro-ohm)",
+            "SF6 gas handling unit (if GIS breaker)"
+        ],
+        "bolt_sizes": [
+            "Panel mounting: 4× M12 × 40mm stainless",
+            "Bus bar connections: M16 × 50mm copper bolt"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "CRITICAL ELECTRICAL ISOLATION. De-energise breaker. Apply earthing clamps upstream and downstream. Test ALL conductors for absence of voltage with CAT IV meter before any contact. Obtain electrical permit-to-work.",
+                "tool_required": "CAT_IV_multimeter",
+                "safety_ref": "NFPA_70E_Article_120",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 2,
+                "action": "Discharge mechanism spring manually using manufacturer discharge tool. NEVER assume spring is discharged — always verify mechanically. Spring energy can cause severe injury.",
+                "tool_required": "spring_discharge_tool",
+                "safety_ref": "NFPA_70E",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 3,
+                "action": "Disconnect bus bar connections (copper/aluminium busbars — Grade A high value). Remove control wiring harness and label all terminals.",
+                "tool_required": "insulated_spanner",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "With insulated tools, remove vacuum interrupter bottles. Test vacuum integrity (dielectric strength test). If bottles hold vacuum they may be refurbished — log test results.",
+                "tool_required": "hipot_tester",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 5,
+                "action": "Segregate: copper busbars (Grade A — $8.80/kg), aluminium frame (Grade A — $2.10/kg), steel mechanism parts (Grade B), vacuum bottles (specialist e-waste or refurb stream), PCBs (e-waste per WEEE Directive).",
+                "tool_required": null,
+                "safety_ref": "EU_WEEE_Directive_2012_19_EU",
+                "estimated_time_min": 20
+            }
+        ]
+    },
+    {
+        "id": "guide_control_valve_dn100",
+        "part_class": "control_valve",
+        "material_family": "stainless_steel",
+        "subtype": "globe_control_valve_pneumatic_actuator_DN100",
+        "source": "OEM Manual — Flowserve Valtek Mark One",
+        "part_number_tags": [
+            "control_valve",
+            "Valtek",
+            "DN100",
+            "pneumatic",
+            "globe_body"
+        ],
+        "required_tools": [
+            "torque wrench 250 Nm",
+            "M20 socket set",
+            "spring compressor tool",
+            "4–20 mA calibrator",
+            "compressed air supply (3–6 bar)"
+        ],
+        "bolt_sizes": [
+            "Actuator-to-yoke: 6× M20 × 90mm",
+            "Body bonnet: 8× M20 × 100mm B7"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Isolate and vent actuator air supply. LOTO pneumatic supply and process line. Move valve to fail-safe position. Verify zero pressure on body cavity vent port.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "Disconnect instrument signal (4–20 mA, HART, or bus) from positioner. Label wires. Remove positioner. Disconnect air tubing from actuator ports.",
+                "tool_required": "screwdriver_set",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Compress actuator spring using spring compressor tool before removing yoke bolts. CRITICAL: do not remove bolts with spring under load — spring energy is extreme at pre-tension (2+ kN).",
+                "tool_required": "spring_compressor",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 4,
+                "action": "Once spring tension is zero, remove yoke bolts (6× M20). Lift actuator casing away. Remove spring and diaphragm/piston assembly.",
+                "tool_required": "torque_wrench_250Nm",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 5,
+                "action": "Remove body bonnet bolts (8× M20 B7). Extract stem, plug, and cage. Inspect plug seating surfaces for damage.",
+                "tool_required": "M20_socket",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 6,
+                "action": "Segregate: body (SS 316 Grade A — $1.42/kg), plug/cage (SS or hardface Stellite — Grade A), actuator casing (aluminium — Grade A $2.10/kg), spring (spring steel — Grade B), diaphragm (rubber/NBR — Class C).",
+                "tool_required": "xrf_analyser",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            }
+        ]
+    },
+    {
+        "id": "guide_pipe_fitting_elbow",
+        "part_class": "pipe_fitting",
+        "material_family": "stainless_steel",
+        "subtype": "long_radius_elbow_DN50_BW",
+        "source": "ASME B16.9 / ASTM A234",
+        "part_number_tags": [
+            "pipe_fitting",
+            "elbow",
+            "LR_90deg",
+            "DN50",
+            "BW",
+            "A234_WPB"
+        ],
+        "required_tools": [
+            "angle grinder",
+            "pipe clamp",
+            "grinding disc"
+        ],
+        "bolt_sizes": [],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Confirm pipeline is fully purged and isolated. Butt-weld fittings cannot be unbolted — pipe section must be cut out. Mark cut lines at least 50 mm from each weld toe.",
+                "tool_required": null,
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Angle grind or plasma cut pipe flush with fitting ends. Deburr cut ends. Remove any insulation from fitting (check for asbestos on pre-1990 pipework).",
+                "tool_required": "angle_grinder",
+                "safety_ref": "OSHA_1926.1101_asbestos",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Weigh fitting. XRF test fittings from mixed-grade headers — A234 WPB carbon steel and A403 WP316 stainless look identical to the eye. XRF before binning.",
+                "tool_required": "xrf_analyser",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 4,
+                "action": "Route: CS fitting (Grade B — $0.25/kg), SS 316 fitting (Grade A — $1.42/kg). Weld attachments (strongbacks, supports) — burn off and bin as structural scrap.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 5
+            }
+        ]
+    },
+    {
+        "id": "guide_transformer_distribution",
+        "part_class": "transformer",
+        "material_family": "copper_alloy",
+        "subtype": "oil_filled_distribution_11kV_100kVA",
+        "source": "IEC 60076 / IEEE C57.12 / OEM Manual",
+        "part_number_tags": [
+            "transformer",
+            "11kV",
+            "100kVA",
+            "oil_filled",
+            "ONAN",
+            "distribution"
+        ],
+        "required_tools": [
+            "CAT IV multimeter (≥15kV rated)",
+            "oil sample kit",
+            "oil drain pump",
+            "insulated tools",
+            "nitrogen blanket kit"
+        ],
+        "bolt_sizes": [
+            "Tank lid: 12× M16 × 60mm",
+            "Bushing mounting: 4× M12 × 40mm per bushing"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "MANDATORY: De-energise and apply three-phase earthing using approved earthing clamps. Test all HV and LV terminals with CAT IV rated tester. Obtain electrical permit-to-work. Transformers can hold lethal charge even when isolated.",
+                "tool_required": "CAT_IV_multimeter",
+                "safety_ref": "NFPA_70E_Article_120",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 2,
+                "action": "Take dielectric oil sample before draining — test for PCBs (polychlorinated biphenyls) using field test kit. Pre-1990 transformers frequently contain PCB oil (Askarel). PCB oil requires licensed disposal and is classified as hazardous waste.",
+                "tool_required": "pcb_field_test_kit",
+                "safety_ref": "EPA_TSCA_Section_6_PCBs",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Drain all transformer oil via drain valve into sealed, labelled drums. Mineral oil: licensed waste oil recycler. PCB oil: licensed hazardous waste contractor ONLY — do NOT mix with ordinary oil.",
+                "tool_required": "oil_drain_pump",
+                "safety_ref": "EPA_TSCA_Section_6_PCBs",
+                "estimated_time_min": 60
+            },
+            {
+                "step": 4,
+                "action": "Remove primary and secondary bushings. Segregate porcelain or polymer insulator housings for specialist e-waste.",
+                "tool_required": "insulated_spanner",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 5,
+                "action": "Cut tank open with plasma cutter to access core and windings. Extract copper windings (Grade A — highest value: $8.80/kg). Core laminations are grain-oriented silicon steel (Grade B — $0.18/kg).",
+                "tool_required": "plasma_cutter",
+                "safety_ref": null,
+                "estimated_time_min": 60
+            },
+            {
+                "step": 6,
+                "action": "Segregate: copper windings (Grade A — strip resin insulation for maximum recovery), core steel (Grade B — silicon steel commands slight premium over HMS), tank (carbon steel Grade B), radiators (SS or CS). Total copper weight is primary value driver.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 30
+            }
+        ]
+    },
+    {
+        "id": "guide_ball_valve_dn15_dn50_pn16",
+        "part_class": "ball_valve",
+        "material_family": "stainless_steel",
+        "subtype": "floating_ball_small",
+        "dn_min": 15,
+        "dn_max": 50,
+        "pressure_class": "PN16",
+        "ansi_class": "150",
+        "estimated_mass_kg_range": [
+            1,
+            8
+        ],
+        "crew_required": 1,
+        "source": "OEM Service Manual — Kitz/Velan/Trunnion Small Bore Ball Valve Series (DN15–DN50, PN16)",
+        "part_number_tags": [
+            "DN15",
+            "DN20",
+            "DN25",
+            "DN32",
+            "DN40",
+            "DN50",
+            "PN16",
+            "Class150",
+            "½inch",
+            "1inch",
+            "2inch",
+            "floating_ball",
+            "small_bore",
+            "screwed_end"
+        ],
+        "required_tools": [
+            "adjustable spanner (up to 200mm)",
+            "screwdriver set (flathead + Phillips)",
+            "Allen key set (3mm–10mm)",
+            "brass drift + rubber mallet",
+            "torque screwdriver 5–20 Nm",
+            "inspection torch"
+        ],
+        "bolt_sizes": [
+            "Body bolts: 4× M8 × 30mm A2-70 hex bolt (PN16 DN25/DN32)",
+            "Stem packing gland: 2× M6 × 20mm A2-70",
+            "Actuator mounting: 4× M6 × 25mm (ISO 5211 F03/F04)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Confirm valve is in open position. Shut off upstream/downstream isolation. Attach LOTO tag to actuator or handwheel. Verify pressure = 0 bar at process line bleed.",
+                "tool_required": "loto_kit",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 2,
+                "action": "For screwed-end valves: wrap pipe threads with PTFE tape before disassembly to preserve threads. Unscrew body end pieces (LH thread — remember: counter-clockwise tightens on LH). Use strap wrench on body, not on trim.",
+                "tool_required": "strap_wrench_and_pipe_wrench",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 3,
+                "action": "For flanged-end DN32–DN50: remove 4× M8 body bolts using cross-pattern sequence at 20 Nm → 10 Nm → 0 Nm. Set aside end piece, expose ball.",
+                "tool_required": "torque_screwdriver_20Nm",
+                "safety_ref": null,
+                "estimated_time_min": 8
+            },
+            {
+                "step": 4,
+                "action": "Carefully lift ball from body. Note orientation mark (flow arrow). Inspect surface for pitting, erosion. If > 2mm groove: Grade C (non-reusable). Wipe with lint-free cloth.",
+                "tool_required": "inspection_torch",
+                "safety_ref": null,
+                "estimated_time_min": 5
+            },
+            {
+                "step": 5,
+                "action": "Remove seats (PTFE or RTFE) using brass drift. Label as polymer waste — do NOT mix with metal scrap. Remove stem from top by pulling upward after removing packing gland screws (2× M6).",
+                "tool_required": "brass_drift",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 6,
+                "action": "Segregate: body (SS Grade A — ₹105/kg), ball (SS Grade A — typically 316L, 0.3–1.5 kg), stem (SS Grade A), seats (PTFE — polymer bin, NOT metal), packing (dispose as polymer waste). Photograph each component for DPP record.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 43
+    },
+    {
+        "id": "guide_ball_valve_dn65_dn150_pn16_pn40",
+        "part_class": "ball_valve",
+        "material_family": "stainless_steel",
+        "subtype": "trunnion_ball_medium",
+        "dn_min": 65,
+        "dn_max": 150,
+        "pressure_class": "PN40",
+        "ansi_class": "300",
+        "estimated_mass_kg_range": [
+            9,
+            60
+        ],
+        "crew_required": 2,
+        "source": "OEM Service Manual — Flowserve/Orbit/Bonney Forge Trunnion Ball Valve DN65–DN150 PN16/40",
+        "part_number_tags": [
+            "DN65",
+            "DN80",
+            "DN100",
+            "DN125",
+            "DN150",
+            "PN16",
+            "PN40",
+            "Class300",
+            "3inch",
+            "4inch",
+            "6inch",
+            "trunnion_ball",
+            "medium_bore",
+            "flange_end"
+        ],
+        "required_tools": [
+            "torque wrench 0–300 Nm calibrated",
+            "M16–M24 socket set (24mm, 30mm, 36mm AF)",
+            "brass drift 25mm dia",
+            "sling/chain block (SWL ≥ 80 kg)",
+            "digital torque adapter",
+            "packing extractor",
+            "spiral wound gasket removal tool",
+            "bore gauge (0–200mm)"
+        ],
+        "bolt_sizes": [
+            "Body-to-body split: 8× M16 × 70mm A4-80 stud bolt + nut (DN80)",
+            "Body-to-body split: 12× M20 × 90mm A4-80 stud bolt + nut (DN100–DN150)",
+            "Stem packing gland: 4× M12 × 50mm A2-70",
+            "Bearing retainer: 4× M8 × 35mm",
+            "Body end flanges: 8× M16 × 65mm A4-80 (PN40, DN100)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Two-person LOTO: P1 operates isolation, P2 verifies at valve. Apply LOTO locks. Bleed pressure via 1/4\" NPT bleed plug (top of body, 3mm hex key). Wait for no flow for 60 seconds minimum. Confirm with calibrated 0–60 bar gauge.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 2,
+                "action": "Drain body cavity through vent/drain port. Estimate residual volume: DN100 body holds approx. 2.5 L. Collect all fluid. Remove actuator (pneumatic: disconnect air supply, bleed actuator spring). Note spring orientation for reassembly.",
+                "tool_required": "drain_kit",
+                "safety_ref": "NFPA_30_section_5.3",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Remove stem assembly: unfasten packing gland (4× M12, torque-off at 50 Nm). Remove Belleville washers — note stack orientation (concave up). Extract stem upward using stem removal jig or threaded rod. CAUTION: spring-loaded anti-blowout pin — hold stem while releasing packing.",
+                "tool_required": "torque_wrench_300Nm",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 4,
+                "action": "Remove body split bolts (8–12× M16/M20 per size). Use cross-pattern 3-pass release: 300 Nm → 150 Nm → 0 Nm. Separate body halves using body jack or M12 forcing bolts in jacking holes. Do NOT use pry bars on seal faces.",
+                "tool_required": "torque_wrench_300Nm_and_body_jack",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 5,
+                "action": "Lift ball out using valve ball sling (nylon sling around bore — never wire rope on SS). DN80 ball: ~4 kg (unaided). DN150 ball: ~18 kg (chain block required, SWL 80 kg confirmed). Inspect for erosion, cavitation, pitting. Depth gauge: > 1.5mm = Grade C reject.",
+                "tool_required": "chain_block_80kg_SWL",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 6,
+                "action": "Remove trunnion bearings (glass-filled PTFE). Remove seats by tapping gently from body side with 25mm brass drift — PTFE seats fracture if over-loaded; work evenly around circumference. Remove seat springs (304 SS coil spring).",
+                "tool_required": "brass_drift_25mm",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 7,
+                "action": "Segregate: body halves (SS 316L Grade A — heavy, 5–30 kg each), ball (SS 316L Grade A — solid, high value per kg), stem (SS 316L Grade A), trunnion bearings (PTFE — polymer bin), seats (PTFE — polymer bin), springs (SS Grade A), spiral wound gasket (mixed — Metal/PTFE, Class C). Tag and weigh each stream. Photograph all for DPP record.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 15
+            }
+        ],
+        "estimated_total_time_min": 145
+    },
+    {
+        "id": "guide_ball_valve_dn200_dn300_pn40",
+        "part_class": "ball_valve",
+        "material_family": "stainless_steel",
+        "subtype": "trunnion_ball_large",
+        "dn_min": 200,
+        "dn_max": 300,
+        "pressure_class": "PN40",
+        "ansi_class": "300",
+        "estimated_mass_kg_range": [
+            80,
+            300
+        ],
+        "crew_required": 3,
+        "lifting_equipment_required": true,
+        "min_crane_swl_tonnes": 0.5,
+        "source": "OEM Service Manual — Cameron/Velan Big-Bore Trunnion Ball Valve DN200–DN300 PN40",
+        "part_number_tags": [
+            "DN200",
+            "DN250",
+            "DN300",
+            "PN40",
+            "Class300",
+            "8inch",
+            "10inch",
+            "12inch",
+            "large_bore",
+            "trunnion",
+            "heavy_duty"
+        ],
+        "required_tools": [
+            "hydraulic torque wrench 0–3500 Nm with DN-matching square drive",
+            "M24–M36 socket set (36mm, 41mm, 50mm AF)",
+            "overhead crane or hydraulic floor crane (SWL ≥ 500 kg)",
+            "4-leg chain sling set 2t SWL",
+            "valve turning tool (DN200+ stem engagement)",
+            "body jack set (20 tonne hydraulic)",
+            "calibrated digital torque multiplier",
+            "brass drift 40mm dia",
+            "ball sling (nylon, 2t SWL)",
+            "magnetic base torque reaction arm"
+        ],
+        "bolt_sizes": [
+            "Body split flanges: 20× M24 × 120mm A4-80 stud bolt + heavy hex nut (DN200)",
+            "Body split flanges: 28× M30 × 150mm A4-80 stud bolt + heavy hex nut (DN250–DN300)",
+            "Gland flange: 6× M20 × 80mm A2-70 (DN200); 8× M24 × 100mm (DN300)",
+            "Trunnion plate: 8× M16 × 60mm A4-80 (each trunnion, × 2)",
+            "Torque values: M24 A4-80 = 480 Nm dry; M30 A4-80 = 840 Nm dry"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "MANDATORY 3-person procedure: LOTO coordinator (P1) manages isolation, P2 operates valve, P3 verifies pressures. Complete written PTW (Permit to Work) before starting. Apply 3 independent LOTO locks. Verify 0 bar via 0–60 bar calibrated gauge at all 3 bleed points (upstream, downstream, body cavity).",
+                "tool_required": "calibrated_pressure_gauge_0_60bar",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 2,
+                "action": "Rig valve for crane: attach 4-leg 2t chain sling around valve body flanges (never around actuator stem). Confirm crane load indicator shows body weight (DN200: ~120 kg, DN300: ~280 kg). Take up slack without lifting. Crane operator must be rated and present for all subsequent steps.",
+                "tool_required": "overhead_crane_500kg_SWL",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Drain body cavity (DN200 body holds ~15 L). Remove actuator: disconnect pneumatic/hydraulic supply, bleed actuator accumulator to 0 bar. Lift actuator with separate sling (actuator alone: 40–80 kg typically). Never leave actuator hanging on stem.",
+                "tool_required": "drain_kit_and_actuator_sling",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 4,
+                "action": "Remove gland packing (6–8× M20/M24, hydraulic torque wrench 480 Nm). Gland follower may require hydraulic puller — do not use impact on SS stem. Extract stem upward — DN200 stem: ~15 kg, use mechanical assist.",
+                "tool_required": "hydraulic_torque_wrench_3500Nm",
+                "safety_ref": null,
+                "estimated_time_min": 35
+            },
+            {
+                "step": 5,
+                "action": "Remove body split bolts (20–28× M24/M30). Hydraulic torque wrench: 3-pass break-out at 60% → 30% → 0% torque. Install body jack (20t hydraulic) in jacking holes. Apply jack pressure slowly (watch for residual pressure — maintain crane tension). Separate body halves with crane assistance.",
+                "tool_required": "hydraulic_torque_wrench_and_body_jack_20t",
+                "safety_ref": null,
+                "estimated_time_min": 60
+            },
+            {
+                "step": 6,
+                "action": "Lift ball using dedicated ball sling (nylon 2t SWL through bore). DN200 ball: ~35 kg. DN300 ball: ~75 kg. CRANE REQUIRED — no manual lift. Lower ball onto padded V-blocks. Inspect for erosion, cracks, galling on seat contact zone. Use dial gauge — roundness deviation > 0.5mm: reject.",
+                "tool_required": "crane_and_ball_sling_2t",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 7,
+                "action": "Remove trunnion plates (8× M16 each, ×2 sides). Remove PTFE seats by hydraulic press (not percussion). Record seat seal face width for DPP. Remove trunnion bearings.",
+                "tool_required": "hydraulic_press_and_torque_wrench",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 8,
+                "action": "Segregate by weight using crane scale: body halves (316L SS, Grade A, each 40–140 kg), ball (316L SS, Grade A, 35–75 kg — highest value component), stem (316L SS, Grade A), trunnion plates (316L SS, Grade A), PTFE seats (polymer bin, Class C), gland packing (polymer/graphite, Class C), spiral wound gaskets (mixed, Class C). Weigh each SS stream separately for accurate DPP.",
+                "tool_required": "crane_scale",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            }
+        ],
+        "estimated_total_time_min": 235
+    },
+    {
+        "id": "guide_gate_valve_dn50_dn80_pn16",
+        "part_class": "gate_valve",
+        "material_family": "stainless_steel",
+        "subtype": "rising_stem_wedge_small",
+        "dn_min": 50,
+        "dn_max": 80,
+        "pressure_class": "PN16",
+        "ansi_class": "150",
+        "estimated_mass_kg_range": [
+            5,
+            20
+        ],
+        "crew_required": 1,
+        "source": "OEM Service Manual — IMI Crane Gate Valve DN50–DN80 PN16",
+        "part_number_tags": [
+            "DN50",
+            "DN80",
+            "PN16",
+            "Class150",
+            "2inch",
+            "3inch",
+            "rising_stem",
+            "wedge_gate",
+            "small_bore",
+            "handwheel"
+        ],
+        "required_tools": [
+            "torque wrench 50–250 Nm",
+            "M14–M16 socket set (22mm, 24mm AF)",
+            "packing extractor tool",
+            "brass drift 15mm",
+            "rubber mallet",
+            "stem thread lubricant (copper-based)",
+            "inspection torch + mirror"
+        ],
+        "bolt_sizes": [
+            "Bonnet bolts: 4× M14 × 60mm A2-70 stud + nut (DN50)",
+            "Bonnet bolts: 8× M16 × 70mm A2-70 stud + nut (DN80)",
+            "Gland follower: 2× M10 × 40mm A2-70",
+            "Torque: M14 A2-70 = 120 Nm; M16 A2-70 = 180 Nm (lubricated)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Open gate fully (stem extended) to relieve wedge contact pressure — easier disassembly. Apply LOTO. Bleed at ¼\" body plug. Verify 0 bar. Close gate before bonnet removal (prevents wedge falling).",
+                "tool_required": "loto_kit",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Remove gland follower bolts (2× M10). Extract gland follower and packing rings using packing extractor. Remove each packing ring in sequence — count rings (typically 5 graphite rings for PN16). Inspect stuffing box for erosion.",
+                "tool_required": "packing_extractor",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Remove bonnet bolts (4–8× M14/M16, cross-pattern 3-pass at rated Nm → 50% → 0). Lift bonnet straight up — bonnet carries stem assembly. DN50 bonnet: ~4 kg. DN80 bonnet: ~8 kg. Assist required for DN80.",
+                "tool_required": "torque_wrench_250Nm",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Unscrew handwheel from stem (LH or RH thread — check OEM manual, usually RH). Remove stem from bonnet by turning handwheel-side threads. Inspect stem thread form for galling, corrosion on Acme thread profile.",
+                "tool_required": "adjustable_spanner",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 5,
+                "action": "Remove wedge/gate from body. DN50 wedge: ~0.5 kg. DN80 wedge: ~1.5 kg. Inspect seat rings (integral machined in body or renewable). Seat ring erosion > 0.8mm depth: body Class C (seat replacement required before reuse).",
+                "tool_required": "inspection_torch",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 6,
+                "action": "Segregate: body (SS Grade A, ~3–12 kg), bonnet (SS Grade A), wedge (SS Grade A), stem (SS Grade A — solid round bar, high value per kg), handwheel (cast iron or SS — segregate accordingly), packing (graphite rings — polymer/carbon bin).",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 8
+            }
+        ],
+        "estimated_total_time_min": 73
+    },
+    {
+        "id": "guide_gate_valve_dn200_dn400_pn16_pn40",
+        "part_class": "gate_valve",
+        "material_family": "carbon_steel",
+        "subtype": "rising_stem_wedge_large",
+        "dn_min": 200,
+        "dn_max": 400,
+        "pressure_class": "PN40",
+        "ansi_class": "300",
+        "estimated_mass_kg_range": [
+            80,
+            600
+        ],
+        "crew_required": 3,
+        "lifting_equipment_required": true,
+        "min_crane_swl_tonnes": 1.0,
+        "source": "OEM Service Manual — Velan/Neway Large Bore Gate Valve DN200–DN400 PN16/PN40",
+        "part_number_tags": [
+            "DN200",
+            "DN250",
+            "DN300",
+            "DN400",
+            "PN16",
+            "PN40",
+            "Class300",
+            "8inch",
+            "10inch",
+            "16inch",
+            "large_gate",
+            "slab_gate",
+            "wedge_gate",
+            "rising_stem",
+            "gear_operated"
+        ],
+        "required_tools": [
+            "hydraulic torque wrench 0–4000 Nm",
+            "M27–M42 heavy hex socket set (41mm, 50mm, 60mm, 65mm AF)",
+            "overhead crane 2t SWL minimum",
+            "4-leg 2t chain sling",
+            "bonnet guide studs × 4 (M27 × 300mm guide studs for safe bonnet removal)",
+            "stem nut removal tool (spanner wrench)",
+            "gate extraction sling",
+            "hydraulic jack 5t"
+        ],
+        "bolt_sizes": [
+            "Bonnet-to-body: 12× M27 × 140mm A4-80 stud + heavy hex nut (DN200 PN16)",
+            "Bonnet-to-body: 16× M33 × 180mm A4-80 stud + heavy hex nut (DN300 PN40)",
+            "Bonnet-to-body: 20× M42 × 220mm A4-80 stud + heavy hex nut (DN400 PN40)",
+            "Torque: M27 A4-80 = 720 Nm; M33 = 1200 Nm; M42 = 2400 Nm (all lubricated MoS2)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Full PTW required. 3-person LOTO. This class of valve holds large fluid volumes (DN400 body: ~80 L). Confirm 3 drain paths are open. Wait minimum 30 min after drainage before bonnet removal. Gear operator (if fitted) must be blanked off after LOTO.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 45
+            },
+            {
+                "step": 2,
+                "action": "Position crane over valve. Attach 4-leg 2t sling to body lifting lugs — NOT to bonnet or pipe flanges. Confirm rigging certified. Crane in stand-by (sling taut, zero load transfer). Valve total weight: DN200: ~120 kg, DN400: ~600 kg.",
+                "tool_required": "overhead_crane_2t",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Install 4 guide studs (M27/M33/M42 × 300mm) replacing 4 diametrically opposite bonnet bolts — these guide the bonnet straight up and prevent binding on gate. Remove remaining bonnet bolts using hydraulic torque wrench (cross-pattern, 3 passes).",
+                "tool_required": "hydraulic_torque_wrench_4000Nm",
+                "safety_ref": null,
+                "estimated_time_min": 60
+            },
+            {
+                "step": 4,
+                "action": "Apply crane lift to bonnet — take weight slowly. Bonnet + stem assembly: DN200: ~40 kg, DN400: ~150 kg. Lift bonnet straight up along guide studs. Two workers guide bonnet edges to prevent lateral swing. Set bonnet on padded steel stands.",
+                "tool_required": "crane_and_guide_studs",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 5,
+                "action": "Gate/wedge removal: attach gate extraction sling through valve bore (rope through bottom of body to bottom of gate). Crane lifts gate out straight up. DN200 gate: ~20 kg, DN400 gate: ~80 kg. Inspect gate sealing faces for angular erosion pattern — indicates seat leak history.",
+                "tool_required": "crane_and_gate_sling",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 6,
+                "action": "Remove stem from bonnet: unscrew stem nut (spanner wrench or pipe wrench on a dedicated flat). Inspect Acme thread (or trapezoidal metric thread): pit depth > 1mm = Grade C stem. Remove yoke sleeve/stem nut bearing — often bronze bushing.",
+                "tool_required": "stem_nut_removal_tool",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 7,
+                "action": "Segregate by crane scale weighing: body (CS A216 WCB or SS, Grade B/A, 60–350 kg), bonnet (CS or SS, Grade B/A, 30–120 kg), gate (SS or CS, Grade A/B, 20–80 kg), stem (SS Grade A — solid bar, highest £/kg), stem nut (bronze — segregate as copper alloy Grade A), yoke (CS Grade B), packing (dispose). CS body: ₹37/kg, SS body: ₹105/kg.",
+                "tool_required": "crane_scale",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            }
+        ],
+        "estimated_total_time_min": 230
+    },
+    {
+        "id": "guide_globe_valve_dn15_dn50_pn40",
+        "part_class": "globe_valve",
+        "material_family": "stainless_steel",
+        "subtype": "globe_small_bore",
+        "dn_min": 15,
+        "dn_max": 50,
+        "pressure_class": "PN40",
+        "ansi_class": "300",
+        "estimated_mass_kg_range": [
+            2,
+            12
+        ],
+        "crew_required": 1,
+        "source": "OEM Service Manual — Crane/Newco/Spirax Globe Valve DN15–DN50 PN40",
+        "part_number_tags": [
+            "DN15",
+            "DN20",
+            "DN25",
+            "DN32",
+            "DN40",
+            "DN50",
+            "PN40",
+            "Class300",
+            "½inch",
+            "1inch",
+            "2inch",
+            "globe_valve",
+            "needle_valve",
+            "regulating",
+            "throttling"
+        ],
+        "required_tools": [
+            "torque wrench 20–100 Nm",
+            "M10–M14 socket set (17mm, 19mm, 22mm AF)",
+            "disc/plug wrench (OEM specific flat-type)",
+            "packing extractor",
+            "pick set for soft seat O-ring removal",
+            "thread gauge M-type or NPT"
+        ],
+        "bolt_sizes": [
+            "Bonnet bolts: 4× M10 × 45mm A2-70 (DN25 PN40)",
+            "Bonnet bolts: 4× M12 × 50mm A2-70 (DN40–DN50 PN40)",
+            "Torque: M10 A2-70 = 40 Nm; M12 = 60 Nm"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Ensure flow direction arrow on body points correct way (globe valves are directional — pressure under disc for standard, over disc for control). Apply LOTO. Verify 0 bar at ¼\" bleed plug.",
+                "tool_required": "loto_kit",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 8
+            },
+            {
+                "step": 2,
+                "action": "Remove gland packing: unscrew gland follower (hand-tight usually, or 2× M8). Extract packing rings — note number of rings. Inspect stuffing box bore for score marks.",
+                "tool_required": "packing_extractor",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 3,
+                "action": "Remove bonnet bolts (4× M10/M12, cross-pattern at rated Nm → 0 over 2 passes). Globe bonnets are lighter than gate — DN50 bonnet: ~2.5 kg. Lift straight up — disc/plug assembly comes with bonnet on screwed stems.",
+                "tool_required": "torque_wrench_100Nm",
+                "safety_ref": null,
+                "estimated_time_min": 12
+            },
+            {
+                "step": 4,
+                "action": "Remove disc from stem: held by disc nut (thin slotted nut — use disc wrench, not pliers). Inspect disc face: erosion > 0.5mm groove = replace. For PTFE soft-seat disc: PTFE Class C polymer waste. For SS hard disc: SS Grade A.",
+                "tool_required": "disc_wrench",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 5,
+                "action": "Inspect seat ring inside body: if renewable (threaded or pressed-in seat ring), remove with seat ring wrench. Seat ring: SS 316L or Stellite-faced. Stellite (Co-Cr alloy) is non-magnetic, medium value — segregate from SS scrap.",
+                "tool_required": "seat_ring_wrench",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 6,
+                "action": "Segregate: body (SS Grade A, 1–6 kg), bonnet (SS Grade A), stem (SS SS Grade A — solid round, high value per kg), disc (SS or PTFE — segregate), seat (SS or Stellite — separate, Stellite to specialist alloy dealer), packing (polymer). Photograph all for DPP.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 8
+            }
+        ],
+        "estimated_total_time_min": 58
+    },
+    {
+        "id": "guide_globe_valve_dn80_dn150_pn40_pn100",
+        "part_class": "globe_valve",
+        "material_family": "stainless_steel",
+        "subtype": "globe_medium_bore",
+        "dn_min": 80,
+        "dn_max": 150,
+        "pressure_class": "PN100",
+        "ansi_class": "600",
+        "estimated_mass_kg_range": [
+            20,
+            90
+        ],
+        "crew_required": 2,
+        "source": "OEM Service Manual — Crane/Velan Globe Valve DN80–DN150 PN40/PN100 (Class 300/600)",
+        "part_number_tags": [
+            "DN80",
+            "DN100",
+            "DN125",
+            "DN150",
+            "PN40",
+            "PN100",
+            "Class300",
+            "Class600",
+            "3inch",
+            "4inch",
+            "6inch",
+            "globe_valve",
+            "high_pressure",
+            "RTJ_flange"
+        ],
+        "required_tools": [
+            "torque wrench 0–500 Nm calibrated",
+            "M20–M27 socket set (30mm, 36mm, 41mm AF)",
+            "RTJ (Ring-Type Joint) gasket removal tool",
+            "packing extractor",
+            "stem extraction tool (threaded rod M20)",
+            "lifting sling SWL ≥ 100 kg",
+            "hydraulic bonnet jack (if bonnet seized)"
+        ],
+        "bolt_sizes": [
+            "Bonnet bolts: 8× M20 × 100mm A4-80 stud + nut (DN80 PN40)",
+            "Bonnet bolts: 8× M24 × 120mm A4-80 stud + nut (DN100 PN100)",
+            "Bonnet bolts: 12× M27 × 140mm A4-80 stud + nut (DN150 PN100)",
+            "Torque: M20 A4-80 = 340 Nm; M24 = 480 Nm; M27 = 720 Nm (MoS2 lubricant)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Two-person LOTO. PN100 (Class 600) valves handle high-pressure steam or HT fluids — thermal soak time after isolation minimum 2 hours if >150°C service. Verify 0 bar AND temperature < 50°C before touching bonnet bolts. Wear face shield (not just safety glasses) for PN100 service.",
+                "tool_required": "calibrated_pressure_gauge_and_thermometer",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 2,
+                "action": "If RTJ flange connection: remove RTJ ring gasket (oval or octagonal, SS or Soft Iron). Use RTJ extractor — do NOT chisel. RTJ ring: segregate as SS or iron as appropriate (small but Grade A). If raised face: standard spiral wound gasket removal.",
+                "tool_required": "RTJ_removal_tool",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Remove bonnet bolts (8–12× M20/M24/M27, hydraulic torque wrench recommended at PN100. Cross-pattern 3-pass release). If bonnet seized: use bonnet jack in jacking holes. DN100 bonnet: ~15 kg. Use 2-person lift or sling.",
+                "tool_required": "torque_wrench_500Nm",
+                "safety_ref": null,
+                "estimated_time_min": 40
+            },
+            {
+                "step": 4,
+                "action": "Extract stem assembly: DN150 PN100 stem can be 30+ kg. Use threaded rod jig into stem threaded end for controlled extraction. Remove Belleville spring stack (note orientation). Remove lantern ring spacers if fitted.",
+                "tool_required": "stem_extraction_tool",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 5,
+                "action": "Remove disc from stem and inspect: DN100+ discs are typically SS hard-faced with Stellite #6 or Colmonoy. Stellite is cobalt-chromium alloy — segregate from SS. Contact specialist dealer (Kennametal, Deloro Stellite) for Stellite scrap value (₹800–1200/kg for clean Stellite).",
+                "tool_required": "disc_wrench_heavy",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 6,
+                "action": "Segregate by weight: body (SS Grade A, 10–60 kg), bonnet (SS Grade A, 8–30 kg), stem (SS Grade A — highest value per kg, solid bar), disc (SS Grade A or Stellite — separate), seat (SS or Stellite), packing (carbon/graphite polymer bin). Stellite to specialist alloy recycler only.",
+                "tool_required": "crane_scale_100kg",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            }
+        ],
+        "estimated_total_time_min": 155
+    },
+    {
+        "id": "guide_butterfly_valve_dn200_dn400_pn16",
+        "part_class": "butterfly_valve",
+        "material_family": "carbon_steel",
+        "subtype": "lug_wafer_medium",
+        "dn_min": 200,
+        "dn_max": 400,
+        "pressure_class": "PN16",
+        "ansi_class": "150",
+        "estimated_mass_kg_range": [
+            20,
+            120
+        ],
+        "crew_required": 2,
+        "source": "OEM Service Manual — Flowserve/Emerson Butterfly Valve DN200–DN400 PN16 (Lug/Wafer Body)",
+        "part_number_tags": [
+            "DN200",
+            "DN250",
+            "DN300",
+            "DN350",
+            "DN400",
+            "PN16",
+            "Class150",
+            "8inch",
+            "10inch",
+            "12inch",
+            "16inch",
+            "butterfly_valve",
+            "lug_type",
+            "wafer_type",
+            "concentric",
+            "elastomer_seat"
+        ],
+        "required_tools": [
+            "torque wrench 0–300 Nm",
+            "M16–M20 socket set (24mm, 30mm AF)",
+            "disk puller or 2-jaw puller (disc removal from shaft)",
+            "rubber seat removal spoon/hook",
+            "shaft bearing press (for bearing extraction)",
+            "lifting sling 100 kg SWL (DN350+)"
+        ],
+        "bolt_sizes": [
+            "Lug body through-bolts (to pipe flanges): 8× M16 × 55mm A2-70 (DN200 PN16)",
+            "Lug body through-bolts: 12× M20 × 65mm A2-70 (DN350 PN16)",
+            "Actuator bracket: 4× M12 × 40mm (ISO 5211 F07/F10 pad)",
+            "Torque: M16 A2-70 = 150 Nm; M20 = 240 Nm"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Two-person LOTO. Butterfly valves store elastic energy in seat/disc contact — do NOT open valve during disassembly (disc can snap open). Position disc at 10° open ONLY if needed for shaft access. Verify 0 bar. Pneumatic actuators: disconnect air and exhaust actuator spring to 0 bar.",
+                "tool_required": "loto_kit",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "Remove actuator: ISO 5211 mounting pad (4× M12). Note actuator weight — DN300 actuator: 20–40 kg. Use second worker to support actuator during unbolting. Disconnect feedback positioner cables before removal.",
+                "tool_required": "torque_wrench_and_actuator_support",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 3,
+                "action": "Remove disc from shaft: disc is keyed and pinned (taper pin or roll pin). Drive out taper pin with brass punch (never steel on a lined valve). For corroded square/key drive: use shaft puller — disc material DN200+: typically ductile iron with SS or rubber-coated disc.",
+                "tool_required": "disc_puller_and_brass_punch",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            },
+            {
+                "step": 4,
+                "action": "Remove elastomer seat: seat is compressed-fit inside body. Use rubber-seat removal spoon — work around circumference with even force. EPDM, NBR, or PTFE seats are Class C polymer waste — no scrap value but must not contaminate metal stream.",
+                "tool_required": "rubber_seat_removal_spoon",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 5,
+                "action": "Remove shaft/stem: drive shaft out using plastic or brass punch from non-actuator end. Remove upper and lower shaft bushings (PTFE or bronze). Bronze bushing: high value — segregate as copper alloy (₹420/kg). PTFE bushing: polymer bin.",
+                "tool_required": "shaft_press_or_punch",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 6,
+                "action": "Segregate: body (CI grade B ₹22/kg, CS grade B ₹37/kg, or SS grade A ₹105/kg — verify via magnet test), disc (verify material — SS Grade A, ductile iron Grade B, or rubber-lined disc = Class C), shaft (SS Grade A — solid, high value), seat (EPDM/NBR/PTFE — polymer bin Class C), bronze bushings (copper alloy Grade A), actuator to separate E-waste stream if electric.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 15
+            }
+        ],
+        "estimated_total_time_min": 110
+    },
+    {
+        "id": "guide_butterfly_valve_dn450_dn600_pn16",
+        "part_class": "butterfly_valve",
+        "material_family": "carbon_steel",
+        "subtype": "double_offset_large",
+        "dn_min": 450,
+        "dn_max": 600,
+        "pressure_class": "PN16",
+        "ansi_class": "150",
+        "estimated_mass_kg_range": [
+            150,
+            450
+        ],
+        "crew_required": 3,
+        "lifting_equipment_required": true,
+        "min_crane_swl_tonnes": 1.0,
+        "source": "OEM Service Manual — Emerson Fisher/Metso Large Bore Butterfly Valve DN450–DN600 PN16 (Double Offset)",
+        "part_number_tags": [
+            "DN450",
+            "DN500",
+            "DN600",
+            "PN16",
+            "Class150",
+            "18inch",
+            "20inch",
+            "24inch",
+            "large_butterfly",
+            "double_offset",
+            "triple_offset",
+            "PTFE_seat",
+            "metal_seat"
+        ],
+        "required_tools": [
+            "hydraulic torque wrench 0–2000 Nm",
+            "M24–M30 socket set (36mm, 41mm, 50mm AF)",
+            "1t+ overhead crane",
+            "disc sling 500 kg SWL",
+            "PTFE seat removal jig (OEM specific)",
+            "hydraulic shaft press 20t",
+            "magnetic particle inspection kit (if reuse assessment needed)"
+        ],
+        "bolt_sizes": [
+            "Body lug through bolts: 16× M24 × 80mm A4-80 (DN450 PN16)",
+            "Body lug through bolts: 20× M27 × 90mm A4-80 (DN600 PN16)",
+            "Actuator bracket: 8× M20 × 60mm (ISO 5211 F14/F16)",
+            "Torque: M24 A4-80 = 480 Nm; M27 = 720 Nm (MoS2)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "3-person PTW. Large butterfly valves (DN600) weigh 300–450 kg. All movement must be crane-assisted. Confirm crane operator certified and crane in good order. LOTO all actuators (often dual electric + manual). DN600 actuator can weigh 100+ kg separately.",
+                "tool_required": "crane_1t_swl",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 2,
+                "action": "Rig body to crane (body lifting lugs, 4-leg sling). Confirm load. Disconnect actuator coupling — note torque setting on positioner for DPP record. Remove actuator using second crane pick or forklift (actuator ≥ 80 kg for DN600).",
+                "tool_required": "crane_and_actuator_lift",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 3,
+                "action": "Remove lug bolts. Body remains on crane in slung position throughout for control. Separate from pipe flanges. Transport body to disassembly stand on crane — do NOT leave unsupported.",
+                "tool_required": "hydraulic_torque_wrench_2000Nm",
+                "safety_ref": null,
+                "estimated_time_min": 40
+            },
+            {
+                "step": 4,
+                "action": "Disc removal: large double-offset disc is taper-pinned. Use hydraulic pin extraction kit — taper pins in DN600 valves may require up to 50 kN to extract. DN600 disc alone: ~80 kg. Crane lowering required. Inspect disc and seat face for scoring — metal seat discs may be refaceable.",
+                "tool_required": "hydraulic_pin_extraction_and_crane",
+                "safety_ref": null,
+                "estimated_time_min": 45
+            },
+            {
+                "step": 5,
+                "action": "Shaft removal: DN600 shaft is typically 100–120mm dia, 400mm long, 30–50 kg. Use 20t hydraulic press. Spray penetrating oil on shaft/bushing interface 24h before if seized. Bronze journal bearings (copper alloy, Grade A) removed after shaft extraction.",
+                "tool_required": "hydraulic_press_20t",
+                "safety_ref": null,
+                "estimated_time_min": 40
+            },
+            {
+                "step": 6,
+                "action": "Remove PTFE or graphite packing seat using OEM-specific seat jig. PTFE seat: polymer Class C. Metal seat (SS or Stellite-faced): SS Grade A or Stellite specialist. Weigh all streams with crane scale for DPP accuracy.",
+                "tool_required": "seat_removal_jig_and_crane_scale",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 7,
+                "action": "Segregate: body (CS Grade B ₹37/kg or SS Grade A ₹105/kg, 80–300 kg), disc (ductile iron/CS/SS per grade, 30–100 kg), shaft (SS/CS — verify, 30–50 kg), bronze bushings (copper alloy Grade A, ₹420/kg), PTFE seat (polymer Class C), actuator (WEEE — electric actuators to authorised e-waste processor, pneumatic to scrap). All streams weighed by crane scale.",
+                "tool_required": "crane_scale",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            }
+        ],
+        "estimated_total_time_min": 245
+    },
+    {
+        "id": "guide_centrifugal_pump_small_up_to_15kw",
+        "part_class": "centrifugal_pump",
+        "material_family": "stainless_steel",
+        "subtype": "end_suction_small",
+        "dn_min": null,
+        "dn_max": null,
+        "pressure_class": "PN16",
+        "power_class_kw_max": 15,
+        "estimated_mass_kg_range": [
+            10,
+            50
+        ],
+        "crew_required": 1,
+        "source": "OEM Service Manual — Grundfos/KSB/Flowserve End-Suction Centrifugal Pump up to 15kW",
+        "part_number_tags": [
+            "centrifugal_pump",
+            "end_suction",
+            "single_stage",
+            "up_to_15kW",
+            "PN16",
+            "impeller",
+            "mechanical_seal",
+            "back_pullout"
+        ],
+        "required_tools": [
+            "torque wrench 50–250 Nm",
+            "bearing puller (2-jaw and 3-jaw set)",
+            "impeller puller tool or drawbolt M12",
+            "M10–M16 socket set",
+            "circlip pliers (internal and external)",
+            "rubber mallet",
+            "mechanical seal installation sleeve"
+        ],
+        "bolt_sizes": [
+            "Pump casing bolts: 4× M12 × 50mm A2-70 (split casing small pumps)",
+            "Bearing housing bolts: 4× M10 × 35mm A2-70",
+            "Backplate/lantern piece: 6× M10 × 40mm A2-70",
+            "Impeller nut: M14 RH or LH thread (verify OEM — some pumps LH thread impeller)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "De-energize motor: LOTO electrical supply. Isolate suction and discharge flanges. Open casing vent to atmosphere. Drain casing via ¾\" drain plug — small pump: ~2 L. Check mechanical seal area for weeping (indicates seal wear — handle seal with PPE if toxic/corrosive service).",
+                "tool_required": "loto_kit",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "Disconnect coupling: remove coupling guard. Mark coupling halves for reassembly reference. Remove coupling bolts. Slide back flexible insert or spider element (nitrile rubber — polymer waste). Separate pump from motor (if close-coupled). Motor: WEEE stream — separate from mechanical pump.",
+                "tool_required": "coupling_puller_and_M10_socket",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "Remove casing bolts. Separate casing halves (for split casing) OR remove back pullout assembly (for end-suction): impeller + shaft + seal + bearing housing come out as one unit — back pullout design means pipework stays in place. Mark mating faces.",
+                "tool_required": "torque_wrench_250Nm",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 4,
+                "action": "Remove impeller: hold shaft (use shaft holding tool or strap wrench on coupling end). Unscrew impeller nut (verify thread direction — many pumps use LH thread to prevent loosening during operation). Use impeller draw-bolt if stuck. Inspect impeller for cavitation pitting — Grade A if serviceable, Grade B if pitted.",
+                "tool_required": "impeller_puller_and_shaft_holder",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 5,
+                "action": "Remove mechanical seal: spring-loaded — compress spring and release from shaft groove. Handle seal faces with lint-free gloves — ceramic or silicon carbide faces fracture if dropped. Seal faces: silicon carbide (Class C ceramic). Seat: carbon/graphite (Class C).",
+                "tool_required": "mechanical_seal_sleeve",
+                "safety_ref": null,
+                "estimated_time_min": 10
+            },
+            {
+                "step": 6,
+                "action": "Remove bearings from shaft using bearing puller (2-jaw for small bearings, OD < 100mm). Mark bearing position (drive end vs non-drive end). Inspect grease — dark brown = overheated, milky = water ingress. Bearings: steel (Class B ferrous).",
+                "tool_required": "bearing_puller_2jaw",
+                "safety_ref": null,
+                "estimated_time_min": 15
+            },
+            {
+                "step": 7,
+                "action": "Segregate: casing (CI Grade B ₹22/kg or SS Grade A ₹105/kg — test with magnet), impeller (SS Grade A or bronze ₹420/kg — test with magnet — bronze impeller is non-magnetic), shaft (SS Grade A, solid round bar), bearings (steel Grade B), mechanical seal (ceramic + carbon — Class C polymer/ceramic bin), coupling (SS/CI/polymer per type), motor → separate WEEE stream.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 15
+            }
+        ],
+        "estimated_total_time_min": 100
+    },
+    {
+        "id": "guide_centrifugal_pump_medium_15_to_75kw",
+        "part_class": "centrifugal_pump",
+        "material_family": "stainless_steel",
+        "subtype": "split_casing_medium",
+        "dn_min": null,
+        "dn_max": null,
+        "pressure_class": "PN40",
+        "power_class_kw_min": 15,
+        "power_class_kw_max": 75,
+        "estimated_mass_kg_range": [
+            60,
+            250
+        ],
+        "crew_required": 2,
+        "lifting_equipment_required": true,
+        "min_crane_swl_tonnes": 0.5,
+        "source": "OEM Service Manual — KSB Etanorm/Flowserve PVMX/Grundfos NK Split-Casing Centrifugal Pump 15–75kW",
+        "part_number_tags": [
+            "centrifugal_pump",
+            "split_casing",
+            "between_bearings",
+            "15kW",
+            "37kW",
+            "75kW",
+            "PN40",
+            "heavy_duty",
+            "double_suction"
+        ],
+        "required_tools": [
+            "hydraulic bearing puller (OD up to 250mm, 10t capacity)",
+            "torque wrench 0–500 Nm calibrated",
+            "M12–M24 socket set (19mm–36mm AF)",
+            "shaft alignment laser tool",
+            "upper casing lift frame or lifting eyes in casing",
+            "overhead crane 500 kg SWL",
+            "mechanical seal installation fixture",
+            "micrometer (0–50mm) for shaft runout",
+            "shaft coupling alignment gauges"
+        ],
+        "bolt_sizes": [
+            "Casing parting plane bolts: 8× M16 × 80mm A2-70 (30kW pump)",
+            "Casing parting plane bolts: 12× M20 × 100mm A2-70 (75kW pump)",
+            "Bearing housing bolts: 4× M14 × 60mm A2-70 (both ends)",
+            "Impeller locknut: M24 or M30 per shaft size (LH thread — common on this class)",
+            "Torque: M20 A2-70 = 230 Nm; M24 = 380 Nm"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Two-person LOTO. 30–75kW pump + motor sets weigh 100–300 kg combined. Plan crane movements before starting. Isolate motor, suction, and discharge. Open vent valves — verify 0 bar. Drain casing (large pumps hold 10–25 L). Note: double-suction pump has TWO suction isolation points.",
+                "tool_required": "calibrated_pressure_gauge",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 2,
+                "action": "Disconnect motor coupling: note coupling type (elastic jaw — replace spider element at disassembly; gear coupling — drain grease; disc coupling — no lube). Mark all rotational alignments with paint marker. P2 supports motor coupling while P1 removes bolts. Motor weight: 30kW = ~200 kg — crane required.",
+                "tool_required": "crane_and_coupling_tools",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 3,
+                "action": "Attach lifting frame to upper casing (threaded lifting eyes in parting plane). Remove parting plane bolts (8–12× M16/M20, cross-pattern). Tap upper casing with rubber mallet — do NOT pry at sealing faces. Lift upper casing with crane, set on wooden blocks (cradle). Casing half weight: 30–80 kg.",
+                "tool_required": "crane_500kg_and_torque_wrench",
+                "safety_ref": null,
+                "estimated_time_min": 35
+            },
+            {
+                "step": 4,
+                "action": "Lift shaft + impeller assembly from lower casing using shaft lifting sling (sling under both bearing journals — never on impeller). For double-suction impeller: key-locked centre impeller, use draw-bolt puller. Impeller + shaft: 15–50 kg crane-assisted. Check shaft runout (dial gauge at seal area: max 0.05mm TIR acceptable).",
+                "tool_required": "crane_and_shaft_sling",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 5,
+                "action": "Remove bearings using 10t hydraulic bearing puller. Deep groove ball or angular contact bearings (drive end: radial + thrust, non-drive end: radial only). Record bearing numbers from stamping — SKF or FAG part no. confirms bearing size class. Bearings (steel, Grade B ferrous).",
+                "tool_required": "hydraulic_bearing_puller_10t",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 6,
+                "action": "Remove mechanical seals (typically 2× — one each end for between-bearings design). Cartridge seals: remove as unit. Component seals: remove spring, mating ring, primary ring in sequence. Seal material: SS Grade A (gland plate + follower), silicon carbide faces (Class C ceramic), PTFE gasket (Class C polymer).",
+                "tool_required": "mechanical_seal_tools",
+                "safety_ref": null,
+                "estimated_time_min": 20
+            },
+            {
+                "step": 7,
+                "action": "Segregate by crane scale: upper casing (CI/SS Grade B/A, 30–80 kg), lower casing (CI/SS Grade B/A, 30–80 kg), shaft (SS/CS Grade A/B, 8–25 kg — solid round bar, weigh carefully), impeller (SS, bronze, or ductile iron — magnet test to distinguish, 5–20 kg), bearing housings (CI Grade B), bearings (steel Grade B), mechanical seal hardware (SS gland plate Grade A, ceramic/polymer Class C), motor → WEEE.",
+                "tool_required": "crane_scale_500kg",
+                "safety_ref": null,
+                "estimated_time_min": 25
+            }
+        ],
+        "estimated_total_time_min": 180
+    },
+
+    {
+        "id": "guide_lithium_ion_battery",
+        "part_class": "battery",
+        "material_family": "lithium_compound",
+        "subtype": "lithium_ion_18650_or_pack",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / IEC 62133 / IATA DGR Section 3.9",
+        "part_number_tags": ["battery", "li-ion", "lithium", "18650", "lipo", "li_polymer", "battery_pack", "cell"],
+        "required_tools": [
+            "cut-resistant nitrile gloves (min. 0.5mm)",
+            "safety goggles (chemical splash rated)",
+            "fire-retardant storage bag or metal container with sand",
+            "non-sparking plastic tongs",
+            "CPCB-authorised battery collection bin",
+            "damage assessment checklist"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "VISUAL INSPECTION FIRST. Do NOT touch the battery yet. Check for: swelling/bulging, cracks, leaking electrolyte (white crystalline residue), burn marks, or strong odour. If any of these are present, treat as DANGER — use tongs, do not handle bare-handed.",
+                "tool_required": "damage_assessment_checklist",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 2,
+                "action": "Put on cut-resistant nitrile gloves and safety goggles before picking up the battery. If battery is swollen or leaking, place it immediately into a fire-retardant bag or a metal container filled with dry sand. Do NOT put in plastic bins or near flammable materials.",
+                "tool_required": "nitrile_gloves_safety_goggles",
+                "safety_ref": "IATA_DGR_Section_3.9",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "Label the battery condition: GOOD / DAMAGED / LEAKING. Mark collection bin accordingly. Lithium batteries must never be placed in general waste bins or kerbside recycling — they cause bin fires.",
+                "tool_required": "labelling_tape_marker",
+                "safety_ref": "Basel_Convention_Annex_VIII_A1180",
+                "estimated_time_min": 2
+            },
+            {
+                "step": 4,
+                "action": "Place battery in a CPCB-authorised e-waste battery collection bin. Do NOT crush, puncture, disassemble, or incinerate lithium batteries. Short-circuiting causes thermal runaway — keep terminals covered with non-conductive tape if exposed.",
+                "tool_required": "CPCB_battery_collection_bin",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 5,
+                "action": "Log batch to digital record: battery type, estimated quantity, condition grade, date, collection center. Route to Producer Responsibility Organisation (PRO) registered under CPCB for downstream recycling. Authorised recyclers: Attero Recycling, Eco Recycling Ltd (Ecoreco), E-Parisaraa.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 18
+    },
+
+    {
+        "id": "guide_pcb_circuit_board",
+        "part_class": "circuit_board",
+        "material_family": "FR4_fibreglass",
+        "subtype": "printed_circuit_board_pcb",
+        "source": "E-Waste (Management) Rules 2022 (India) / EU WEEE Directive 2012/19/EU / RoHS 3 Directive 2015/863",
+        "part_number_tags": ["pcb", "circuit_board", "motherboard", "logic_board", "PCB", "printed_circuit", "FR4", "green_board", "BGA", "SMD"],
+        "required_tools": [
+            "nitrile gloves",
+            "anti-static bag or ESD tray",
+            "e-waste collection bin (labelled WEEE)",
+            "lead dust caution label",
+            "magnifying glass for component check"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Put on nitrile gloves. PCBs from pre-2006 equipment likely contain lead solder (Pb > 0.1%) — a RoHS-restricted substance. Do not touch solder joints bare-handed, do not eat or drink near PCBs. Wash hands after handling.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": "RoHS3_Directive_2015_863",
+                "estimated_time_min": 2
+            },
+            {
+                "step": 2,
+                "action": "Check for intact vs damaged status. If PCB has visible burns, cracks, or component leakage (capacitor swelling, liquid residue), handle with extra care — damaged capacitors may contain dielectric fluid. Place in sealed anti-static bag.",
+                "tool_required": "anti_static_bag",
+                "safety_ref": "REACH_SVHC_EC1907_2006",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "Do NOT attempt to desolder or disassemble components unless at a certified e-waste processor facility. Heating PCBs releases toxic fumes (brominated flame retardants, lead vapour). Route to authorised WEEE processor.",
+                "tool_required": null,
+                "safety_ref": "WEEE_Directive_2012_19_EU",
+                "estimated_time_min": 2
+            },
+            {
+                "step": 4,
+                "action": "Sort into WEEE collection bin. Label batch: quantity, board size estimate (small/medium/large), lead solder suspected (yes/no). Authorised Indian recyclers: E-Parisaraa (Bangalore), Attero Recycling (Roorkee), Eco Recycling Ltd (Mumbai). Do not mix PCBs with general metal scrap.",
+                "tool_required": "WEEE_collection_bin",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 5,
+                "action": "Log to DPP: board type, estimated Pb content risk (pre/post 2006), quantity (count or weight), date collected. Bulk PCB scrap has commodity value: gold-bearing boards (servers, telecoms) command ₹200–500/kg at authorised processors. Do not sell to informal kabadiwala for PCBs — illegal under E-Waste Rules 2022.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 19
+    },
+
+    {
+        "id": "guide_mobile_device",
+        "part_class": "mobile_device",
+        "material_family": "lithium_compound",
+        "subtype": "smartphone_tablet_laptop",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / IEC 62321 / Basel Convention",
+        "part_number_tags": ["mobile", "smartphone", "phone", "tablet", "laptop", "notebook", "mobile_device", "handheld"],
+        "required_tools": [
+            "nitrile gloves",
+            "WEEE collection bin",
+            "data wipe confirmation label",
+            "anti-static bag"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "IMPORTANT: Ensure personal data is wiped before disposal. Device must be factory-reset or physically confirmed as data-erased. Unreset devices pose a data security and privacy violation risk.",
+                "tool_required": "data_wipe_confirmation_label",
+                "safety_ref": "IT_Act_2000_India_Data_Privacy",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 2,
+                "action": "Check battery condition visually. If device back cover is bulging (swollen battery), handle as per battery guide — do not press or try to open. Place in fire-retardant container.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": "IATA_DGR_Section_3.9",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 3,
+                "action": "Remove any SIM cards and memory cards before collection — these are not recyclable via WEEE and contain personal data. Store separately and destroy if required.",
+                "tool_required": "SIM_ejector_pin",
+                "safety_ref": null,
+                "estimated_time_min": 2
+            },
+            {
+                "step": 4,
+                "action": "Place device in WEEE e-waste collection bin. Do NOT disassemble unless at a certified facility. Mobile devices contain lead, cadmium, mercury (in older LCDs), brominated flame retardants, and lithium — all require specialist recycling.",
+                "tool_required": "WEEE_collection_bin",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 2
+            },
+            {
+                "step": 5,
+                "action": "Log batch: device type (smartphone/tablet/laptop), brand if visible, quantity, condition (working/faulty/screen damaged/dead). Route to Producer Responsibility Organisation (PRO). Working devices can be refurbished — flag as 'REFURB CANDIDATE' if screen and chassis are intact.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 17
+    },
+
+    {
+        "id": "guide_plastic_waste",
+        "part_class": "plastic_waste",
+        "material_family": "polypropylene",
+        "subtype": "plastic_recyclable_general",
+        "source": "Plastic Waste Management Rules 2016 (India MoEFCC) / ISO 14021",
+        "part_number_tags": ["plastic", "PET", "HDPE", "PP", "polypropylene", "polyethylene", "plastic_bottle", "plastic_container", "polymer"],
+        "required_tools": [
+            "sorting gloves",
+            "recycling stream bins (colour-coded)",
+            "resin ID reference card"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Check the resin identification code (triangle with number) on the item. 1=PET, 2=HDPE, 3=PVC, 4=LDPE, 5=PP, 6=PS, 7=Other. PVC (3) and PS (6) require specialist recycling — do not mix with clean recyclables.",
+                "tool_required": "resin_ID_reference_card",
+                "safety_ref": "Plastic_Waste_Management_Rules_2016",
+                "estimated_time_min": 2
+            },
+            {
+                "step": 2,
+                "action": "Empty and rinse containers. Contaminated plastic (food residue, chemicals, oil) is NOT recyclable — contaminated plastics go to waste-to-energy or landfill stream. Clean plastic commands better value.",
+                "tool_required": "rinse_station",
+                "safety_ref": null,
+                "estimated_time_min": 3
+            },
+            {
+                "step": 3,
+                "action": "Sort by resin type into colour-coded bins: PET (clear/green bin), HDPE (blue), PP (orange), mixed (grey). Flatten bottles and containers to save bin space. Remove caps if different resin from container.",
+                "tool_required": "sorting_bins",
+                "safety_ref": null,
+                "estimated_time_min": 5
+            },
+            {
+                "step": 4,
+                "action": "Log batch weight per resin type. Authorised India buyers: PET — Reliance Industries, ONGC Petro Additions. HDPE — Shriram Polymers, Kolkata recyclers. PP — Gharda Chemicals. India 2022 rules mandate separate collection of Category 1 (rigid) and Category 2 (flexible) plastic.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "Plastic_Waste_Management_Rules_2016",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 15
+    },
+
+    {
+        "id": "guide_ewaste_general",
+        "part_class": "ewaste",
+        "material_family": "unknown",
+        "subtype": "general_electronic_waste",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / EU WEEE Directive 2012/19/EU",
+        "part_number_tags": ["ewaste", "e-waste", "electronic_waste", "cable", "charger", "adapter", "power_supply", "monitor", "display", "keyboard", "printer", "scanner", "electronic"],
+        "required_tools": [
+            "nitrile gloves",
+            "WEEE collection bin",
+            "condition label"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "Put on nitrile gloves. Identify the item category: Large household equipment (fridges, washing machines), Small household equipment (toasters, kettles), IT/telecoms equipment, Consumer electronics, Lighting, or Monitoring instruments.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 2,
+                "action": "Check for hazardous sub-components: batteries (remove separately per battery guide), CRT screens (contain lead and barium — do not break), fluorescent lamps (contain mercury — handle unbroken), capacitors (may contain PCBs in older industrial equipment).",
+                "tool_required": null,
+                "safety_ref": "Basel_Convention_Annex_VIII",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "Assess refurb potential: if item is functional or has minor fault, label as 'REFURB CANDIDATE' — do not crush or disassemble. Refurbishment extends product life and avoids e-waste. Route to refurb stream if applicable.",
+                "tool_required": "condition_label",
+                "safety_ref": null,
+                "estimated_time_min": 5
+            },
+            {
+                "step": 4,
+                "action": "Route to CPCB-authorised WEEE collection point or Producer Responsibility Organisation (PRO). Never discard e-waste in municipal solid waste — illegal under E-Waste (Management) Rules 2022. Penalty: ₹1 lakh or imprisonment.",
+                "tool_required": "WEEE_collection_bin",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 5,
+                "action": "Log batch: item type, quantity, weight estimate, condition, date. Authorised bulk e-waste recyclers in India: Attero Recycling, E-Parisaraa, Eco Recycling Ltd (Ecoreco), Karo Sambhav PRO, Manufacturers' EPR portals.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 21
+    },
+
+    {
+        "id": "guide_display_monitor",
+        "part_class": "display_screen",
+        "material_family": "glass_silica",
+        "subtype": "lcd_led_crt_monitor",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / EU WEEE Directive 2012/19/EU / Basel Convention Annex VIII A1180",
+        "part_number_tags": ["monitor", "display", "screen", "lcd", "led_display", "crt", "tft", "oled", "tv", "television", "panel"],
+        "required_tools": [
+            "nitrile gloves",
+            "safety goggles",
+            "CRT caution label (if applicable)",
+            "WEEE collection bin",
+            "bubble wrap or foam for CRT"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "CRITICAL — IDENTIFY TYPE FIRST. CRT monitors/TVs contain lead oxide glass (15–30% Pb by weight) and stored high voltage. LCD/LED screens may have mercury fluorescent backlights (pre-2010 models). Check label on back for model info.",
+                "tool_required": "safety_goggles_nitrile_gloves",
+                "safety_ref": "Basel_Convention_Annex_VIII_A1180",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 2,
+                "action": "FOR CRT DISPLAYS: Do NOT break or crush — lead glass shards are hazardous. Do not attempt to discharge the tube. Place upright in foam/bubble wrap cradle. Mark 'CRT — HAZARDOUS — DO NOT CRUSH'. Route ONLY to CRT-certified recyclers. In India: E-Parisaraa (Bangalore), Eco Recycling Ltd.",
+                "tool_required": "CRT_caution_label_foam_cradle",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "FOR LCD/LED DISPLAYS: Pre-2010 LCD backlights likely contain mercury fluorescent tubes. If screen is cracked and you see thin white tubes behind the panel, handle with extra care — mercury vapour is toxic. Do not vacuum broken LCD panels.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": "REACH_SVHC_EC1907_2006",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 4,
+                "action": "Separate removable cables, stands, and external power bricks — these route to different e-waste streams. Power bricks are separate WEEE items. Cables go to cable recycling. The panel/screen unit is the primary WEEE item.",
+                "tool_required": null,
+                "safety_ref": null,
+                "estimated_time_min": 3
+            },
+            {
+                "step": 5,
+                "action": "Log to DPP: screen type (CRT/LCD/LED/OLED), size (inches), brand, condition (working/cracked/dead), mercury risk (yes=pre-2010, no=post-2010 LED). Route to CPCB-authorised WEEE processor. Recovery value: LCD aluminium frame and PCB assets. OLED panels have rare earth recovery potential.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 19
+    },
+
+    {
+        "id": "guide_hard_drive_ssd",
+        "part_class": "storage_device",
+        "material_family": "neodymium_magnet_aluminum",
+        "subtype": "hdd_ssd_storage",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / NIST SP 800-88 (Data Sanitisation) / EU WEEE Directive",
+        "part_number_tags": ["hard_drive", "hdd", "ssd", "harddisk", "storage", "disk_drive", "solid_state", "nvme", "hard_disk"],
+        "required_tools": [
+            "nitrile gloves",
+            "data wipe certificate or degausser record",
+            "WEEE e-waste bin",
+            "anti-static bag"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "DATA SECURITY FIRST — MANDATORY. Before disposal, confirm data has been securely erased via NIST 800-88 overwrite software (DBAN/Eraser), degaussing for HDDs, or physical destruction for SSDs. Obtain a data destruction certificate for corporate assets.",
+                "tool_required": "data_wipe_certificate",
+                "safety_ref": "IT_Act_2000_India_Data_Privacy",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "HDD SPECIFIC: Hard disk drives contain high-strength neodymium rare-earth magnets — valuable for recycling but must not be swallowed or placed near cardiac devices or credit cards. Also contain aluminium platters, copper coil voice actuator — all recoverable at specialist recyclers.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": null,
+                "estimated_time_min": 3
+            },
+            {
+                "step": 3,
+                "action": "SSD SPECIFIC: SSDs contain NAND flash that may retain data — must use ATA Secure Erase or NVMe Format commands, or physical destruction. Place in anti-static bag. SSDs also have small PCBs with gold contacts — route to PCB recycler.",
+                "tool_required": "anti_static_bag",
+                "safety_ref": "NIST_SP_800-88",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 4,
+                "action": "Sort into WEEE bin. Label: HDD or SSD, capacity if known, data wiped (yes/no + method), condition (functional/clicking/dead). Server-class 3.5\" HDDs have higher neodymium magnet recovery value — flag separately.",
+                "tool_required": "WEEE_collection_bin",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 5,
+                "action": "Route to CPCB-authorised e-waste recycler. Functional drives under 5 years may qualify for refurbishment — flag as 'REFURB CANDIDATE'. Authorised Indian recyclers with HDD shredding: Attero Recycling, E-Parisaraa. Recovery value: neodymium magnets (~31% Nd by weight), aluminium, copper.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 26
+    },
+
+    {
+        "id": "guide_smps_power_supply",
+        "part_class": "power_supply",
+        "material_family": "ferrite_copper",
+        "subtype": "switch_mode_power_supply",
+        "source": "E-Waste (Management) Rules 2022 (India) / IEC 62368-1 / EU WEEE Directive",
+        "part_number_tags": ["power_supply", "psu", "smps", "adapter", "charger", "ups", "inverter", "power_brick", "ac_adapter", "dc_adapter", "power_unit"],
+        "required_tools": [
+            "nitrile gloves",
+            "non-contact voltage tester (NCV tester)",
+            "WEEE bin"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "CAPACITOR HAZARD. Power supplies contain large electrolytic capacitors that can hold dangerous charge (up to 400V DC) even when unplugged. DO NOT open the casing unless at a certified facility. If casing is cracked, do not touch internal components. Allow 30 minutes for discharge before any handling.",
+                "tool_required": "NCV_tester",
+                "safety_ref": "IEC_62368_1",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 2,
+                "action": "Identify type: laptop power brick (external, ≤20V), desktop PSU (12V/5V/3.3V), industrial SMPS (24–48V DIN rail), UPS/inverter (battery-backed). UPS units also contain sealed lead-acid batteries — remove battery first per battery guide before routing UPS casing to WEEE.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": null,
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "For UPS/inverter: Remove the sealed lead-acid battery first — lead-acid batteries contain sulphuric acid — do not tip. Route battery to authorised lead-acid battery recycler (separate stream from Li-ion). PSU casing contains copper transformer windings, ferrite cores, aluminium heatsink — high recovery value.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": "Basel_Convention_Annex_VIII_A1180",
+                "estimated_time_min": 8
+            },
+            {
+                "step": 4,
+                "action": "Place intact PSU/SMPS in WEEE bin. Label: type (laptop brick/desktop PSU/UPS/industrial), wattage, condition, battery removed (yes/no for UPS). Do not attempt desoldering outside certified facility — solder may be leaded.",
+                "tool_required": "WEEE_collection_bin",
+                "safety_ref": "RoHS3_Directive_2015_863",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 5,
+                "action": "Log to DPP: type, wattage, brand, condition. Recovery: copper (transformer windings), ferrite core, aluminium heatsink, steel enclosure. Desktop PSUs (500–1000W) have 400–600g copper — significant scrap value. Route to E-Parisaraa or Attero for component-level recovery.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 26
+    },
+
+    {
+        "id": "guide_lighting_lamp",
+        "part_class": "lighting",
+        "material_family": "glass_phosphor",
+        "subtype": "led_cfl_fluorescent_lamp",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / Basel Convention / Minamata Convention on Mercury",
+        "part_number_tags": ["lamp", "bulb", "fluorescent", "cfl", "led_bulb", "led_tube", "tube_light", "hid", "halogen", "sodium_vapour", "lighting", "light_fixture"],
+        "required_tools": [
+            "nitrile gloves",
+            "mercury spill kit (for fluorescent/CFL breakage)",
+            "sealed plastic bag",
+            "lamp recycling bin"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "IDENTIFY LAMP TYPE. LED bulbs/tubes: safest, no mercury. CFL (compact fluorescent): spiral tube, contains 3–5mg mercury — DO NOT BREAK. Linear fluorescent tubes (T8/T5/T12): 5–10mg mercury. HID (sodium vapour, metal halide): highest mercury content. Mercury content is on the lamp spec label.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": "Minamata_Convention_Mercury",
+                "estimated_time_min": 2
+            },
+            {
+                "step": 2,
+                "action": "FOR FLUORESCENT/CFL/HID: Transport UNBROKEN. If lamp breaks: vacate area 15 minutes for mercury vapour to disperse. Do NOT vacuum (spreads mercury). Use damp paper towel to collect fragments, place in sealed double plastic bags. Treat as hazardous waste. Notify site safety officer.",
+                "tool_required": "mercury_spill_kit",
+                "safety_ref": "Basel_Convention_Annex_VIII_A1180",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "FOR LED BULBS: Safe to handle without special precautions. However, LED driver PCBs may contain lead solder — use gloves. LED chips contain indium, gallium (rare metals) recoverable at specialist facilities. Do not mix with general glass recycling.",
+                "tool_required": "nitrile_gloves",
+                "safety_ref": null,
+                "estimated_time_min": 2
+            },
+            {
+                "step": 4,
+                "action": "Do NOT dispose of any lamps in general waste bins. Mercury-containing lamps are classified as hazardous waste under Basel Convention. LED lamps should go to WEEE stream. Separate mercury lamps from LED lamps in collection.",
+                "tool_required": "lamp_recycling_bin",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 3
+            },
+            {
+                "step": 5,
+                "action": "Log batch: type (LED/CFL/T8/T5/HID), quantity, broken units (count separately), condition. Route CFL/fluorescent to mercury lamp recycler. India: Philips India take-back (MyLamp programme), Wipro Eco Energy lamp recycling. LED recovery: aluminium heatsink, copper wires, rare earth phosphors (yttrium, terbium).",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 5
+            }
+        ],
+        "estimated_total_time_min": 17
+    },
+
+    {
+        "id": "guide_ev_hv_battery_pack",
+        "part_class": "ev_battery",
+        "material_family": "lithium_nickel_manganese_cobalt",
+        "subtype": "electric_vehicle_hv_battery_pack",
+        "source": "Battery Waste Management Rules 2022 (India) / IEC 62619 / UN 38.3 Transport Test",
+        "part_number_tags": ["ev_battery", "hv_battery", "battery_pack", "traction_battery", "electric_vehicle", "hybrid_battery", "nmc", "lfp", "high_voltage"],
+        "required_tools": [
+            "HV insulating gloves (Class 0, 1000V rated)",
+            "HV safety footwear",
+            "HV insulating mat",
+            "non-contact HV voltage tester (up to 1000V AC)",
+            "fire extinguisher (Class D or dry sand for lithium fires)",
+            "SWL-rated hoist (EV packs: 300–700kg)",
+            "HV trained technician (mandatory — 2 persons minimum)"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "MANDATORY: HV-trained technician only. EV battery packs operate at 200–800V DC — lethal voltage. Minimum 2-person rule. Wear Class 0 HV insulating gloves (tested to 1000V, pre-use inspect for pin-holes). Put on HV insulating footwear. Place HV insulating mat under work area. Never proceed alone.",
+                "tool_required": "HV_insulating_gloves_HV_footwear_HV_mat",
+                "safety_ref": "IEC_62619_Lithium_Secondary_Cells",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 2,
+                "action": "DISCHARGE AND ISOLATION. Confirm vehicle is powered off. Disconnect 12V auxiliary battery first. Wait 10 minutes for capacitors to discharge. Use non-contact HV tester to verify 0V at pack terminals before touching. Accident-damaged packs may be internally short-circuited — treat as live until verified.",
+                "tool_required": "NCV_HV_tester",
+                "safety_ref": "UN_38.3_Transport_Test",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 3,
+                "action": "FIRE MONITORING. Damaged lithium EV packs can enter thermal runaway hours or days after impact. Monitor for heat, swelling, smoke, or chemical odour. If any present: do NOT approach, evacuate 15m radius, call fire brigade. EV fires require large volumes of water to cool — standard fire extinguisher is insufficient.",
+                "tool_required": "fire_extinguisher_dry_sand",
+                "safety_ref": "Basel_Convention_Annex_VIII_A1180",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 4,
+                "action": "For intact packs: assess State of Health (SoH). Packs with >70% SoH may qualify for second-life stationary energy storage. Contact OEM or certified battery second-life aggregator. Below 70% SoH or physically damaged — proceed to certified recycler. Never open individual cells.",
+                "tool_required": "battery_SoH_tester",
+                "safety_ref": "Battery_Waste_Management_Rules_2022_India",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 5,
+                "action": "Transport under UN 38.3 compliant conditions: UN 3480 (lithium ion). Requires proper packaging, hazmat labelling, transport documentation. Route to authorised EV battery recycler. India: Attero Recycling, Log9 Materials. Recovery: lithium, cobalt, nickel, manganese (black mass) — high commodity value.",
+                "tool_required": "UN3480_transport_packaging",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 20
+            }
+        ],
+        "estimated_total_time_min": 80
+    },
+
+    {
+        "id": "guide_solar_pv_panel",
+        "part_class": "solar_panel",
+        "material_family": "crystalline_silicon",
+        "subtype": "monocrystalline_polycrystalline_pv_module",
+        "source": "E-Waste (Management) Rules 2022 (India MoEFCC) / IEC 61215 / IEC 62109",
+        "part_number_tags": ["solar_panel", "pv_panel", "solar_module", "photovoltaic", "monocrystalline", "polycrystalline", "thin_film", "solar"],
+        "required_tools": [
+            "HV insulating gloves",
+            "non-contact voltage tester",
+            "opaque cover/tarpaulin",
+            "two-person team for panels >20kg",
+            "lifting straps",
+            "edge protector foam"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "LIVE VOLTAGE HAZARD. Solar panels generate electricity in ANY light — even cloudy conditions. Cover completely with opaque tarpaulin/black plastic sheet before handling. Verify 0V at terminals with NCV tester before handling connectors. Do NOT assume panel is safe because inverter is off.",
+                "tool_required": "opaque_cover_NCV_tester",
+                "safety_ref": "IEC_62109_Safety_PV_Power_Converters",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "ASSESS PANEL CONDITION. Intact panel: low hazard. Cracked panel: silicon shards sharp — leather gloves over nitrile. Some thin-film panels (CdTe, CIGS) contain cadmium telluride and indium gallium selenide — toxic if inhaled. Cracked thin-film panels require sealed rigid container.",
+                "tool_required": "HV_insulating_gloves",
+                "safety_ref": "Basel_Convention_Annex_VIII_A1180",
+                "estimated_time_min": 5
+            },
+            {
+                "step": 3,
+                "action": "Disconnect DC cables at MC4 connectors. Do NOT cut DC cables under load — arc flash risk. Cover panel first, verify 0V, then disconnect. Label connectors with polarity markers. Separate inverter, mounting rail, and junction box as different recyclable components.",
+                "tool_required": "MC4_wrench_NCV_tester",
+                "safety_ref": "IEC_62109_Safety_PV_Power_Converters",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 4,
+                "action": "Transport individually with edge protectors — glass breakage risk. Stack horizontally, max 3 high, foam between each. Label: technology (mono-Si/poly-Si/thin-film), wattage, manufacturer, year, condition (intact/cracked). Thin-film panels MUST be flagged — separate hazmat handling required for CdTe technology.",
+                "tool_required": "edge_protector_foam_lifting_straps",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 5,
+                "action": "Route to solar panel recycler. In India: log with MNRE e-waste portal or contact manufacturer take-back scheme. Recovery: tempered glass (94% by weight), aluminium frame, copper wiring, silicon cells, silver contact paste. Panels under 20 years may have second-life potential in off-grid applications — flag for assessment.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 10
+            }
+        ],
+        "estimated_total_time_min": 45
+    },
+
+    {
+        "id": "guide_plc_control_panel",
+        "part_class": "control_panel",
+        "material_family": "stainless_steel",
+        "subtype": "plc_scada_control_panel",
+        "source": "E-Waste (Management) Rules 2022 (India) / IEC 61010-1 / OSHA 1910.147",
+        "part_number_tags": ["plc", "control_panel", "scada", "hmi", "cabinet", "switchgear", "mcc", "control_system", "industrial_controller", "dcs", "relay_panel"],
+        "required_tools": [
+            "LOTO lockout/tagout kit (multi-lock hasp)",
+            "multi-meter (CAT III 600V rated)",
+            "insulating gloves (Class 0)",
+            "screwdriver set (Phillips, flat, Torx)",
+            "anti-static wrist strap",
+            "asset inventory form"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "LOTO MANDATORY. Control panels may carry 415V AC three-phase. Apply multi-lock LOTO hasp to main isolator. Verify zero energy with CAT III multi-meter at main bus bars. Post warning signs. Check for UPS-backed circuits that remain live after main isolation — these are separate energy sources.",
+                "tool_required": "LOTO_kit_CAT3_multimeter",
+                "safety_ref": "OSHA_1910.147",
+                "estimated_time_min": 20
+            },
+            {
+                "step": 2,
+                "action": "ASSET INVENTORY. Before removal, photograph and document: PLC model/firmware version, I/O module count, HMI model, SCADA license tags, safety relay modules (SIL-rated). Some PLCs and SCADA software licenses are transferable — notify IT/OT team before physical removal.",
+                "tool_required": "asset_inventory_form",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 3,
+                "action": "BATTERY-BACKED MEMORY. Most PLCs have a lithium coin cell (CR2032) or rechargeable backup battery for program memory retention. Ensure program backup is taken before battery removal — removing battery erases PLC program. Remove coin cells per lithium battery guide.",
+                "tool_required": "anti_static_wrist_strap_screwdriver",
+                "safety_ref": "E_Waste_Rules_2022_India",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 4,
+                "action": "Remove modules in reverse installation order. Label each with slot number and I/O type. High-value items for separate routing: CPU module (copper/gold contacts), IGBT/VFD drive modules (copper, aluminium heatsink), transformer (ferrite/copper), stainless enclosure. Wiring copper to cable recycler.",
+                "tool_required": "screwdriver_set",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 5,
+                "action": "Sort into streams: PCB modules → WEEE PCB route (E-Parisaraa, Attero). Copper cable → cable scrap. Steel enclosure → metal scrap. Power supplies → SMPS guide route. Log to DPP: PLC brand/model, I/O count, age, enclosure weight estimate. Medium MCC panel typically contains 8–15kg copper — significant recovery value.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 15
+            }
+        ],
+        "estimated_total_time_min": 105
+    },
+
+    {
+        "id": "guide_hvac_refrigerant_unit",
+        "part_class": "hvac",
+        "material_family": "copper_aluminum",
+        "subtype": "air_conditioning_refrigerant_unit",
+        "source": "E-Waste (Management) Rules 2022 (India) / Ozone Depleting Substances (Regulation) Rules 2000 / EU F-Gas Regulation 517/2014",
+        "part_number_tags": ["hvac", "air_conditioner", "ac_unit", "split_ac", "window_ac", "chiller", "refrigerator", "fridge", "heat_pump", "vrf", "cooling_unit", "compressor"],
+        "required_tools": [
+            "refrigerant recovery machine",
+            "manifold gauge set",
+            "nitrile gloves",
+            "certified refrigerant recovery cylinder",
+            "multi-meter",
+            "spanner set"
+        ],
+        "steps": [
+            {
+                "step": 1,
+                "action": "REFRIGERANT MUST BE RECOVERED BEFORE DISMANTLING — ILLEGAL TO VENT. Releasing refrigerants to atmosphere is banned under Ozone Depleting Substances Rules 2000 and Kigali Amendment. Identify refrigerant type from unit nameplate: R22 (banned from new production, ODP=0.055), R32/R410A/R134a (modern, zero ODP but HFC greenhouse gas).",
+                "tool_required": "refrigerant_recovery_machine",
+                "safety_ref": "ODS_Regulation_Rules_2000_India",
+                "estimated_time_min": 10
+            },
+            {
+                "step": 2,
+                "action": "REFRIGERANT RECOVERY (certified technician only). Connect manifold gauge set to service ports. Run recovery machine to transfer refrigerant into certified recovery cylinder. Log refrigerant weight recovered. Do not proceed until system pressure reaches recovery target (typically ≤5 psig).",
+                "tool_required": "refrigerant_recovery_machine_manifold_gauge",
+                "safety_ref": "Kigali_Amendment_Montreal_Protocol",
+                "estimated_time_min": 30
+            },
+            {
+                "step": 3,
+                "action": "COMPRESSOR OIL. Refrigerant compressors contain 0.5–2 litres of mineral or synthetic oil mixed with refrigerant residue — hazardous waste. Drain into approved waste oil container. Do NOT mix with other workshop oil. Route to authorised waste oil recycler.",
+                "tool_required": "nitrile_gloves_waste_oil_container",
+                "safety_ref": "Hazardous_Waste_Management_Rules_2016_India",
+                "estimated_time_min": 15
+            },
+            {
+                "step": 4,
+                "action": "COMPONENT SEGREGATION (after refrigerant removal). Strip for material recovery: copper refrigerant tubing (high value — very pure 8–15mm OD), aluminium fins/evaporator coil, compressor motor (copper windings + cast iron shell), steel cabinet, PCB controller board, capacitors (separate WEEE). HVAC has the highest copper density of common domestic appliances.",
+                "tool_required": "spanner_set",
+                "safety_ref": null,
+                "estimated_time_min": 30
+            },
+            {
+                "step": 5,
+                "action": "Log to DPP: unit type (split/window/cassette/chiller), refrigerant type and quantity recovered (kg), system tonnage (TR), brand, year, condition. Recovered refrigerant must go to authorised reprocessors — not resold for reuse unless properly processed. Recovery value: copper tubing ₹500–700/kg, aluminium ₹100–150/kg, compressor copper ₹200–350/kg.",
+                "tool_required": "digital_log_system",
+                "safety_ref": "E_Waste_Rules_2022_EPR",
+                "estimated_time_min": 10
+            }
+        ],
+        "estimated_total_time_min": 95
+    }
+]

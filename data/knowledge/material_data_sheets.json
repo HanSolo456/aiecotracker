@@ -1,0 +1,264 @@
+[
+    {
+        "id": "mds_316L_stainless",
+        "material_designation": "316L Stainless Steel",
+        "material_family": "stainless_steel",
+        "alloy_grade": "UNS_S31603",
+        "standard": "ASTM A240 / ASTM A276",
+        "density_g_cm3": 8.0,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 1.42,
+        "properties": {
+            "tensile_strength_mpa": 485,
+            "yield_strength_mpa": 170,
+            "hardness_HRB": 95,
+            "melting_point_c": 1390,
+            "corrosion_resistance": "Excellent — resistant to phosphoric acid, seawater, halogens at moderate temps"
+        },
+        "disassembly_notes": "Non-sparking cut with carbide tools. Separate from carbon steel before binning — mixed contamination downgrades to Class B. XRF verification recommended for high-value recovery.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_inconel_625",
+        "material_designation": "Inconel 625",
+        "material_family": "nickel_superalloy",
+        "alloy_grade": "UNS_N06625",
+        "standard": "ASTM B443 / ASME SB-443",
+        "density_g_cm3": 8.44,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 18.50,
+        "properties": {
+            "tensile_strength_mpa": 930,
+            "yield_strength_mpa": 517,
+            "hardness_HRB": 96,
+            "melting_point_c": 1350,
+            "corrosion_resistance": "Outstanding — seawater, acids, alkalis, high temp oxidation to 980°C"
+        },
+        "disassembly_notes": "HIGH VALUE — segregate immediately into dedicated Inconel bin. Do not mix with other Ni alloys (Inconel 718, Hastelloy) without XRF verification. Recovery value strongly justifies Grade A certification.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_titanium_6al4v",
+        "material_designation": "Titanium Ti-6Al-4V",
+        "material_family": "titanium_alloy",
+        "alloy_grade": "UNS_R56400",
+        "standard": "ASTM B265 / AMS 4928",
+        "density_g_cm3": 4.43,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 31.50,
+        "properties": {
+            "tensile_strength_mpa": 950,
+            "yield_strength_mpa": 880,
+            "hardness_HRC": 36,
+            "melting_point_c": 1660,
+            "corrosion_resistance": "Excellent — seawater, chlorides, dilute acids"
+        },
+        "disassembly_notes": "AEROSPACE GRADE. Verify part life limit status before recovery routing — life-expired titanium must be mutilated per FAA AC 20-62E and cannot re-enter parts supply chain. Non-life-expired Ti warrants certified scrap value.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_ptfe",
+        "material_designation": "Polytetrafluoroethylene (PTFE)",
+        "material_family": "fluoropolymer",
+        "alloy_grade": null,
+        "standard": "ASTM D1457",
+        "density_g_cm3": 2.2,
+        "recyclability_class": "C",
+        "recovery_value_usd_per_kg": 0.08,
+        "properties": {
+            "tensile_strength_mpa": 25,
+            "hardness_Shore_D": 55,
+            "melting_point_c": 327,
+            "chemical_resistance": "Exceptional — resistant to virtually all chemicals"
+        },
+        "disassembly_notes": "Low recovery value. Do NOT incinerate — at high temps PTFE releases perfluorooctanoic acid (PFOA), a persistent pollutant. Thermal processing at licensed fluoropolymer facility only. Bin as Class-C polymer.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_carbon_steel_A216",
+        "material_designation": "Carbon Steel ASTM A216 WCB",
+        "material_family": "carbon_steel",
+        "alloy_grade": "AISI_1020",
+        "standard": "ASTM A216",
+        "density_g_cm3": 7.85,
+        "recyclability_class": "B",
+        "recovery_value_usd_per_kg": 0.25,
+        "properties": {
+            "tensile_strength_mpa": 485,
+            "yield_strength_mpa": 250,
+            "hardness_HRB": 90,
+            "melting_point_c": 1480
+        },
+        "disassembly_notes": "Common valve and pump body material. Do not mix with stainless steel — density sensors and XRF will catch contamination. Carbon steel scrap value ~$0.25/kg vs 316L at $1.42/kg — segregation is important for revenue capture.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_hastelloy_c276",
+        "material_designation": "Hastelloy C-276",
+        "material_family": "nickel_superalloy",
+        "alloy_grade": "UNS_N10276",
+        "standard": "ASTM B575 / ASME SB-575",
+        "density_g_cm3": 8.89,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 22.00,
+        "properties": {
+            "tensile_strength_mpa": 785,
+            "yield_strength_mpa": 365,
+            "hardness_HRB": 100,
+            "melting_point_c": 1371,
+            "corrosion_resistance": "Superior — hydrochloric acid, chlorine, wet chlorine gas, hypochlorite, chlorine dioxide solutions"
+        },
+        "disassembly_notes": "HIGH VALUE Ni-Mo-Cr alloy. XRF mandatory before binning — easily confused with Inconel without testing. Segregate into dedicated Hastelloy bin, do not contaminate with 625 or 718 grade alloys. Scrap buyer will require mill cert confirmation.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_duplex_ss_2205",
+        "material_designation": "Duplex Stainless Steel 2205",
+        "material_family": "duplex_stainless_steel",
+        "alloy_grade": "UNS_S32205",
+        "standard": "ASTM A890 / ASTM A928",
+        "density_g_cm3": 7.80,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 1.85,
+        "properties": {
+            "tensile_strength_mpa": 620,
+            "yield_strength_mpa": 450,
+            "hardness_HRB": 100,
+            "melting_point_c": 1400,
+            "corrosion_resistance": "Excellent pitting and crevice corrosion resistance, superior to 316L in chloride environments"
+        },
+        "disassembly_notes": "Duplex SS commands premium over standard austenitic grades. Must be separated from 316L and carbon steel — grades are visually identical, XRF is the only reliable differentiator. Bin as high-grade SS scrap. Do not cut with carbon steel tools without cleaning.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_super_duplex_2507",
+        "material_designation": "Super Duplex Stainless Steel 2507",
+        "material_family": "duplex_stainless_steel",
+        "alloy_grade": "UNS_S32750",
+        "standard": "ASTM A890 Grade 6A",
+        "density_g_cm3": 7.80,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 2.40,
+        "properties": {
+            "tensile_strength_mpa": 795,
+            "yield_strength_mpa": 550,
+            "hardness_HRC": 32,
+            "melting_point_c": 1400,
+            "corrosion_resistance": "Exceptional — subsea, aggressive chloride, sour gas service. PREN > 43"
+        },
+        "disassembly_notes": "Higher value than standard duplex. Common in offshore and subsea valve bodies. XRF verify before routing — PREN value test distinguishes from 2205. Keep separate from lower-grade stainless scrap. Hydrogen embrittlement risk if improperly stored.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_aluminium_6061",
+        "material_designation": "Aluminium 6061-T6",
+        "material_family": "aluminium_alloy",
+        "alloy_grade": "UNS_A96061",
+        "standard": "ASTM B209 / AMS 2770",
+        "density_g_cm3": 2.70,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 2.10,
+        "properties": {
+            "tensile_strength_mpa": 310,
+            "yield_strength_mpa": 276,
+            "hardness_HB": 95,
+            "melting_point_c": 652,
+            "corrosion_resistance": "Good — natural oxide layer. Avoid contact with copper alloys (galvanic corrosion)"
+        },
+        "disassembly_notes": "Lightweight, high recyclability. Keep separate from other aluminium alloys (2xxx, 7xxx series) — different recovery specs. Do not bin with steel; magnetic separation effective. Avoid contamination with paint, coatings, or anodising compounds before smelting.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_copper_c110",
+        "material_designation": "Copper C110 (Electrolytic Tough Pitch)",
+        "material_family": "copper_alloy",
+        "alloy_grade": "UNS_C11000",
+        "standard": "ASTM B152",
+        "density_g_cm3": 8.94,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 8.80,
+        "properties": {
+            "tensile_strength_mpa": 220,
+            "yield_strength_mpa": 69,
+            "hardness_HRF": 40,
+            "melting_point_c": 1085,
+            "electrical_conductivity_iacs_pct": 101
+        },
+        "disassembly_notes": "HIGH VALUE — copper scrap is a priority revenue stream. Segregate immediately from brass, bronze, and copper alloys — blended copper downgrades significantly. Strip insulation before binning (bare copper vs insulated copper differ by ~$1.50/kg). No flux or solder contamination.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_naval_brass_c464",
+        "material_designation": "Naval Brass C464",
+        "material_family": "copper_alloy",
+        "alloy_grade": "UNS_C46400",
+        "standard": "ASTM B21",
+        "density_g_cm3": 8.41,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 5.20,
+        "properties": {
+            "tensile_strength_mpa": 483,
+            "yield_strength_mpa": 207,
+            "hardness_HRB": 75,
+            "melting_point_c": 900,
+            "corrosion_resistance": "Good — seawater resistance, marine grade"
+        },
+        "disassembly_notes": "Common in marine valve trim, pump impellers, and fittings. Keep separate from pure copper — brass alloys command lower scrap price. Lead content may be present in free-machining variants (confirm with XRF). Route as Red Brass scrap category.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_monel_400",
+        "material_designation": "Monel 400",
+        "material_family": "nickel_copper_alloy",
+        "alloy_grade": "UNS_N04400",
+        "standard": "ASTM B127 / ASTM B165",
+        "density_g_cm3": 8.80,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 14.00,
+        "properties": {
+            "tensile_strength_mpa": 550,
+            "yield_strength_mpa": 240,
+            "hardness_HRB": 75,
+            "melting_point_c": 1350,
+            "corrosion_resistance": "Excellent — hydrofluoric acid, seawater, salt solutions, alkaline solutions"
+        },
+        "disassembly_notes": "High value Ni-Cu alloy used in pump shafts, valve trim, and marine fasteners. Visually similar to stainless — XRF mandatory. Segregate into Monel-specific bin. Do not mix with Inconel or pure nickel alloys without XRF confirmation.",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_carbon_steel_a105",
+        "material_designation": "Carbon Steel ASTM A105 (Forgings)",
+        "material_family": "carbon_steel",
+        "alloy_grade": "AISI_1035",
+        "standard": "ASTM A105 / ASME SA-105",
+        "density_g_cm3": 7.85,
+        "recyclability_class": "B",
+        "recovery_value_usd_per_kg": 0.27,
+        "properties": {
+            "tensile_strength_mpa": 485,
+            "yield_strength_mpa": 250,
+            "hardness_HRB": 89,
+            "melting_point_c": 1480
+        },
+        "disassembly_notes": "Standard forged carbon steel for flanges, fittings, and valve bodies. Slightly higher value than cast WCB grades due to forged grain structure. Magnetic — easy to separate from SS with magnet test. Bin as heavy melting scrap (HMS1).",
+        "hazardous_content": false
+    },
+    {
+        "id": "mds_grey_cast_iron",
+        "material_designation": "Grey Cast Iron",
+        "material_family": "cast_iron",
+        "alloy_grade": "ASTM_A48_Class30",
+        "standard": "ASTM A48",
+        "density_g_cm3": 7.15,
+        "recyclability_class": "B",
+        "recovery_value_usd_per_kg": 0.12,
+        "properties": {
+            "tensile_strength_mpa": 200,
+            "compressive_strength_mpa": 570,
+            "hardness_HB": 180,
+            "melting_point_c": 1200
+        },
+        "disassembly_notes": "Common in older pump housings, compressor blocks, and valve bodies. Low recovery value but high recyclability as foundry return. Brittle — do not drop, risk of shattering and creating sharp shards (PPE required). Bin separately from nodular/ductile iron (different metallurgy).",
+        "hazardous_content": false
+    }
+]

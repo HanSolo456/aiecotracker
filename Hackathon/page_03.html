@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI-EcoTrack Solution Overview</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+        :root {
+            --bg-dark: #0A0F1E;
+            --accent-green: #00FF88;
+            --accent-cyan: #00D4FF;
+            --text-gray: #9CA3AF;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Slide Container */
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Background Effects */
+        .bg-glow-top {
+            position: absolute;
+            top: -100px;
+            left: 20%;
+            width: 600px;
+            height: 300px;
+            background: var(--accent-cyan);
+            filter: blur(150px);
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .bg-glow-bottom {
+            position: absolute;
+            bottom: -100px;
+            right: 20%;
+            width: 600px;
+            height: 300px;
+            background: var(--accent-green);
+            filter: blur(150px);
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .circuit-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(10, 15, 30, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 255, 136, 0.1);
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Icon Styling */
+        .icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-1 .icon-box { color: var(--accent-green); border-color: rgba(0, 255, 136, 0.2); background: rgba(0, 255, 136, 0.05); }
+        .card-2 .icon-box { color: var(--accent-cyan); border-color: rgba(0, 212, 255, 0.2); background: rgba(0, 212, 255, 0.05); }
+        .card-3 .icon-box { color: #A78BFA; border-color: rgba(167, 139, 250, 0.2); background: rgba(167, 139, 250, 0.05); }
+        .card-4 .icon-box { color: #FBBF24; border-color: rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.05); }
+
+        /* Typography Override */
+        h1, h2, h3 { margin: 0; }
+        p { margin: 0; line-height: 1.6; }
+
+    </style>
+<script bis_use="true" type="text/javascript" charset="utf-8" data-bis-config="[&quot;facebook.com/&quot;,&quot;twitter.com/&quot;,&quot;youtube-nocookie.com/embed/&quot;,&quot;//vk.com/&quot;,&quot;//www.vk.com/&quot;,&quot;linkedin.com/&quot;,&quot;//www.linkedin.com/&quot;,&quot;//instagram.com/&quot;,&quot;//www.instagram.com/&quot;,&quot;//www.google.com/recaptcha/api2/&quot;,&quot;//hangouts.google.com/webchat/&quot;,&quot;//www.google.com/calendar/&quot;,&quot;//www.google.com/maps/embed&quot;,&quot;spotify.com/&quot;,&quot;soundcloud.com/&quot;,&quot;//player.vimeo.com/&quot;,&quot;//disqus.com/&quot;,&quot;//tgwidget.com/&quot;,&quot;//js.driftt.com/&quot;,&quot;friends2follow.com&quot;,&quot;/widget&quot;,&quot;login&quot;,&quot;//video.bigmir.net/&quot;,&quot;blogger.com&quot;,&quot;//smartlock.google.com/&quot;,&quot;//keep.google.com/&quot;,&quot;/web.tolstoycomments.com/&quot;,&quot;moz-extension://&quot;,&quot;chrome-extension://&quot;,&quot;/auth/&quot;,&quot;//analytics.google.com/&quot;,&quot;adclarity.com&quot;,&quot;paddle.com/checkout&quot;,&quot;hcaptcha.com&quot;,&quot;recaptcha.net&quot;,&quot;2captcha.com&quot;,&quot;accounts.google.com&quot;,&quot;www.google.com/shopping/customerreviews&quot;,&quot;buy.tinypass.com&quot;,&quot;gstatic.com&quot;,&quot;secureir.ebaystatic.com&quot;,&quot;docs.google.com&quot;,&quot;contacts.google.com&quot;,&quot;github.com&quot;,&quot;mail.google.com&quot;,&quot;chat.google.com&quot;,&quot;audio.xpleer.com&quot;,&quot;keepa.com&quot;,&quot;static.xx.fbcdn.net&quot;,&quot;sas.selleramp.com&quot;,&quot;1plus1.video&quot;,&quot;console.googletagservices.com&quot;,&quot;//lnkd.demdex.net/&quot;,&quot;//radar.cedexis.com/&quot;,&quot;//li.protechts.net/&quot;,&quot;challenges.cloudflare.com/&quot;,&quot;ogs.google.com&quot;,&quot;//www.ukrnafta.com/data/map/&quot;,&quot;//maps.google.com/maps&quot;,&quot;//www.openstreetmap.org/export/embed.html&quot;,&quot;//www.google.com/maps/d/u/3/embed&quot;]" data-dynamic-id="962e1098-a0ba-46bb-bdff-e358be06ea8c" src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/executors/200.js"></script></head>
+<body style="" bis_status="ok" bis_frame_id="1881">
+<div class="slide-container">
+<!-- Background Layers -->
+<div class="bg-glow-top"></div>
+<div class="bg-glow-bottom"></div>
+<div class="circuit-grid"></div>
+<!-- Header Section -->
+<header class="relative z-10 w-full px-12 pt-10 pb-4 flex justify-between items-center border-b border-gray-800 border-opacity-50">
+<div class="flex items-center gap-3">
+<i class="fas fa-recycle text-eco-green text-2xl" style="color: var(--accent-green)"></i>
+<h2 class="font-heading text-xl font-bold tracking-wide">AI-EcoTrack</h2>
+</div>
+<div class="text-sm font-mono text-gray-500">03 / 08</div>
+</header>
+<!-- Main Content -->
+<main class="relative z-10 flex-1 flex flex-col px-12 pt-8 pb-12">
+<!-- Slide Title -->
+<div class="mb-10 text-center">
+<h1 class="font-heading text-5xl font-bold mb-3 text-white">Introducing <span style="color: var(--accent-green)">AI-EcoTrack</span></h1>
+<p class="text-xl text-gray-400 font-light">
+                AI-EcoTrack = <span class="text-white font-medium">Smart Bin</span> + <span class="text-white font-medium">AI Scanner</span> + <span class="text-white font-medium">Real-time Dashboard</span>
+</p>
+</div>
+<!-- Cards Grid -->
+<div class="grid grid-cols-4 gap-6 h-full items-stretch">
+<!-- Card 1: Smart Bin -->
+<div class="glass-card card-1 p-6 flex flex-col h-full">
+<div class="icon-box">
+<i class="fas fa-trash-alt"></i>
+</div>
+<h3 class="font-heading text-xl font-bold mb-3 text-white">Smart Bin (IoT)</h3>
+<div class="flex-1">
+<p class="text-gray-400 text-sm">
+                        Integrated sensor suite that monitors critical metrics at the source.
+                    </p>
+<ul class="mt-4 space-y-2">
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: var(--accent-green)"></i>
+<span>Real-time fill levels</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: var(--accent-green)"></i>
+<span>Toxic gas detection</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: var(--accent-green)"></i>
+<span>Temp &amp; humidity</span>
+</li>
+</ul>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-700 border-opacity-30 flex justify-between items-center">
+<span class="text-xs font-mono text-gray-500">HARDWARE</span>
+<i class="fas fa-microchip text-gray-600"></i>
+</div>
+</div>
+<!-- Card 2: AI Scanner -->
+<div class="glass-card card-2 p-6 flex flex-col h-full">
+<div class="icon-box">
+<i class="fas fa-eye"></i>
+</div>
+<h3 class="font-heading text-xl font-bold mb-3 text-white">AI Scanner</h3>
+<div class="flex-1">
+<p class="text-gray-400 text-sm">
+                        Computer vision system powered by Llama 4 Scout for precise ID.
+                    </p>
+<ul class="mt-4 space-y-2">
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: var(--accent-cyan)"></i>
+<span>Identifies parts</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: var(--accent-cyan)"></i>
+<span>Detects materials</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: var(--accent-cyan)"></i>
+<span>Flags hazards</span>
+</li>
+</ul>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-700 border-opacity-30 flex justify-between items-center">
+<span class="text-xs font-mono text-gray-500">MODEL</span>
+<i class="fas fa-robot text-gray-600"></i>
+</div>
+</div>
+<!-- Card 3: Digital Passport -->
+<div class="glass-card card-3 p-6 flex flex-col h-full">
+<div class="icon-box">
+<i class="fas fa-passport"></i>
+</div>
+<h3 class="font-heading text-xl font-bold mb-3 text-white">Digital Passport</h3>
+<div class="flex-1">
+<p class="text-gray-400 text-sm">
+                        Generates a unique digital identity for every recycled component.
+                    </p>
+<ul class="mt-4 space-y-2">
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: #A78BFA"></i>
+<span>Material composition</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: #A78BFA"></i>
+<span>Recovery value ($)</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: #A78BFA"></i>
+<span>Lifecycle trace</span>
+</li>
+</ul>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-700 border-opacity-30 flex justify-between items-center">
+<span class="text-xs font-mono text-gray-500">DATA</span>
+<i class="fas fa-database text-gray-600"></i>
+</div>
+</div>
+<!-- Card 4: Live Dashboard -->
+<div class="glass-card card-4 p-6 flex flex-col h-full">
+<div class="icon-box">
+<i class="fas fa-chart-line"></i>
+</div>
+<h3 class="font-heading text-xl font-bold mb-3 text-white">Live Dashboard</h3>
+<div class="flex-1">
+<p class="text-gray-400 text-sm">
+                        Centralized web application visualizing all system data instantly.
+                    </p>
+<ul class="mt-4 space-y-2">
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: #FBBF24"></i>
+<span>Real-time sensor graphs</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: #FBBF24"></i>
+<span>Scan history logs</span>
+</li>
+<li class="flex items-start gap-2 text-sm text-gray-300">
+<i class="fas fa-check-circle text-xs mt-1" style="color: #FBBF24"></i>
+<span>Alert notifications</span>
+</li>
+</ul>
+</div>
+<div class="mt-4 pt-4 border-t border-gray-700 border-opacity-30 flex justify-between items-center">
+<span class="text-xs font-mono text-gray-500">PLATFORM</span>
+<i class="fas fa-desktop text-gray-600"></i>
+</div>
+</div>
+</div>
+<!-- Decorative Connector Lines (Subtle) -->
+<div class="absolute top-1/2 left-0 w-full pointer-events-none z-0 hidden">
+<!-- SVG lines connecting cards could go here if needed, but keeping it clean for now -->
+</div>
+</main>
+</div>
+
+</body></html>

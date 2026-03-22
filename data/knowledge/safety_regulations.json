@@ -1,0 +1,116 @@
+[
+    {
+        "id": "OSHA_1910.147",
+        "title": "OSHA 29 CFR 1910.147 — Control of Hazardous Energy (Lockout/Tagout)",
+        "standard_body": "OSHA",
+        "regulatory_region": [
+            "US",
+            "GLOBAL"
+        ],
+        "applies_to": [
+            "pressurized_component",
+            "electrical_equipment",
+            "mechanical_equipment"
+        ],
+        "summary": "Requires that all energy sources be isolated and locked/tagged before servicing. Technician must: (1) notify affected employees, (2) identify all energy sources, (3) apply lockout device, (4) release residual energy, (5) verify isolation.",
+        "key_clauses": [
+            "1910.147(c)(1): Energy control program must be established in writing.",
+            "1910.147(d)(1): Notify all affected employees before LOTO.",
+            "1910.147(d)(4): Ensure isolation of ALL energy sources — stored, electrical, hydraulic.",
+            "1910.147(d)(6): Release/restrain stored energy — bleed hydraulics, block suspended parts.",
+            "1910.147(e)(1): Verify isolation with a test device before work begins."
+        ]
+    },
+    {
+        "id": "ATEX_Directive_2014_34_EU",
+        "title": "ATEX Directive 2014/34/EU — Equipment for Explosive Atmospheres",
+        "standard_body": "European Commission",
+        "regulatory_region": [
+            "EU"
+        ],
+        "applies_to": [
+            "hydrocarbon_likely",
+            "chemical_likely",
+            "explosive_atmosphere"
+        ],
+        "summary": "All equipment and tools used in areas with explosive atmospheres (Zone 0, 1, 2) must be ATEX-certified. Non-sparking tools mandatory. No open flames. Continuous atmospheric monitoring required for hydrocarbon environments.",
+        "key_clauses": [
+            "Article 2(1): 'Explosive atmosphere' means a mixture with air of flammable substances in gaseous, vapour, mist or dust form.",
+            "Annex I: Equipment for Zone 0 must be Category 1 — suitable for permanent explosive atmosphere.",
+            "Annex II: Non-electrical equipment must meet EN 13463-1 for non-sparking risk.",
+            "Requirement: Use only ATEX-certified tools. Use copper/beryllium non-sparking hand tools in hydrocarbon environments."
+        ]
+    },
+    {
+        "id": "NFPA_30",
+        "title": "NFPA 30 — Flammable and Combustible Liquids Code",
+        "standard_body": "NFPA",
+        "regulatory_region": [
+            "US",
+            "GLOBAL"
+        ],
+        "applies_to": [
+            "hydrocarbon_likely",
+            "residual_fluid"
+        ],
+        "summary": "Governs storage, handling, and disposal of flammable and combustible liquids. Residual hydrocarbons must be drained to approved HDPE containers, not open ground. Ventilation required. Waste classified per flashpoint.",
+        "key_clauses": [
+            "NFPA 30 Section 5.3: Flammable liquids must be stored in approved containers with proper labelling.",
+            "NFPA 30 Section 5.5: Bonding and grounding required when transferring flammable liquids between metal containers.",
+            "NFPA 30 Section 17.4: Fire protection systems required in areas storing >25 gallons of Class I liquids."
+        ]
+    },
+    {
+        "id": "REACH_Annex_XVII",
+        "title": "REACH Regulation (EC) No 1907/2006 — Annex XVII: Restrictions on Lead",
+        "standard_body": "ECHA",
+        "regulatory_region": [
+            "EU"
+        ],
+        "applies_to": [
+            "lead_solder_likelihood"
+        ],
+        "summary": "Restricts use of lead and lead compounds in manufacturing. Components with lead solder require controlled disassembly with respiratory protection (FFP3 mask minimum) and classified waste disposal per hazardous waste regs.",
+        "key_clauses": [
+            "Entry 63: Lead and its compounds — restrictions on use in articles.",
+            "Disassembly rule: Lead solder must be removed under local exhaust ventilation (LEV).",
+            "PPE: FFP3 respirator, nitrile gloves mandatory when handling lead-containing components.",
+            "Waste: All lead-containing components must be segregated and disposed as hazardous waste per Directive 2008/98/EC."
+        ]
+    },
+    {
+        "id": "RoHS_Directive",
+        "title": "RoHS Directive 2011/65/EU — Restriction of Hazardous Substances",
+        "standard_body": "European Commission",
+        "regulatory_region": [
+            "EU"
+        ],
+        "applies_to": [
+            "lead_solder_likelihood",
+            "electronics"
+        ],
+        "summary": "Restricts 10 hazardous substances in electrical/electronic equipment including lead, mercury, cadmium, and hexavalent chromium. During disassembly of EEE containing these substances, segregate restricted materials for specialist hazwaste processing.",
+        "key_clauses": [
+            "Article 4(1): Electrical/electronic equipment shall not contain restricted substances.",
+            "Annex II: Maximum concentration of lead = 0.1% by weight in homogeneous material (exemptions apply).",
+            "During EoL: Subject materials must be processed at licensed WEEE facilities."
+        ]
+    },
+    {
+        "id": "ISO_4126",
+        "title": "ISO 4126 — Safety Devices for Protection Against Excessive Pressure",
+        "standard_body": "ISO",
+        "regulatory_region": [
+            "GLOBAL"
+        ],
+        "applies_to": [
+            "pressurized_component"
+        ],
+        "summary": "Defines requirements for safety relief valves and burst disc devices on pressurized systems. Before disassembly, all pressure relief paths must be confirmed open and system fully depressurized.",
+        "key_clauses": [
+            "ISO 4126-1: Requirements for safety valves — ensure valve is in good condition before depressurization.",
+            "ISO 4126-4: Pilot-operated safety valves — additional caution: pilot line must be isolated first.",
+            "Verification: Use calibrated pressure gauge — visual inspection of pressure gauge alone is insufficient."
+        ]
+    }
+]

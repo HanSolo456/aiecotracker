@@ -1,0 +1,151 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────────────
+
+    // Fetch the calling user's profile document
+    function myProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // True if the caller belongs to the given org
+    function isOrgMember(orgId) {
+      return request.auth != null && myProfile().orgId == orgId;
+    }
+
+    // True if the caller is an org_admin of the given org
+    function isOrgAdmin(orgId) {
+      return isOrgMember(orgId) && myProfile().role == 'org_admin';
+    }
+
+    // True if signed-in with a real account (not anonymous)
+    function isSignedIn() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    // ── /scans ──────────────────────────────────────────────────────────────────
+    match /scans/{scanId} {
+      // Individual document get: authenticated users only.
+      // Public QR deep-links should go through a server endpoint that returns a
+      // sanitised passport view instead of exposing the raw scan document.
+      allow get: if request.auth != null;
+
+      // List: authenticated users only, including guest/anonymous app sessions.
+      allow list: if request.auth != null;
+
+      // Create: authenticated users only. The written workerId MUST equal the
+      // caller's UID — prevents a user from forging another worker's scans.
+      allow create: if request.auth != null
+        && request.resource.data.workerId == request.auth.uid;
+
+      // Scans are immutable once written — no updates or deletes from client
+      allow update, delete: if false;
+    }
+
+    // ── /sensor_readings ────────────────────────────────────────────────────────
+    match /sensor_readings/{readingId} {
+      // Org-scoped read — only members of the owning org can read a reading.
+      allow read: if request.auth != null
+        && resource.data.orgId is string
+        && isOrgMember(resource.data.orgId);
+      // Writes come from ESP32/Pi via Firebase Admin SDK, never from client
+      allow write: if false;
+    }
+
+    // ── /devices ────────────────────────────────────────────────────────────────
+    match /devices/{deviceId} {
+      // Members can view devices in their org.
+      allow get, list: if request.auth != null
+        && resource.data.orgId is string
+        && isOrgMember(resource.data.orgId);
+
+      // Org admins can create/update/delete device registration records.
+      allow create: if request.auth != null
+        && request.resource.data.orgId is string
+        && isOrgAdmin(request.resource.data.orgId);
+
+      allow update, delete: if request.auth != null
+        && resource.data.orgId is string
+        && isOrgAdmin(resource.data.orgId);
+    }
+
+    // ── /commands ───────────────────────────────────────────────────────────────
+    match /commands/{docId} {
+      // Tightened: only authenticated users can read commands.
+      // Previously this was open to the internet; now requires a Firebase token.
+      allow read: if request.auth != null;
+      // Commands are written server-side only (Admin SDK / ESP32 firmware)
+      allow write: if false;
+    }
+
+    // ── /users ──────────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      // You can only read your own profile
+      allow get: if request.auth != null && request.auth.uid == uid;
+
+      // Org members can list users (needed for workers management page)
+      allow list: if request.auth != null
+        && myProfile().orgId != null;
+
+      // Users can write their own profile only
+      // (role / orgId changes go through Admin SDK / invite flow)
+      allow write: if request.auth != null && request.auth.uid == uid;
+
+      // Push notification tokens — one doc per FCM device token
+      // Each user can only read/write their own tokens
+      match /notificationTokens/{tokenId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // ── /orgs ───────────────────────────────────────────────────────────────────
+    match /orgs/{orgId} {
+      // Only members of this org can read it
+      allow read: if isOrgMember(orgId);
+
+      // Any real (non-anonymous) user can create a new org
+      allow create: if isSignedIn();
+
+      // Only org admins can update their org document
+      allow update: if isOrgAdmin(orgId);
+
+      // No client-side deletions
+      allow delete: if false;
+    }
+
+    // ── /invites ─────────────────────────────────────────────────────────────────
+    match /invites/{code} {
+      // Any authenticated user can read an invite (to validate a code)
+      allow read: if request.auth != null;
+
+      // Only signed-in (non-anonymous) users can create invites
+      allow create: if isSignedIn();
+
+      // One-time redemption: can only update when usedBy hasn't been set yet
+      allow update: if request.auth != null
+        && !('usedBy' in resource.data);
+
+      allow delete: if false;
+    }
+
+    // ── /bins ────────────────────────────────────────────────────────────────────
+    // Smart dustbin IoT device — data written by ESP32 via Admin SDK
+    match /bins/{binId} {
+      // Authenticated users (including workers) can read bin data
+      allow read: if request.auth != null;
+      // All writes come from the ESP32 firmware via Firebase Admin SDK
+      allow write: if false;
+    }
+
+    // ── /bookings ────────────────────────────────────────────────────────────────
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                             && resource.data.userId == request.auth.uid;
+    }
+
+  }
+}

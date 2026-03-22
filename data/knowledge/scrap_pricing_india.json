@@ -1,0 +1,762 @@
+{
+    "metadata": {
+        "version": "1.0",
+        "base_currency": "INR",
+        "last_updated": "2026-03",
+        "price_unit": "INR per kg",
+        "data_sources": [
+            "MSTC Limited e-auction records (mstcindia.co.in)",
+            "SIMA (Steel Industries Maharashtra Association) monthly circulars",
+            "Indian Non-Ferrous Metals Manufacturers Association (INFMMA)",
+            "LME-linked domestic scrap surveys — Mumbai Metal Markets",
+            "CPCB authorised recycler tender data"
+        ],
+        "notes": "Prices are indicative market rates (March 2026). Actual prices depend on lot size, condition, and negotiation. Minimum lot for premium pricing typically 500 kg. Prices exclude GST (18%) and transportation.",
+        "update_frequency": "monthly",
+        "market_hubs": [
+            "Mumbai (MIDC)",
+            "Pune (Pimpri-Chinchwad)",
+            "Chennai (Ambattur)",
+            "Surat",
+            "Ahmedabad (GIDC)",
+            "Coimbatore",
+            "Delhi NCR (Faridabad)",
+            "Vizag (VSEZ)"
+        ]
+    },
+    "materials": [
+        {
+            "id": "carbon_steel",
+            "common_names": [
+                "mild steel scrap",
+                "MS scrap",
+                "HMS",
+                "heavy melting scrap",
+                "carbon steel",
+                "AISI_1020",
+                "AISI_1035",
+                "A216_WCB",
+                "A105"
+            ],
+            "recycler_category": "Ferrous — Heavy Melting Scrap (HMS)",
+            "recyclability_class": "B",
+            "price_tiers": {
+                "premium": {
+                    "description": "Clean, sorted HMS1 — no attachments, single grade, verified by XRF. Delivered to steel foundry or EAF plant.",
+                    "inr_per_kg": 37,
+                    "min_lot_kg": 1000
+                },
+                "standard": {
+                    "description": "HMS2 — mixed carbon steel, some attachments. Typical e-waste facility or local scrap dealer.",
+                    "inr_per_kg": 32,
+                    "min_lot_kg": 100
+                },
+                "spot": {
+                    "description": "Small lot, mixed grade. Roadside scrap dealer (kabadiwala/kabadi).",
+                    "inr_per_kg": 26,
+                    "min_lot_kg": 10
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 37,
+                "Pune_Pimpri": 35,
+                "Chennai_Ambattur": 34,
+                "Surat": 33,
+                "Ahmedabad_GIDC": 34,
+                "Coimbatore": 32,
+                "Delhi_NCR_Faridabad": 36,
+                "Vizag": 35
+            },
+            "licensed_buyers_india": [
+                "Tata Steel Scrap Division",
+                "JSW Steel Scrap Procurement",
+                "MSTC e-Auction (mstcindia.co.in)",
+                "Lloyds Metals and Energy",
+                "State government scrap depots"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Carbon steel scrap eligible for export under DGFT licence. FOB price typically $290–320/tonne from major ports."
+        },
+        {
+            "id": "cast_iron",
+            "common_names": [
+                "CI scrap",
+                "grey cast iron",
+                "pig iron scrap",
+                "foundry returns",
+                "ASTM_A48"
+            ],
+            "recycler_category": "Ferrous — Cast Iron Scrap",
+            "recyclability_class": "B",
+            "price_tiers": {
+                "premium": {
+                    "description": "Clean foundry-grade cast iron, no contamination. Returns to grey iron foundry.",
+                    "inr_per_kg": 24,
+                    "min_lot_kg": 500
+                },
+                "standard": {
+                    "description": "Mixed CI, minor surface rust, pump/valve housings.",
+                    "inr_per_kg": 20,
+                    "min_lot_kg": 50
+                },
+                "spot": {
+                    "description": "Small lot, mixed with steel.",
+                    "inr_per_kg": 16,
+                    "min_lot_kg": 5
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 22,
+                "Pune_Pimpri": 22,
+                "Chennai_Ambattur": 20,
+                "Surat": 19,
+                "Ahmedabad_GIDC": 20,
+                "Coimbatore": 21,
+                "Delhi_NCR_Faridabad": 21,
+                "Vizag": 20
+            },
+            "licensed_buyers_india": [
+                "Coimbatore foundry clusters (direct)",
+                "Rajkot casting industry scrap dealers",
+                "MSTC e-Auction",
+                "Local scrap merchants in industrial clusters"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": false,
+            "export_note": "Cast iron scrap export restricted under Ministry of Steel policy."
+        },
+        {
+            "id": "stainless_steel_CF8M",
+            "common_names": [
+                "SS 304 scrap",
+                "SS 316 scrap",
+                "stainless scrap",
+                "austenitic SS",
+                "CF8M",
+                "CF8",
+                "316L",
+                "304"
+            ],
+            "recycler_category": "Non-Ferrous — Stainless Steel",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-verified 316L/304 clean scrap, no mixed grades. Delivered to SS melt shop.",
+                    "inr_per_kg": 105,
+                    "min_lot_kg": 500
+                },
+                "standard": {
+                    "description": "SS scrap, visually sorted, no XRF. General stainless dealer.",
+                    "inr_per_kg": 90,
+                    "min_lot_kg": 100
+                },
+                "spot": {
+                    "description": "Mixed SS, small lot.",
+                    "inr_per_kg": 75,
+                    "min_lot_kg": 10
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 105,
+                "Pune_Pimpri": 100,
+                "Chennai_Ambattur": 98,
+                "Surat": 102,
+                "Ahmedabad_GIDC": 100,
+                "Coimbatore": 95,
+                "Delhi_NCR_Faridabad": 103,
+                "Vizag": 96
+            },
+            "licensed_buyers_india": [
+                "Jindal Stainless (Hisar) Scrap Division",
+                "Viraj Profiles scrap procurement",
+                "Surat Stainless Melters Association",
+                "MSTC e-Auction — Grade A",
+                "POSCO India scrap dealers"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Stainless scrap exports at premium. 316L commands 10–15% premium over 304 at export ports (JNPT, Mundra)."
+        },
+        {
+            "id": "316L_stainless_steel",
+            "common_names": [
+                "316L",
+                "UNS S31603",
+                "SS 316L",
+                "CF8M stainless"
+            ],
+            "recycler_category": "Non-Ferrous — Stainless Steel Premium Grade",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-certified 316L, no 304 contamination. Co-molybdenum premium applies.",
+                    "inr_per_kg": 118,
+                    "min_lot_kg": 500
+                },
+                "standard": {
+                    "description": "Declared 316L, unverified. Buyer applies discount for uncertainty.",
+                    "inr_per_kg": 100,
+                    "min_lot_kg": 100
+                },
+                "spot": {
+                    "description": "Small lot 316L.",
+                    "inr_per_kg": 85,
+                    "min_lot_kg": 5
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 118,
+                "Pune_Pimpri": 112,
+                "Chennai_Ambattur": 108,
+                "Surat": 114,
+                "Ahmedabad_GIDC": 112,
+                "Coimbatore": 105,
+                "Delhi_NCR_Faridabad": 115,
+                "Vizag": 108
+            },
+            "licensed_buyers_india": [
+                "Jindal Stainless (Hisar)",
+                "Viraj Profiles Ltd",
+                "Facor Steels",
+                "Mukand Ltd Scrap Cell"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "316L attracts better export price due to Mo content. Export via JNPT/Mundra preferred."
+        },
+        {
+            "id": "duplex_ss_2205",
+            "common_names": [
+                "duplex stainless",
+                "2205",
+                "UNS S32205",
+                "25Cr duplex"
+            ],
+            "recycler_category": "Non-Ferrous — Duplex Stainless Steel",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-verified 2205 clean scrap. Separate from standard austenitic SS.",
+                    "inr_per_kg": 155,
+                    "min_lot_kg": 300
+                },
+                "standard": {
+                    "description": "Declared duplex, spot market.",
+                    "inr_per_kg": 130,
+                    "min_lot_kg": 100
+                },
+                "spot": {
+                    "description": "Small lot.",
+                    "inr_per_kg": 110,
+                    "min_lot_kg": 10
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 155,
+                "Pune_Pimpri": 148,
+                "Chennai_Ambattur": 142,
+                "Surat": 150,
+                "Ahmedabad_GIDC": 148,
+                "Coimbatore": 138,
+                "Delhi_NCR_Faridabad": 150,
+                "Vizag": 142
+            },
+            "licensed_buyers_india": [
+                "Outokumpu India dealers",
+                "Jindal Stainless (Hisar) — Grade A procurement",
+                "Speciality metal scrap dealers in Mumbai"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Duplex SS scrap commands strong export demand. XRF cert mandatory for export buyers."
+        },
+        {
+            "id": "super_duplex_2507",
+            "common_names": [
+                "super duplex",
+                "2507",
+                "UNS S32750",
+                "6Mo duplex"
+            ],
+            "recycler_category": "Non-Ferrous — Super Duplex Stainless",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-verified 2507, clean segregated scrap.",
+                    "inr_per_kg": 200,
+                    "min_lot_kg": 200
+                },
+                "standard": {
+                    "description": "Spot purchase, unverified grade.",
+                    "inr_per_kg": 165,
+                    "min_lot_kg": 50
+                },
+                "spot": {
+                    "description": "Small lot.",
+                    "inr_per_kg": 140,
+                    "min_lot_kg": 5
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 200,
+                "Pune_Pimpri": 190,
+                "Chennai_Ambattur": 180,
+                "Surat": 195,
+                "Ahmedabad_GIDC": 188,
+                "Coimbatore": 175,
+                "Delhi_NCR_Faridabad": 195,
+                "Vizag": 180
+            },
+            "licensed_buyers_india": [
+                "Specialty alloy scrap exporters — JNPT",
+                "Chennai port-based specialty dealers",
+                "Mumbai nickel alloy recyclers"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Strong export liquidity to European specialty steel mills."
+        },
+        {
+            "id": "inconel_625",
+            "common_names": [
+                "Inconel 625",
+                "UNS N06625",
+                "nickel superalloy",
+                "ni-cr-mo alloy",
+                "625 alloy"
+            ],
+            "recycler_category": "Non-Ferrous — Nickel Superalloy (HIGH VALUE)",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-certified IN625. Mill cert preferred. Delivered to CPCB-authorised Ni alloy recycler.",
+                    "inr_per_kg": 1850,
+                    "min_lot_kg": 50
+                },
+                "standard": {
+                    "description": "Spot purchase, XRF done by buyer.",
+                    "inr_per_kg": 1550,
+                    "min_lot_kg": 20
+                },
+                "spot": {
+                    "description": "Small lot, no cert.",
+                    "inr_per_kg": 1200,
+                    "min_lot_kg": 1
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 1850,
+                "Pune_Pimpri": 1800,
+                "Chennai_Ambattur": 1750,
+                "Surat": 1800,
+                "Ahmedabad_GIDC": 1750,
+                "Coimbatore": 1650,
+                "Delhi_NCR_Faridabad": 1820,
+                "Vizag": 1750
+            },
+            "licensed_buyers_india": [
+                "Mukand/Mupro Alloys Mumbai",
+                "Midhani (Mishra Dhatu Nigam) — Government buyer for aerospace-grade",
+                "Specialty nickel alloy exporters via JNPT",
+                "Hinduja Foundries — Nickel scrap desk"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Highest-demand export material. European aerospace/chemical industries are active buyers. Always get 3 competing quotes."
+        },
+        {
+            "id": "hastelloy_c276",
+            "common_names": [
+                "Hastelloy C276",
+                "UNS N10276",
+                "Ni-Mo-Cr alloy",
+                "C276",
+                "Hastelloy scrap"
+            ],
+            "recycler_category": "Non-Ferrous — Nickel Superalloy (HIGH VALUE)",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-certified C276 clean scrap. Must be separate from C22/C2000.",
+                    "inr_per_kg": 2100,
+                    "min_lot_kg": 50
+                },
+                "standard": {
+                    "description": "Declared C276, XRF by buyer.",
+                    "inr_per_kg": 1750,
+                    "min_lot_kg": 20
+                },
+                "spot": {
+                    "description": "Spot/no cert.",
+                    "inr_per_kg": 1400,
+                    "min_lot_kg": 1
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 2100,
+                "Pune_Pimpri": 2050,
+                "Chennai_Ambattur": 1950,
+                "Surat": 2000,
+                "Ahmedabad_GIDC": 1980,
+                "Coimbatore": 1850,
+                "Delhi_NCR_Faridabad": 2050,
+                "Vizag": 1950
+            },
+            "licensed_buyers_india": [
+                "Midhani (Mishra Dhatu Nigam)",
+                "Specialty alloy dealers — Turbhe, Navi Mumbai",
+                "Export via JNPT to European buyers"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "High Mo content drives premium. Haynes International and Sandvik are major European end-users."
+        },
+        {
+            "id": "titanium_6al4v",
+            "common_names": [
+                "titanium scrap",
+                "Ti-6Al-4V",
+                "Ti64",
+                "UNS R56400",
+                "Grade 5 titanium",
+                "aerospace titanium"
+            ],
+            "recycler_category": "Non-Ferrous — Titanium Alloy (VERY HIGH VALUE)",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "Non-life-expired aviation-grade Ti-6Al-4V with cert. Delivered to CPCB-authorised Ti recycler. OEM traceability required.",
+                    "inr_per_kg": 2800,
+                    "min_lot_kg": 20
+                },
+                "standard": {
+                    "description": "Industrial Ti64, no aviation cert. XRF verified.",
+                    "inr_per_kg": 2400,
+                    "min_lot_kg": 10
+                },
+                "spot": {
+                    "description": "Small lot, no cert.",
+                    "inr_per_kg": 1800,
+                    "min_lot_kg": 1
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 2800,
+                "Pune_Pimpri": 2700,
+                "Chennai_Ambattur": 2650,
+                "Surat": 2620,
+                "Ahmedabad_GIDC": 2650,
+                "Coimbatore": 2500,
+                "Delhi_NCR_Faridabad": 2750,
+                "Vizag": 2640
+            },
+            "licensed_buyers_india": [
+                "Midhani (only government-approved buyer for life-limited aviation Ti)",
+                "DMRL (Defence Metallurgical Research Laboratory) Hyderabad",
+                "VTM Ltd (Vijay Titanium Metals) — industrial grade",
+                "Export to Kobe Steel, TIMET for aerospace grade"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "DGFT export licence required for aviation-grade titanium. Industrial grade is freely exportable. IATA DGR compliance for air shipment."
+        },
+        {
+            "id": "monel_400",
+            "common_names": [
+                "Monel 400",
+                "UNS N04400",
+                "nickel-copper alloy",
+                "Monel scrap",
+                "70Ni-30Cu"
+            ],
+            "recycler_category": "Non-Ferrous — Nickel-Copper Alloy (HIGH VALUE)",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "XRF-certified Monel 400, segregated clean scrap.",
+                    "inr_per_kg": 1400,
+                    "min_lot_kg": 30
+                },
+                "standard": {
+                    "description": "Declared Monel, spot market.",
+                    "inr_per_kg": 1150,
+                    "min_lot_kg": 10
+                },
+                "spot": {
+                    "description": "Small lot.",
+                    "inr_per_kg": 900,
+                    "min_lot_kg": 1
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 1400,
+                "Pune_Pimpri": 1350,
+                "Chennai_Ambattur": 1300,
+                "Surat": 1320,
+                "Ahmedabad_GIDC": 1310,
+                "Coimbatore": 1250,
+                "Delhi_NCR_Faridabad": 1370,
+                "Vizag": 1300
+            },
+            "licensed_buyers_india": [
+                "Nickel alloy dealers in Turbhe and Bhiwandi",
+                "Mumbai Metal Market NiCu dealers",
+                "Export via JNPT"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Demand from marine and chemical industry globally."
+        },
+        {
+            "id": "copper_alloy",
+            "common_names": [
+                "copper scrap",
+                "bare bright copper",
+                "Cu C110",
+                "ETP copper",
+                "electrolytic copper"
+            ],
+            "recycler_category": "Non-Ferrous — Copper (HIGH VALUE)",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "Bare bright copper wire/rod, no insulation, no solder. Grade 1 copper per ISRI 200.",
+                    "inr_per_kg": 720,
+                    "min_lot_kg": 100
+                },
+                "standard": {
+                    "description": "No.2 scrap copper — mixed sources, slight tarnish. Includes tube, bus bars.",
+                    "inr_per_kg": 680,
+                    "min_lot_kg": 50
+                },
+                "spot": {
+                    "description": "Small lot, mixed with other metals.",
+                    "inr_per_kg": 620,
+                    "min_lot_kg": 5
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 720,
+                "Pune_Pimpri": 705,
+                "Chennai_Ambattur": 695,
+                "Surat": 700,
+                "Ahmedabad_GIDC": 705,
+                "Coimbatore": 690,
+                "Delhi_NCR_Faridabad": 715,
+                "Vizag": 695
+            },
+            "licensed_buyers_india": [
+                "Hindalco Copper Division (Birla)",
+                "Sterlite Copper (Vedanta) scrap procurement",
+                "MMTC — copper scrap",
+                "ISRI-member dealers in Mumbai (Bhuleshwar metal market)",
+                "Chennai Copper Scrap Dealers Association"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Copper scrap subject to 5% export duty in India. Domestic recyclers often more competitive. LME-linked pricing."
+        },
+        {
+            "id": "naval_brass_c464",
+            "common_names": [
+                "brass scrap",
+                "naval brass",
+                "yellow brass",
+                "C464",
+                "CuZn30",
+                "red brass",
+                "valve brass"
+            ],
+            "recycler_category": "Non-Ferrous — Brass",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "Clean naval/yellow brass, no iron contamination, no chrome plating.",
+                    "inr_per_kg": 420,
+                    "min_lot_kg": 100
+                },
+                "standard": {
+                    "description": "Mixed brass — fittings and valves with minor attachments.",
+                    "inr_per_kg": 380,
+                    "min_lot_kg": 30
+                },
+                "spot": {
+                    "description": "Small lot.",
+                    "inr_per_kg": 340,
+                    "min_lot_kg": 5
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 420,
+                "Pune_Pimpri": 408,
+                "Chennai_Ambattur": 400,
+                "Surat": 412,
+                "Ahmedabad_GIDC": 405,
+                "Coimbatore": 390,
+                "Delhi_NCR_Faridabad": 415,
+                "Vizag": 398
+            },
+            "licensed_buyers_india": [
+                "Jamnagar brass industry (world's largest brass cluster)",
+                "Surat non-ferrous scrap dealers",
+                "Bhuleshwar metal market Mumbai",
+                "MMTC brass scrap"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": true,
+            "export_note": "Jamnagar is the largest brass scrap consumer globally. Direct sale to Jamnagar dealers avoids middleman margin."
+        },
+        {
+            "id": "aluminium_alloy",
+            "common_names": [
+                "aluminium scrap",
+                "Al 6061",
+                "Al 7075",
+                "clean aluminium",
+                "UNS A96061",
+                "motor frame",
+                "pump casing"
+            ],
+            "recycler_category": "Non-Ferrous — Aluminium",
+            "recyclability_class": "A",
+            "price_tiers": {
+                "premium": {
+                    "description": "Clean 6061-T6 or 7075-T6, single grade, XRF verified. No paint, no anodising. Delivered to secondary aluminium smelter.",
+                    "inr_per_kg": 155,
+                    "min_lot_kg": 200
+                },
+                "standard": {
+                    "description": "Mixed aluminium alloy, some surface coatings.",
+                    "inr_per_kg": 135,
+                    "min_lot_kg": 50
+                },
+                "spot": {
+                    "description": "Small lot, mixed grades.",
+                    "inr_per_kg": 110,
+                    "min_lot_kg": 5
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 155,
+                "Pune_Pimpri": 148,
+                "Chennai_Ambattur": 142,
+                "Surat": 150,
+                "Ahmedabad_GIDC": 148,
+                "Coimbatore": 140,
+                "Delhi_NCR_Faridabad": 152,
+                "Vizag": 142
+            },
+            "licensed_buyers_india": [
+                "Hindalco (Novelis) secondary aluminium",
+                "Vedanta Aluminium scrap procurement",
+                "NALCO Aluminium scrap stores",
+                "Coimbatore aluminium re-melt foundries",
+                "Bhiwandi aluminium secondary smelters"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": false,
+            "export_note": "Aluminium scrap export banned under recent DGFT notifications to protect domestic industry."
+        },
+        {
+            "id": "PTFE_seat_ring",
+            "common_names": [
+                "PTFE scrap",
+                "teflon scrap",
+                "fluoropolymer waste",
+                "valve seats",
+                "pump seals"
+            ],
+            "recycler_category": "Polymer — Fluoropolymer (Hazardous Disposal)",
+            "recyclability_class": "C",
+            "price_tiers": {
+                "premium": {
+                    "description": "Clean PTFE, no contamination with process fluid. Specialist fluoropolymer recycler.",
+                    "inr_per_kg": 10,
+                    "min_lot_kg": 50
+                },
+                "standard": {
+                    "description": "Mixed PTFE — valve trim waste.",
+                    "inr_per_kg": 4,
+                    "min_lot_kg": 10
+                },
+                "spot": {
+                    "description": "Disposed as industrial waste. No payment; disposal charge applies.",
+                    "inr_per_kg": -5,
+                    "min_lot_kg": 1
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 8,
+                "Pune_Pimpri": 7,
+                "Chennai_Ambattur": 6,
+                "Surat": 7,
+                "Ahmedabad_GIDC": 7,
+                "Coimbatore": 5,
+                "Delhi_NCR_Faridabad": 8,
+                "Vizag": 6
+            },
+            "licensed_buyers_india": [
+                "Gujarat Enviro Protection & Infrastructure Ltd (GEPIL)",
+                "Ramky Enviro Engineers",
+                "SEIL (Shriram EPC Infrastructure)",
+                "Ecoreco (authorised e-waste/polymer handler)"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": false,
+            "export_note": "PTFE waste is a controlled substance. Do not incinerate. Licensed disposal only under Hazardous Waste Management Rules 2016 (India)."
+        },
+        {
+            "id": "silicon_carbide_seal",
+            "common_names": [
+                "SiC scrap",
+                "silicon carbide",
+                "ceramic seal",
+                "pump seal ring",
+                "mechanical seal face"
+            ],
+            "recycler_category": "Ceramic — Industrial Waste",
+            "recyclability_class": "C",
+            "price_tiers": {
+                "premium": {
+                    "description": "Clean SiC with no metal backing — specialist ceramic processor.",
+                    "inr_per_kg": 8,
+                    "min_lot_kg": 20
+                },
+                "standard": {
+                    "description": "Disposed with metal backing as mixed waste.",
+                    "inr_per_kg": 0,
+                    "min_lot_kg": 1
+                }
+            },
+            "regional_rates_inr_per_kg": {
+                "Mumbai_MIDC": 6,
+                "Pune_Pimpri": 5,
+                "Chennai_Ambattur": 5,
+                "Surat": 5,
+                "Ahmedabad_GIDC": 5,
+                "Coimbatore": 4,
+                "Delhi_NCR_Faridabad": 6,
+                "Vizag": 5
+            },
+            "licensed_buyers_india": [
+                "Saint-Gobain India (limited buy-back scheme)",
+                "Industrial ceramics scrap processors in Morbi (Gujarat)"
+            ],
+            "gst_rate_pct": 18,
+            "export_eligible": false
+        }
+    ],
+    "pricing_calculator_notes": {
+        "how_to_use": "Use `regional_rates_inr_per_kg[nearest_hub]` × `mass_kg` for the best scrap estimate. For premium pricing, the part must be XRF-verified and delivered in minimum lot quantities.",
+        "default_region": "Mumbai_MIDC",
+        "value_improvement_tips": [
+            "XRF verification adds 10–20% premium — always verify high-value alloys (Inconel, Hastelloy, Ti, Monel)",
+            "Segregation adds value — mixed grades are penalised 15–30% vs clean sorted grades",
+            "Minimum lots matter — below minimum lot, prices drop to spot tier",
+            "Copper windings — strip insulation before selling, bare copper commands ₹720/kg vs ₹550/kg for insulated",
+            "PTFE and polymer seals — segregate from metal before sale, contamination downgrades metal grade"
+        ],
+        "disclaimer": "Prices are indicative market rates as of March 2026. Actual prices fluctuate with LME, INR/USD exchange rate, and domestic supply/demand. Obtain 3 competing quotations before any transaction > ₹50,000."
+    }
+}

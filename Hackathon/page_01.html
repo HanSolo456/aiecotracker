@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI-EcoTrack Title Slide</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0F1E;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .text-eco-green {
+            color: #00FF88;
+        }
+        .text-eco-cyan {
+            color: #00D4FF;
+        }
+        .bg-eco-green {
+            background-color: #00FF88;
+        }
+        .bg-eco-cyan {
+            background-color: #00D4FF;
+        }
+        
+        /* Circuit pattern using SVG Data URI to avoid external dependencies */
+        .circuit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L20 10 L20 20' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Cpath d='M80 80 L70 80 L70 90' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23374151'/%3E%3Ccircle cx='70' cy='90' r='1.5' fill='%23374151'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        /* Ambient Glow Orbs (replacing gradients) */
+        .glow-orb-1 {
+            position: absolute;
+            top: 20%;
+            left: 25%;
+            width: 400px;
+            height: 400px;
+            background-color: #00FF88;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.08;
+            z-index: 0;
+        }
+        .glow-orb-2 {
+            position: absolute;
+            bottom: 10%;
+            right: 15%;
+            width: 500px;
+            height: 500px;
+            background-color: #00D4FF;
+            border-radius: 50%;
+            filter: blur(180px);
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-text-shadow {
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.25);
+        }
+
+        .logo-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            animation: pulse 4s infinite;
+        }
+        
+        .logo-ring-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 110px;
+            height: 110px;
+            border: 1px dashed rgba(0, 212, 255, 0.4);
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.1); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 255, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+        }
+    </style>
+<script bis_use="true" type="text/javascript" charset="utf-8" data-bis-config="[&quot;facebook.com/&quot;,&quot;twitter.com/&quot;,&quot;youtube-nocookie.com/embed/&quot;,&quot;//vk.com/&quot;,&quot;//www.vk.com/&quot;,&quot;linkedin.com/&quot;,&quot;//www.linkedin.com/&quot;,&quot;//instagram.com/&quot;,&quot;//www.instagram.com/&quot;,&quot;//www.google.com/recaptcha/api2/&quot;,&quot;//hangouts.google.com/webchat/&quot;,&quot;//www.google.com/calendar/&quot;,&quot;//www.google.com/maps/embed&quot;,&quot;spotify.com/&quot;,&quot;soundcloud.com/&quot;,&quot;//player.vimeo.com/&quot;,&quot;//disqus.com/&quot;,&quot;//tgwidget.com/&quot;,&quot;//js.driftt.com/&quot;,&quot;friends2follow.com&quot;,&quot;/widget&quot;,&quot;login&quot;,&quot;//video.bigmir.net/&quot;,&quot;blogger.com&quot;,&quot;//smartlock.google.com/&quot;,&quot;//keep.google.com/&quot;,&quot;/web.tolstoycomments.com/&quot;,&quot;moz-extension://&quot;,&quot;chrome-extension://&quot;,&quot;/auth/&quot;,&quot;//analytics.google.com/&quot;,&quot;adclarity.com&quot;,&quot;paddle.com/checkout&quot;,&quot;hcaptcha.com&quot;,&quot;recaptcha.net&quot;,&quot;2captcha.com&quot;,&quot;accounts.google.com&quot;,&quot;www.google.com/shopping/customerreviews&quot;,&quot;buy.tinypass.com&quot;,&quot;gstatic.com&quot;,&quot;secureir.ebaystatic.com&quot;,&quot;docs.google.com&quot;,&quot;contacts.google.com&quot;,&quot;github.com&quot;,&quot;mail.google.com&quot;,&quot;chat.google.com&quot;,&quot;audio.xpleer.com&quot;,&quot;keepa.com&quot;,&quot;static.xx.fbcdn.net&quot;,&quot;sas.selleramp.com&quot;,&quot;1plus1.video&quot;,&quot;console.googletagservices.com&quot;,&quot;//lnkd.demdex.net/&quot;,&quot;//radar.cedexis.com/&quot;,&quot;//li.protechts.net/&quot;,&quot;challenges.cloudflare.com/&quot;,&quot;ogs.google.com&quot;,&quot;//www.ukrnafta.com/data/map/&quot;,&quot;//maps.google.com/maps&quot;,&quot;//www.openstreetmap.org/export/embed.html&quot;,&quot;//www.google.com/maps/d/u/3/embed&quot;]" data-dynamic-id="962e1098-a0ba-46bb-bdff-e358be06ea8c" src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/executors/200.js"></script></head>
+<body style="" bis_status="ok" bis_frame_id="1924">
+<div class="relative flex flex-col items-center justify-center overflow-hidden" style="width: 100vw; height: 100vh;">
+<!-- Background Elements -->
+<div class="circuit-overlay"></div>
+<div class="glow-orb-1"></div>
+<div class="glow-orb-2"></div>
+<!-- Background Tech Icons -->
+<div class="absolute top-10 right-10 text-gray-800 opacity-20 z-0">
+<i class="fas fa-microchip fa-6x"></i>
+</div>
+<div class="absolute bottom-10 left-10 text-gray-800 opacity-20 z-0">
+<i class="fas fa-satellite-dish fa-6x"></i>
+</div>
+<!-- Main Content Wrapper -->
+<div class="z-10 w-full max-w-5xl flex flex-col items-center justify-center pt-8">
+<!-- Icon/Logo Area -->
+<div class="relative w-40 h-40 mb-8 flex items-center justify-center">
+<div class="logo-ring"></div>
+<div class="logo-ring-inner"></div>
+<div class="relative z-20 flex flex-col items-center justify-center">
+<i class="fas fa-recycle text-6xl text-eco-green mb-1 filter drop-shadow-lg"></i>
+
+</div>
+</div>
+<!-- Title -->
+<div class="text-center mb-6">
+<h1 class="font-heading text-8xl font-bold tracking-tight text-white mb-2 hero-text-shadow">
+                    AI-<font color="#00ff88">Eco Track</font></h1>
+</div>
+<!-- Tagline -->
+<div class="flex items-center justify-center mb-16 w-full max-w-2xl">
+<div class="h-px flex-1 bg-gray-700"></div>
+<p class="mx-6 font-heading text-2xl text-gray-300 font-light tracking-widest uppercase">
+                    Smarter E-Waste. Greener Future.
+                </p>
+<div class="h-px flex-1 bg-gray-700"></div>
+</div>
+<!-- Info Card -->
+<div class="glass-panel rounded-2xl p-1 w-full max-w-3xl mx-auto">
+<div class="flex flex-row rounded-xl overflow-hidden">
+<!-- Team Section -->
+<div class="flex-1 p-6 flex flex-col items-center justify-center relative">
+<div class="absolute top-0 left-0 w-full h-1 bg-eco-green opacity-50"></div>
+<div class="mb-2">
+<i class="fas fa-users text-eco-green text-xl"></i>
+</div>
+<p class="text-xs font-bold tracking-widest text-gray-500 uppercase mb-1">Presented By</p>
+<p class="font-heading text-xl font-bold text-white">MakersLab</p>
+<p class="text-sm text-gray-400 mt-1">Saumitra Matta • Satyam Anand</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Footer Tech Line -->
+<div class="absolute bottom-0 w-full flex justify-between px-8 py-4 text-xs font-mono text-gray-600 uppercase tracking-widest">
+<p>System Status: <span class="text-eco-green">Online</span></p>
+<p>v.1.0.26</p>
+</div>
+</div>
+
+</body></html>

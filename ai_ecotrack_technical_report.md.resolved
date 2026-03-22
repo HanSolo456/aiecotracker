@@ -1,0 +1,603 @@
+# AI-EcoTrack: Technical Architecture & System Design Specification
+
+**Project:** AI-EcoTrack — Mobile-First Reverse Manufacturing Platform
+**Version:** 1.0 | **Date:** 2026-03-02
+**Classification:** Internal Technical Specification
+
+---
+
+## Section 1 — VLM ↔ RAG Integration: Achieving 99% Accuracy in Safety Protocol Retrieval
+
+### 1.1 Pipeline Architecture Overview
+
+The accuracy bottleneck in VLM-RAG systems is not retrieval quality in isolation — it is **query precision at the handoff boundary**. The VLM must emit a structured, typed query object rather than a raw natural language string. This eliminates ambiguity in vector search and enables deterministic safety rule enforcement at the routing layer.
+
+```
+[Technician Camera Input]
+        │
+        ▼
+┌───────────────────┐
+│   VLM Inference   │  ← LLaVA-1.6 / GPT-4V fine-tuned on industrial parts dataset
+│  (Vision Layer)   │    (GrabCAD, NIST MDS, OEM service manuals)
+└────────┬──────────┘
+         │  Emits: PartMetadataPayload (typed JSON)
+         ▼
+┌───────────────────────────────────┐
+│   Query Router & Safety Gatekeeper│  ← Confidence threshold enforcement
+│                                   │    Hazmat flag injection
+│   Confidence ≥ 0.92 → PASS        │    OSHA / REACH / RoHS tag resolution
+│   Confidence < 0.92 → ESCALATE    │
+└────────┬──────────────────────────┘
+         │  Emits: RagQueryPayload (typed + filtered)
+         ▼
+┌───────────────────┐
+│   RAG Retrieval   │  ← Pinecone / Weaviate vector DB
+│   (Knowledge Layer│    Chunks indexed from: NIST DS, GrabCAD manuals,
+│                   │    IEC 60300, ISO 14224, OEM disassembly guides
+└────────┬──────────┘
+         │  Returns: Top-K ranked document chunks
+         ▼
+┌──────────────────────────┐
+│  LLM Re-ranker + Composer│  ← Cohere Re-rank or cross-encoder
+│  (Response Layer)        │    Grounded answer + source citations
+└──────────────────────────┘
+         │
+         ▼
+[Technician Mobile UI — Disassembly Guide + Safety Protocol Card]
+```
+
+---
+
+### 1.2 The PartMetadataPayload — VLM Output Schema
+
+The VLM does not return prose. It returns a **typed structured object** parsed from a constrained decoding grammar (e.g., using `outlines` or `instructor` libraries):
+
+```json
+{
+  "part_metadata_payload": {
+    "visual_id": {
+      "part_class": "gate_valve",
+      "subtype": "wedge_gate_DN100",
+      "confidence_score": 0.96,
+      "bounding_box": [0.12, 0.08, 0.88, 0.91]
+    },
+    "material_inference": {
+      "primary_material": "316L_stainless_steel",
+      "secondary_material": "PTFE_seat_ring",
+      "confidence_score": 0.91,
+      "surface_condition": "moderate_corrosion_grade_2",
+      "estimated_alloy_grade": "UNS_S31603"
+    },
+    "hazard_flags": {
+      "asbestos_era_likelihood": false,
+      "lead_solder_likelihood": true,
+      "pressurized_component": true,
+      "residual_fluid_risk": "hydrocarbon_likely"
+    },
+    "geometry_descriptor": {
+      "nominal_size_mm": 100,
+      "connection_type": "flanged_ANSI_B16.5",
+      "estimated_mass_kg": 14.2
+    },
+    "query_intent": "disassembly_sequence_retrieval",
+    "fallback_required": false
+  }
+}
+```
+
+**Key design decisions:**
+- `confidence_score` is set per-field, not globally — material inference is often less certain than part classification.
+- `hazard_flags` are inferred by the VLM but **overridden as `true`** by the safety gatekeeper if part age or material class meets OSHA threshold rules (defense-in-depth).
+- `query_intent` constrains RAG retrieval to specific document types (disassembly guides vs. material data sheets vs. regulatory filings).
+
+---
+
+### 1.3 Safety Gatekeeper Logic — Hitting 99% Protocol Accuracy
+
+The gatekeeper is a deterministic rule engine (not an LLM) that sits between the VLM and the RAG query layer. It enforces safety non-negotiables regardless of model confidence:
+
+```python
+SAFETY_OVERRIDE_RULES = [
+    # Rule 1: Any pressurized component requires PPE protocol injection
+    lambda p: p["hazard_flags"]["pressurized_component"] == True →
+        inject_doc_filter(["OSHA_1910.147", "ISO_4126"]),
+
+    # Rule 2: Lead solder likelihood → REACH compliance check mandatory
+    lambda p: p["hazard_flags"]["lead_solder_likelihood"] == True →
+        inject_doc_filter(["REACH_Annex_XVII", "RoHS_Directive"]),
+
+    # Rule 3: Hydrocarbon residual → ATEX / explosive atmosphere protocol
+    lambda p: p["hazard_flags"]["residual_fluid_risk"].startswith("hydrocarbon") →
+        inject_doc_filter(["ATEX_Directive_2014_34_EU", "NFPA_30"]),
+
+    # Rule 4: Low material confidence → human escalation, no auto-guide generation
+    lambda p: p["material_inference"]["confidence_score"] < 0.85 →
+        escalate_to_materials_engineer(),
+]
+```
+
+**The 99% target is achieved through layered redundancy:**
+
+| Layer | Mechanism | Accuracy Contribution |
+|---|---|---|
+| VLM Fine-tuning | Domain-specific training on 50K+ industrial part images | Base recall ~92% |
+| Constrained Decoding | Forced JSON output grammar, eliminates hallucinated field values | +4% |
+| Safety Rule Engine | Deterministic override for known hazard classes | +2% (safety-specific) |
+| Re-ranker | Cross-encoder validates semantic relevance of retrieved chunks | +1.5% |
+| Human Escalation Threshold | <0.92 confidence routes to expert review, not auto-generation | Eliminates tail-risk errors |
+
+> [!IMPORTANT]
+> The 99% target applies specifically to **safety protocol completeness** (no missing hazard steps), not overall answer quality. These are measured independently via Protocol Coverage Score (PCS) = (safety steps retrieved / safety steps ground-truth) × 100.
+
+---
+
+### 1.4 RAG Index Design for Industrial Manuals
+
+| Index Namespace | Source Documents | Chunk Strategy | Embedding Model |
+|---|---|---|---|
+| `disassembly_guides` | GrabCAD, OEM PDFs | Step-level chunks (one step per chunk) | `text-embedding-3-large` |
+| `material_data_sheets` | NIST MDS, MatWeb | Property-table chunks | `text-embedding-3-large` |
+| `safety_regulations` | OSHA, REACH, RoHS, ATEX | Clause-level chunks | `text-embedding-3-large` |
+| `failure_mode_library` | ISO 14224, FMEA databases | Failure-mode context chunks | `text-embedding-3-large` |
+
+**Metadata filters applied at query time** (not post-retrieval) to enforce precision:
+
+```json
+{
+  "rag_query_payload": {
+    "semantic_query": "disassembly sequence for wedge gate valve DN100 flanged ANSI B16.5 stainless steel",
+    "namespace_filter": ["disassembly_guides", "safety_regulations"],
+    "metadata_filters": {
+      "part_class": "gate_valve",
+      "material_family": "stainless_steel",
+      "regulatory_region": "EU",
+      "pressure_rated": true
+    },
+    "top_k": 8,
+    "rerank": true,
+    "safety_docs_mandatory": true
+  }
+}
+```
+
+---
+
+## Section 2 — Digital Product Passport (DPP) JSON Schema
+
+The schema follows EU Digital Product Passport Regulation (ESPR) principles and NIST Material Data curation standards, adapted for industrial component lifecycle tracking.
+
+```json
+{
+  "$schema": "https://ai-ecotrack.io/schemas/dpp/v2.0.json",
+  "$id": "urn:ai-ecotrack:dpp:comp-2024-valve-00842",
+  "schema_version": "2.0.0",
+
+  "passport_metadata": {
+    "passport_id": "DPP-2024-VALVE-00842",
+    "issued_at": "2024-11-15T09:32:00Z",
+    "issuing_entity": "AI-EcoTrack Platform v1.3",
+    "last_updated_at": "2026-03-01T14:17:00Z",
+    "lifecycle_stage": "end_of_service",
+    "regulatory_frameworks": ["EU_ESPR_2024", "REACH", "RoHS_3", "ISO_14067"]
+  },
+
+  "component_identity": {
+    "ecotrack_uid": "ECTK-2024-VALVE-00842",
+    "manufacturer_part_number": "GV-316L-DN100-PN16-ANSI",
+    "manufacturer": {
+      "name": "Crane Co.",
+      "duns_number": "004305731",
+      "country_of_origin": "DE"
+    },
+    "description": "Wedge Gate Valve, DN100, PN16, Flanged ANSI B16.5",
+    "serial_number": "SN-GC-2019-0088421",
+    "manufacture_date": "2019-03-12",
+    "installation_date": "2019-08-04",
+    "installation_location": {
+      "facility_id": "FAC-PLANT-02",
+      "line_id": "LINE-C-SECTION-4",
+      "asset_tag": "AST-00842"
+    }
+  },
+
+  "material_composition": {
+    "bill_of_materials": [
+      {
+        "component_name": "valve_body",
+        "material_designation": "316L Stainless Steel",
+        "material_standard": "ASTM A216 WCB",
+        "alloy_grade": "UNS_S31603",
+        "mass_kg": 11.8,
+        "mass_fraction_pct": 83.1,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 1.42,
+        "hazardous_substance_content": false
+      },
+      {
+        "component_name": "seat_ring",
+        "material_designation": "PTFE",
+        "material_standard": "ASTM D1457",
+        "alloy_grade": null,
+        "mass_kg": 0.3,
+        "mass_fraction_pct": 2.1,
+        "recyclability_class": "C",
+        "recovery_value_usd_per_kg": 0.08,
+        "hazardous_substance_content": false
+      },
+      {
+        "component_name": "stem_packing",
+        "material_designation": "Graphite-Inconel wire mesh",
+        "material_standard": "API 622",
+        "alloy_grade": "Inconel_625",
+        "mass_kg": 0.12,
+        "mass_fraction_pct": 0.85,
+        "recyclability_class": "B",
+        "recovery_value_usd_per_kg": 18.50,
+        "hazardous_substance_content": false
+      },
+      {
+        "component_name": "fasteners",
+        "material_designation": "A2-70 Stainless Steel Bolts",
+        "material_standard": "ISO 3506",
+        "alloy_grade": "UNS_S30400",
+        "mass_kg": 0.6,
+        "mass_fraction_pct": 4.23,
+        "recyclability_class": "A",
+        "recovery_value_usd_per_kg": 1.28,
+        "hazardous_substance_content": false
+      }
+    ],
+    "total_mass_kg": 14.2,
+    "weighted_recyclability_index": 0.86,
+    "total_theoretical_recovery_value_usd": 18.94
+  },
+
+  "service_history": {
+    "operating_hours": 52840,
+    "service_fluid": "crude_oil_light",
+    "max_operating_pressure_bar": 14.2,
+    "max_operating_temp_c": 88,
+    "maintenance_events": [
+      {
+        "event_id": "MNT-2021-0042",
+        "date": "2021-06-18",
+        "type": "packing_replacement",
+        "technician_id": "TECH-0091",
+        "parts_replaced": ["stem_packing"],
+        "condition_notes": "Minor stem wear, within tolerance per ISO 14224"
+      }
+    ],
+    "failure_codes_recorded": ["FC-LEAK-STEM-MINOR"],
+    "remaining_useful_life_estimate_hrs": 0
+  },
+
+  "disassembly_passport": {
+    "vlm_identification_event": {
+      "scan_timestamp": "2026-03-01T14:10:22Z",
+      "device_id": "DEVICE-FIELD-044",
+      "technician_id": "TECH-0114",
+      "vlm_model_version": "ecotrack-vlm-v2.1",
+      "part_confidence_score": 0.96,
+      "material_confidence_score": 0.91,
+      "hazard_flags_triggered": ["pressurized_component", "residual_fluid_risk"],
+      "safety_protocols_served": ["OSHA_1910.147", "ATEX_Directive_2014_34_EU", "NFPA_30"]
+    },
+    "recommended_disassembly_sequence": [
+      {
+        "step": 1,
+        "action": "Isolate valve from process line. Verify zero pressure via gauge at bleed port.",
+        "tool_required": "calibrated_pressure_gauge",
+        "safety_ref": "OSHA_1910.147_lockout_tagout",
+        "estimated_time_min": 15
+      },
+      {
+        "step": 2,
+        "action": "Drain residual process fluid. Collect in labeled HDPE container for disposal per site SOP-HAZ-007.",
+        "tool_required": "drain_valve_key",
+        "safety_ref": "NFPA_30_section_5.3",
+        "estimated_time_min": 20
+      },
+      {
+        "step": 3,
+        "action": "Remove bonnet bolts (8× M20 A2-70). Sequence: cross-pattern, 3 passes to 0 torque.",
+        "tool_required": "torque_wrench_250Nm",
+        "safety_ref": null,
+        "estimated_time_min": 12
+      },
+      {
+        "step": 4,
+        "action": "Extract wedge disc and stem assembly. Measure stem diameter; record wear value.",
+        "tool_required": "digital_micrometer",
+        "safety_ref": null,
+        "estimated_time_min": 8
+      },
+      {
+        "step": 5,
+        "action": "Separate seat rings. Label PTFE rings for Class-C thermal recovery bin.",
+        "tool_required": null,
+        "safety_ref": null,
+        "estimated_time_min": 5
+      }
+    ]
+  },
+
+  "end_of_life_routing": {
+    "assessment_date": "2026-03-01",
+    "assessed_by_technician": "TECH-0114",
+    "routing_decision": "material_recovery",
+    "routing_rationale": "Operating hours exceed 50K threshold; refurbishment cost exceeds replacement cost by 1.8×. High-grade 316L body warrants Class-A recovery.",
+    "material_streams": [
+      {
+        "material": "316L_stainless_steel",
+        "mass_kg": 11.8,
+        "purity_grade": "A",
+        "destination_bin_id": "BIN-SS316-A-07",
+        "estimated_spot_value_usd": 16.76
+      },
+      {
+        "material": "Inconel_625_packing",
+        "mass_kg": 0.12,
+        "purity_grade": "B",
+        "destination_bin_id": "BIN-NICKELALLOY-B-02",
+        "estimated_spot_value_usd": 2.22
+      },
+      {
+        "material": "PTFE_seat_ring",
+        "mass_kg": 0.3,
+        "purity_grade": "C",
+        "destination_bin_id": "BIN-POLYMER-C-11",
+        "estimated_spot_value_usd": 0.024
+      }
+    ],
+    "total_actual_recovery_value_usd": 18.99,
+    "recovery_efficiency_pct": 100.3
+  },
+
+  "audit_trail": [
+    {
+      "event": "passport_created",
+      "timestamp": "2024-11-15T09:32:00Z",
+      "actor": "AI-EcoTrack Platform"
+    },
+    {
+      "event": "vlm_scan_completed",
+      "timestamp": "2026-03-01T14:10:22Z",
+      "actor": "TECH-0114 via Device DEVICE-FIELD-044"
+    },
+    {
+      "event": "disassembly_guide_delivered",
+      "timestamp": "2026-03-01T14:11:05Z",
+      "actor": "AI-EcoTrack RAG Engine v2.1"
+    },
+    {
+      "event": "end_of_life_routing_confirmed",
+      "timestamp": "2026-03-01T14:30:00Z",
+      "actor": "TECH-0114"
+    }
+  ]
+}
+```
+
+> [!NOTE]
+> `weighted_recyclability_index` (WRI) is computed as: Σ(mass_fraction × recyclability_class_score) / total_mass, where Class A=1.0, B=0.6, C=0.2. This is the key KPI for circular economy reporting dashboards.
+
+---
+
+## Section 3 — Worker Incentive Model: Purity-Linked Compensation
+
+### 3.1 System Architecture
+
+```
+[IoT Load Cell on Sorting Bin] → [Edge Gateway (MQTT)] → [Cloud Aggregator]
+                                                                    │
+[AI-EcoTrack DPP Material Values] ──────────────────────────────────┤
+                                                                    │
+[Live Commodity Price Feed (LME / SCRAP API)] ──────────────────────┤
+                                                                    ▼
+                                              [Incentive Calculation Engine]
+                                                                    │
+                                                                    ▼
+                                              [Technician Incentive Ledger]
+                                              [Shift Dashboard + Mobile Alert]
+```
+
+---
+
+### 3.2 Purity Classification & Grade Mapping
+
+| Purity Grade | Definition | XRF / Sensor Confirmation | Point Multiplier |
+|---|---|---|---|
+| **A** | Single-alloy, uncontaminated, ≥98% base metal | Required for Ni, Ti, Cu alloys | 3.0× |
+| **B** | Mixed-grade but identifiable alloy family | Required for stainless families | 1.8× |
+| **C** | Mixed polymer or composite stream | Visual inspection | 0.5× |
+| **REJECT** | Cross-contaminated (e.g., SS + carbon steel in same bin) | Auto-flagged by density sensor | −2.0× (penalty) |
+
+---
+
+### 3.3 Incentive Calculation Formula
+
+**Daily Incentive (DI) per technician:**
+
+```
+DI = Σ [ (mass_kg × commodity_price_usd_per_kg × purity_multiplier) × shift_bonus_coeff ]
+         for each bin_closing_event in shift
+
+Where:
+  commodity_price_usd_per_kg  = Live LME spot price pulled at shift-end (15-min delayed)
+  purity_multiplier           = Grade A: 0.018 | Grade B: 0.010 | Grade C: 0.002
+                                (fraction of recovery value paid as incentive)
+  shift_bonus_coeff           = 1.0 (standard)
+                              = 1.25 (if zero REJECT events in shift)
+                              = 1.50 (if ≥95% of bins are Grade A for full week)
+```
+
+**Example Calculation — Single shift:**
+
+| Bin | Material | Mass (kg) | LME Price ($/kg) | Grade | Multiplier | Payout ($) |
+|---|---|---|---|---|---|---|
+| BIN-SS316-A-07 | 316L SS | 48.2 | 1.42 | A | 0.018 | $1.23 |
+| BIN-NICKELALLOY-B-02 | Inconel 625 | 12.5 | 18.50 | B | 0.010 | $2.31 |
+| BIN-CUALLOY-A-03 | C110 Copper | 22.0 | 8.80 | A | 0.018 | $3.48 |
+| BIN-POLYMER-C-11 | Mixed PTFE | 8.3 | 0.08 | C | 0.002 | $0.00 |
+| **Subtotal** | | | | | | **$7.02** |
+| Zero-reject bonus (×1.25) | | | | | | **$8.78** |
+
+A technician processing high-value alloys can realistically earn **$150–$300/month** in incentive pay on top of base wages in a mid-sized manufacturing facility — without requiring any subjective performance assessment.
+
+---
+
+### 3.4 Anti-Gaming Controls
+
+| Risk | Control Mechanism |
+|---|---|
+| Inflating mass by adding debris | Load cell delta cross-checked against DPP mass estimates (±15% tolerance) |
+| Falsely claiming Grade A | XRF spot-check protocol: 1 in 10 bins audited; penalty = 2× incentive clawback |
+| Bin switching between technicians | RFID-tagged bin assigned to technician at scan time; immutable in DPP audit trail |
+| Dumping hazardous into recovery bins | Inline spectrometry sensor on high-value bins; hazmat detection triggers bin lock |
+
+---
+
+### 3.5 Operational Dashboard KPIs
+
+| KPI | Target | Alert Threshold |
+|---|---|---|
+| Shift Purity Index (SPI) | ≥ 0.88 WRI | < 0.75 |
+| Grade A Bin Rate | ≥ 70% | < 50% |
+| REJECT Event Rate | ≤ 2% of bins | > 5% |
+| Recovery Value Capture Rate | ≥ 92% of theoretical DPP value | < 80% |
+| Avg Disassembly Time per Part | ≤ target (by part class) | > 150% of target |
+
+---
+
+## Section 4 — Aerospace Adaptation Strategy
+
+### 4.1 Context: Manufacturing vs. Aerospace MRO
+
+The core AI-EcoTrack architecture is valid for aerospace, but the **compliance environment, material families, and traceability requirements** are fundamentally different from general manufacturing.
+
+| Dimension | General Manufacturing | Aerospace MRO |
+|---|---|---|
+| Regulatory Framework | OSHA, REACH, RoHS | FAA Order 8130.3, AS9100D, EASA Part 145 |
+| Traceability Depth | Component-level | Serialized sub-component level (fasteners, bearings) |
+| Material Families | Carbon/stainless steel, cast iron, PTFE | Ti-6Al-4V, Inconel 718, CFRP, Al 7075-T6 |
+| Part Retirement Trigger | Hours / Corrosion / Cost | Calendar life, cycle count, stress exposure |
+| Disassembly Authority | Factory technician | Licensed AME / A&P Mechanic (FAA Part 65) |
+| Data Integrity Standard | Internal ERP | CAMP / AMOS MRO software + FAA Form 337 |
+
+---
+
+### 4.2 VLM Adaptation for Aerospace Parts
+
+**Training corpus additions required:**
+
+| Dataset | Source | Purpose |
+|---|---|---|
+| Boeing CMM image sets | Negotiated OEM access | Part identification for high-life components |
+| Airbus IPC (Illustrated Parts Catalog) | Airbus MRO portal | Subcomponent mapping and serialization |
+| NIST Aerospace Alloy Database | NIST MML | Material inference for Ti, Ni, Al aerospace grades |
+| FAA Suspected Unapproved Parts (SUP) database | FAA.gov | Counterfeit part detection visual signatures |
+| CFRP delamination image library | NASA Technical Reports | Surface condition grading for composite panels |
+
+**New VLM output fields for aerospace:**
+
+```json
+{
+  "aerospace_extensions": {
+    "part_number_faa": "NAS6703U4D",
+    "airworthiness_tag": {
+      "form_8130_3_present": true,
+      "tag_id": "8130-2024-AA-004421",
+      "certifying_authority": "EASA_Part_21J"
+    },
+    "cycle_count_visible": false,
+    "suspected_unapproved_part_risk": 0.04,
+    "life_limit_status": {
+      "calendar_life_remaining_days": 0,
+      "total_cycles_estimated": 12440,
+      "life_limit_cycles": 12000,
+      "status": "life_expired"
+    },
+    "scrap_mandatory": true,
+    "scrap_mutilation_required": true
+  }
+}
+```
+
+> [!CAUTION]
+> Life-expired aerospace parts are subject to **mandatory scrap mutilation** under FAA Advisory Circular AC 20-62E. The DPP must record the mutilation event and the part must never re-enter the parts supply chain. The AI-EcoTrack system must enforce a hard `scrap_mandatory` flag that prevents routing to any refurbishment stream.
+
+---
+
+### 4.3 Aerospace DPP Lifecycle Stages
+
+```
+[New Part Manufacture] → Form 8130-3 issued → DPP Created
+        │
+        ▼
+[In-Service (Aircraft)] → Cycle count incremented per flight log
+        │
+        ▼
+[MRO Event] → VLM scan → Condition graded → Repair or Return-to-Service cert
+        │
+        ▼
+[Life Limit Reached] → Mandatory removal → DPP lifecycle_stage = "life_expired"
+        │
+        ├──→ [Scrap for Material Recovery] → Ti/Ni alloy to certified scrap yard
+        │       DPP records: mutilation_confirmed = true, mutilation_witness_id
+        │
+        └──→ [Serviceable Used Part — if life remaining] → DPP transferred to new operator
+```
+
+---
+
+### 4.4 Material Recovery Value — Aerospace Alloy Specifics
+
+The economics of aerospace material recovery are substantially higher than general manufacturing:
+
+| Alloy | Typical Component | Recovery Grade | LME/SCRAP Price ($/kg) | vs. Carbon Steel |
+|---|---|---|---|---|
+| Ti-6Al-4V | Fan blades, fasteners, landing gear | A | $28–$35 | 35–44× |
+| Inconel 718 | Turbine discs, combustor casings | A | $20–$28 | 25–35× |
+| Al 7075-T6 | Wing spars, fuselage frames | A | $1.80–$2.20 | 2.3–2.8× |
+| CFRP panels | Nacelles, control surfaces | C (recyclate) | $0.50–$1.20 | 0.6–1.5× |
+| Hastelloy X | Combustor liners | B | $14–$18 | 18–23× |
+
+**Strategic implication:** A single retired CFM56 turbine disc (Inconel 718, ~120 kg) represents **$2,400–$3,360** in certified scrap recovery value. Material purity assurance at the aerospace scrap yard level directly impacts smelter procurement agreements and justifies the full AI-EcoTrack deployment cost in a single part.
+
+---
+
+### 4.5 Compliance Integration Layer
+
+To operate in an aerospace MRO context, AI-EcoTrack requires an additional **Compliance API Layer**:
+
+```
+[AI-EcoTrack DPP Engine]
+        │
+        ├──→ [CAMP / AMOS MRO Sync]  ← Bi-directional: pulls cycle counts, pushes scan events
+        │
+        ├──→ [FAA DragonWave / Aviation Registry API]  ← Validates part numbers vs. TSO/PMA status
+        │
+        ├──→ [AS9100D QMS Integration]  ← Pushes disassembly events as quality records
+        │
+        └──→ [Certified Scrap Yard API (e.g., Kitchener Clark)]  ← Pushes DPP + mutilation cert
+```
+
+---
+
+## Appendix: Key Performance Metrics Summary
+
+| Metric | Target | Measurement Method |
+|---|---|---|
+| VLM Part Classification Accuracy | ≥ 96% | Validation set of 5,000 labeled industrial parts |
+| Safety Protocol Coverage Score | ≥ 99% | Ground-truth safety checklist vs. retrieved steps |
+| Material Inference Accuracy | ≥ 91% | XRF verification of VLM material calls |
+| DPP Completeness Rate | 100% | Every scanned part must generate a closed DPP |
+| Weighted Recyclability Index (WRI) | ≥ 0.85 facility avg | Calculated from DPP bill-of-materials |
+| Recovery Value Capture Rate | ≥ 92% | Actual scrap revenue / theoretical DPP value |
+| Grade A Bin Rate | ≥ 70% | IoT sensor + audit log |
+| Aerospace: Zero SUP False Negative Rate | 100% | All suspected unapproved parts must be flagged |
+
+---
+
+*AI-EcoTrack Technical Specification v1.0 — Prepared by AI-EcoTrack Architecture Team*
+*Standards Referenced: OSHA 1910.147 | REACH Annex XVII | RoHS Directive 2011/65/EU | ATEX 2014/34/EU | NFPA 30 | ISO 14224 | ISO 14067 | AS9100D | FAA AC 20-62E | FAA Order 8130.3 | EASA Part 145 | EU ESPR 2024*

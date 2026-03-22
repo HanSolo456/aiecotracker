@@ -1,0 +1,599 @@
+{
+    "metadata": {
+        "version": "1.0",
+        "last_updated": "2026-03",
+        "description": "Per-material regulatory compliance rules for RoHS 3, REACH SVHC, WEEE Directive, EU ESPR 2024, and BIS India standards. Used to populate the Digital Product Passport compliance frameworks section.",
+        "maintained_by": "AI-EcoTrack Compliance Engine",
+        "legal_disclaimer": "This data is for informational purposes. Always verify with a qualified EHS professional before making regulatory claims."
+    },
+    "frameworks": {
+        "RoHS3": {
+            "full_name": "EU Restriction of Hazardous Substances Directive 3",
+            "citation": "EU Directive 2015/863 amending Annex II of 2011/65/EU",
+            "scope": "Electrical and Electronic Equipment (EEE) placed on EU market",
+            "threshold_note": "Max concentration values (MCV) apply per homogeneous material"
+        },
+        "REACH": {
+            "full_name": "Registration, Evaluation, Authorisation and Restriction of Chemicals",
+            "citation": "EU Regulation EC 1907/2006",
+            "scope": "Chemical substances manufactured or imported in EU ≥1 tonne/year",
+            "svhc_list_version": "SVHC Candidate List — January 2024 (240 entries)"
+        },
+        "WEEE": {
+            "full_name": "Waste Electrical and Electronic Equipment Directive",
+            "citation": "EU Directive 2012/19/EU",
+            "scope": "EEE placed on EU market — collection, treatment, recovery targets",
+            "india_equivalent": "E-Waste (Management) Rules 2022 (MoEFCC)"
+        },
+        "EU_ESPR_2024": {
+            "full_name": "EU Ecodesign for Sustainable Products Regulation",
+            "citation": "EU Regulation 2024/1781",
+            "scope": "Digital Product Passport mandatory for regulated product categories from 2026",
+            "dpp_requirement": "Structured data on material composition, recyclability, repairability, and end-of-life"
+        },
+        "BIS_India": {
+            "full_name": "Bureau of Indian Standards — Mandatory Certification",
+            "citation": "BIS Act 2016; relevant IS standards per product category",
+            "scope": "Products under mandatory BIS certification in India (IS marks)",
+            "e_waste_rule": "E-Waste (Management) Rules 2022 — Extended Producer Responsibility (EPR)"
+        }
+    },
+    "materials": [
+        {
+            "id": "carbon_steel",
+            "display_name": "Carbon Steel (ASTM A216 WCB / A105)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Carbon steel does not contain RoHS-restricted substances at concentrations above MCV. Lead content in free-machining variants (AISI 12L14) may exceed 0.1% — XRF verify if free-machining grade suspected."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Clean carbon steel scrap is not REACH SVHC-listed. Chromate surface treatments or lead-based paints applied to carbon steel parts may trigger REACH obligations — verify surface treatment history."
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Carbon steel is not classified as EEE material. No WEEE collection obligation. Standard ferrous scrap stream.",
+                "india_e_waste_rule": "NOT_APPLICABLE"
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "B",
+                "dpp_data_required": [
+                    "material_composition",
+                    "mass_kg",
+                    "alloy_grade"
+                ],
+                "end_of_life_route": "Ferrous scrap — EAF or BOF remelting",
+                "repairability_index": "N/A"
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 2062 (Hot Rolled Steel)",
+                    "IS 1239 (Mild Steel Tubes)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": false,
+                "disposal_rule": "Metal scrap — Scrap Dealer Rules 2013 (Ministry of Steel)"
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "cast_iron",
+            "display_name": "Grey Cast Iron (ASTM A48 Class 30)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Grey cast iron is RoHS compliant. High silicon content (2–3%). Does not contain restricted substances at concern thresholds."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Cast iron scrap is not REACH SVHC-listed. Legacy cast iron from pre-1990 equipment may contain graphite flake with trace heavy metal inclusions — not typically an issue at scrap quantities."
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE. Standard ferrous scrap stream.",
+                "india_e_waste_rule": "NOT_APPLICABLE"
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "B",
+                "dpp_data_required": [
+                    "material_composition",
+                    "mass_kg"
+                ],
+                "end_of_life_route": "Foundry returns — grey iron remelting"
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 210 (Grey Iron Castings)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": false
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "stainless_steel_CF8M",
+            "display_name": "Stainless Steel 316L / CF8M",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Austenitic stainless steel is RoHS compliant. Chromium (Cr) present ≥16% but as alloying element in substrate, not as restricted hexavalent Cr(VI). Cr(VI) MCV is 0.1% in homogeneous material — metallic Cr is not Cr(VI)."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Metallic stainless steel is not REACH SVHC. Note: Nickel (Ni) is SVHC for skin sensitisation but applies to Ni compounds and skin-contact articles — bulk stainless steel scrap is not restricted. Molybdenum in 316L is not SVHC-listed."
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE. Standard non-ferrous high-grade scrap stream.",
+                "india_e_waste_rule": "NOT_APPLICABLE"
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "material_composition",
+                    "alloy_grade",
+                    "mass_kg",
+                    "recyclability_class"
+                ],
+                "end_of_life_route": "SS melt shop — EAF with SS charge",
+                "recycled_content_potential_pct": 80
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 6911 (Stainless Steel Plate Sheet Strip)",
+                    "IS 6603 (SS Bars and Flats)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": false
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "duplex_ss_2205",
+            "display_name": "Duplex Stainless Steel 2205 (UNS S32205)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Duplex SS is RoHS compliant. Higher Cr content (22%) remains as metallic alloying element — not Cr(VI). Nitrogen alloying element is non-restricted."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Duplex stainless steel is not REACH SVHC-listed as bulk metal. Same Ni caveat as austenitic SS — not applicable to bulk scrap."
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE."
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "material_composition",
+                    "alloy_grade",
+                    "XRF_verification_required"
+                ],
+                "end_of_life_route": "Specialty SS melt — must stay separate from austenitic to preserve duplex grade",
+                "key_requirement": "XRF verification mandatory to justify Grade A premium routing"
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 6911"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": false
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "inconel_625",
+            "display_name": "Inconel 625 (UNS N06625) — Nickel Superalloy",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Inconel 625 is RoHS compliant. Contains Ni (~62%), Cr (~22%), Mo (~9%), Nb (~4%) as alloying elements. None present as restricted compounds at MCV levels."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [
+                    {
+                        "substance": "Nickel (as compounds — skin sensitiser)",
+                        "cas": "7440-02-0",
+                        "SVHC_entry": "EC 231-111-4",
+                        "relevance": "LOW — SVHC applies to Ni compounds and skin-contact articles as articles. Bulk Inconel scrap is not restricted. Ni grinding dust during machining/cutting is occupational health concern (OSHA PEL 1.0 mg/m³).",
+                        "action_required": "PPE during cutting/grinding operations"
+                    }
+                ],
+                "status": "MONITOR — Ni dust exposure during processing",
+                "notes": "Bulk Inconel 625 metal is not SVHC. Worker protection required for any operations generating Ni metal dust."
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE. However, Inconel 625 used in EEE applications (e.g. aerospace electronics enclosures) would require WEEE tracking."
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "alloy_grade",
+                    "mill_certificate",
+                    "XRF_verification",
+                    "mass_kg",
+                    "application_history"
+                ],
+                "end_of_life_route": "Specialty Ni alloy recycler — dedicated Inconel 625 stream. Never mix with Inconel 718 or Hastelloy without XRF.",
+                "high_value_flag": true,
+                "recycled_content_potential_pct": 95
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 1570 (Alloy Steels)",
+                    "DGFT regulations for Ni alloy exports"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": false,
+                "export_control": "Ni superalloys may be subject to SCOMET (dual-use) export controls if aerospace-grade — verify with DGFT before export."
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false,
+                "worker_health_note": "Ni metal dust: OSHA PEL 1.0 mg/m³. Respiratory protection required during cutting/grinding operations."
+            }
+        },
+        {
+            "id": "hastelloy_c276",
+            "display_name": "Hastelloy C-276 (UNS N10276)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Hastelloy C-276 is RoHS compliant. Contains Ni (~55%), Mo (~16%), Cr (~16%), W (~4%). Not restricted under RoHS 3 as bulk metal."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [
+                    {
+                        "substance": "Nickel (as compounds — skin sensitiser)",
+                        "cas": "7440-02-0",
+                        "relevance": "LOW — Same as Inconel. PPE required for cutting/grinding.",
+                        "action_required": "PPE during processing"
+                    }
+                ],
+                "status": "MONITOR — Ni dust exposure"
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE."
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "alloy_grade",
+                    "XRF_verification",
+                    "mass_kg",
+                    "service_environment"
+                ],
+                "end_of_life_route": "Dedicated C276 stream — must not contaminate C22 or C2000 scrap",
+                "high_value_flag": true
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "DGFT SCOMET check for export of Ni-Mo alloys"
+                ],
+                "mandatory_certification": false
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "titanium_6al4v",
+            "display_name": "Titanium Ti-6Al-4V (UNS R56400)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Titanium alloys are RoHS compliant. No restricted substances at concern levels. Vanadium (V) in Ti-6Al-4V is not SVHC-listed as metallic alloy element."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Ti-6Al-4V bulk metal is not REACH SVHC. Ti metal dust is flammable (Class 4.1 flammable solid per IMDG) — fire precautions required during machining."
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE. Aerospace/medical grade Ti tracked under AS9100/ISO 13485 traceability systems."
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "alloy_grade",
+                    "life_limit_status",
+                    "flight_hours_if_aviation",
+                    "mill_certificate",
+                    "XRF_verification"
+                ],
+                "end_of_life_route": "Life-expired aviation Ti: MUST be mutilated per FAA AC 20-62E before scrap. Non-life-expired: specialty Ti recycler or certified scrap.",
+                "critical_requirement": "Life limit check mandatory — aviation-grade Ti parts have cycle/hour limits. Exception from MCV for safety-critical parts."
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 14286 (Titanium and Titanium Alloy Products)"
+                ],
+                "mandatory_certification": false,
+                "export_control": "SCOMET (Schedule 2) — aerospace-grade titanium alloys are dual-use controlled. DGFT Special Chemicals, Organisms, Materials, Equipment and Technologies list applies.",
+                "e_waste_rule_applicable": false
+            },
+            "hazardous_classification": {
+                "is_hazardous": true,
+                "hazard_note": "Ti metal dust/powder is a Class 4.1 flammable solid. Machining chips can ignite spontaneously. Fire extinguisher Class D (dry sand) required — water will accelerate Ti fires.",
+                "un_class": "UN3089 (Metal Powder, Flammable NOS)",
+                "special_disposal_required": false,
+                "bulk_hazardous": false
+            }
+        },
+        {
+            "id": "copper_alloy",
+            "display_name": "Copper C110 (ETP Copper)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Pure copper is RoHS compliant. Note: Lead-free solder used with copper must also comply. Copper-beryllium alloys (e.g. C17200) are NOT RoHS compliant — verify alloy before classification."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Copper C110 is not SVHC-listed. Copper compounds (CuSO4, Cu2O, etc.) may be SVHC — not applicable to metallic scrap. Avoid acid-treated copper scrap without confirming residue neutralisation."
+            },
+            "WEEE": {
+                "applicable": true,
+                "reason": "Copper windings and busbars from EEE (motors, transformers) fall within WEEE scope when derived from categorised EEE equipment.",
+                "weee_category": "Large Industrial Tools / Monitoring Equipment",
+                "india_e_waste_rule": "E-Waste (Management) Rules 2022 — Category 6 (Large Equipment). Producer EPR registered? Check CPCB EPR portal.",
+                "collection_target": "65% by weight from EEE categories"
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "source_application",
+                    "mass_kg",
+                    "purity_grade",
+                    "insulation_stripped_flag"
+                ],
+                "end_of_life_route": "Non-ferrous scrap dealer → copper smelter (Hindalco/Sterlite). Strip insulation before delivery.",
+                "recycled_content_potential_pct": 99
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 191 (Copper and Copper Alloys)",
+                    "IS 613 (Copper Conductors)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": true,
+                "epr_note": "EEE-derived copper covered under Extended Producer Responsibility. Producer must be EPR-registered with CPCB."
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "naval_brass_c464",
+            "display_name": "Naval Brass C464 (CuZn30Sn)",
+            "RoHS3": {
+                "status": "CONDITIONAL — CHECK LEAD CONTENT",
+                "restricted_substances_detected": [
+                    "Lead (Pb) — free-machining brass variants may contain Pb > 0.1%"
+                ],
+                "notes": "Standard naval brass C464 is RoHS compliant (<0.01% Pb). However, free-machining brass (C36000) contains 2–3% Pb — EXCEEDS RoHS MCV of 0.1%. XRF test required to distinguish C464 from C36000. If Pb > 0.1%: RoHS non-compliant for EEE application."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [
+                    {
+                        "substance": "Lead (Pb) — if free-machining grade",
+                        "cas": "7439-92-1",
+                        "SVHC_entry": "EC 231-100-4",
+                        "relevance": "HIGH — Lead is SVHC. If brass contains Pb > 0.1% wt and component forms part of an article placed on EU market, SVHC declaration to recipient required per REACH Art. 33.",
+                        "action_required": "XRF verify Pb content. If > 0.1%: issue SVHC notification. Route to Pb-containing brass scrap stream (separate from low-Pb brass)."
+                    }
+                ],
+                "status": "CONDITIONAL — XRF verify Pb content"
+            },
+            "WEEE": {
+                "applicable": true,
+                "reason": "Brass components from EEE (switches, connectors, valve actuators on EEE) fall within WEEE scope.",
+                "india_e_waste_rule": "E-Waste (Management) Rules 2022 — applicable if from EEE equipment"
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "alloy_grade",
+                    "lead_content_pct",
+                    "XRF_result",
+                    "mass_kg"
+                ],
+                "end_of_life_route": "Jamnagar brass cluster (India) — world's largest. Separate Pb-containing from clean brass."
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 291 (Brass Ingots)",
+                    "IS 319 (Free-cutting Brass)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": true
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "lead_risk": "If Pb content confirmed > 1%: Handle as lead-containing waste per HWM Rules 2016. PPE — gloves, no hand-to-mouth contact.",
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "aluminium_alloy",
+            "display_name": "Aluminium 6061-T6 / 7075-T6",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Aluminium alloys are RoHS compliant. Small amounts of Cu, Mg, Si as alloying elements are not restricted. Chrome conversion coatings (Cr(VI) surface treatment) on aluminium may be non-compliant — XRF surface test if chromate-coated."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [],
+                "status": "NO_SVHC_IDENTIFIED",
+                "notes": "Aluminium bulk metal not SVHC. Chromate surface treatments (e.g. Alodine/Iridite) may contain Cr(VI) which is SVHC — check treatment history. Anodising (not chromate) is safe."
+            },
+            "WEEE": {
+                "applicable": true,
+                "reason": "Aluminium motor frames, housing from EEE are within WEEE scope. Track source application.",
+                "india_e_waste_rule": "E-Waste (Management) Rules 2022 — applicable if sourced from EEE"
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "alloy_grade",
+                    "surface_treatment",
+                    "mass_kg",
+                    "source_application"
+                ],
+                "end_of_life_route": "Secondary Al smelter — separate 6xxx from 2xxx and 7xxx series for maximum value.",
+                "recycled_content_potential_pct": 95
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 733 (Aluminium Alloy Bars)",
+                    "IS 736 (Aluminium Alloy Forgings)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": true,
+                "export_ban": "Aluminium scrap export currently banned under DGFT — verify current status before export."
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        },
+        {
+            "id": "PTFE_seat_ring",
+            "display_name": "PTFE (Polytetrafluoroethylene)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "PTFE itself is RoHS compliant. However, PTFE production involves PFAS chemicals — not restricted under RoHS 3 as of 2024. EU is reviewing PFAS restriction under REACH."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [
+                    {
+                        "substance": "PFOA (Perfluorooctanoic acid) and related PFAS",
+                        "cas": "335-67-1",
+                        "SVHC_entry": "EC 206-397-9",
+                        "relevance": "HIGH — PFOA is restricted under POPs Regulation (EU 2019/1021) and REACH Annex XVII. PTFE itself is not PFOA, but degradation and thermal processing of PTFE can generate PFOA. Incineration of PTFE at non-specialist facility is prohibited.",
+                        "action_required": "Route to licensed fluoropolymer recycler. NEVER incinerate in standard waste streams."
+                    }
+                ],
+                "status": "RESTRICTED PROCESSING — fluoropolymer specialist required"
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "PTFE seals and seats are not EEE. Treated as industrial polymer waste."
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "C",
+                "dpp_data_required": [
+                    "material_designation",
+                    "mass_kg",
+                    "service_fluid_history"
+                ],
+                "end_of_life_route": "Licensed fluoropolymer recycler — processing under controlled temperature (<300°C). Do NOT co-process with other polymers.",
+                "disposal_restriction": "INCINERATION PROHIBITED without licensed POPs incinerator"
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "Hazardous Waste Management Rules 2016 — Schedule II (Persistent Organic Pollutants)"
+                ],
+                "mandatory_certification": false,
+                "e_waste_rule_applicable": false,
+                "disposal_rule": "PFAS waste requires licensed TSDF (Treatment, Storage and Disposal Facility) authorised by SPCB. Not landfillable."
+            },
+            "hazardous_classification": {
+                "is_hazardous": true,
+                "hazard_note": "PTFE thermal decomposition above 400°C releases PFIB (perfluoroisobutylene), a highly toxic gas. At 500°C+, PTFE fume fever risk (polymer fume fever). Do NOT weld, burn, or cut with thermal tools without specialist PPE.",
+                "un_class": null,
+                "special_disposal_required": true,
+                "disposal_facility_type": "Licensed fluoropolymer / POPs TSDF"
+            }
+        },
+        {
+            "id": "monel_400",
+            "display_name": "Monel 400 (UNS N04400)",
+            "RoHS3": {
+                "status": "COMPLIANT",
+                "restricted_substances_detected": [],
+                "notes": "Monel 400 (Ni-Cu alloy) is RoHS compliant. No restricted substances at MCV levels as bulk metal."
+            },
+            "REACH": {
+                "svhc_substances_of_concern": [
+                    {
+                        "substance": "Nickel (as compounds — skin sensitiser)",
+                        "cas": "7440-02-0",
+                        "relevance": "LOW — Same as other Ni alloys. Bulk scrap not restricted. PPE for cutting/grinding.",
+                        "action_required": "PPE during processing"
+                    }
+                ],
+                "status": "MONITOR — Ni dust"
+            },
+            "WEEE": {
+                "applicable": false,
+                "reason": "Not EEE."
+            },
+            "EU_ESPR_2024": {
+                "recyclability_class": "A",
+                "dpp_data_required": [
+                    "alloy_grade",
+                    "XRF_verification",
+                    "mass_kg"
+                ],
+                "end_of_life_route": "Monel-specific Ni-Cu alloy recycler. Separate from pure Ni and Inconel streams."
+            },
+            "BIS_India": {
+                "relevant_standards": [
+                    "IS 1570 Part 5 (Ni alloy steels)"
+                ],
+                "mandatory_certification": false
+            },
+            "hazardous_classification": {
+                "is_hazardous": false,
+                "un_class": null,
+                "special_disposal_required": false
+            }
+        }
+    ],
+    "general_india_disposal_rules": {
+        "hazardous_waste_framework": "Hazardous Waste (Management, Handling and Transboundary Movement) Rules 2016",
+        "e_waste_framework": "E-Waste (Management) Rules 2022 (MoEFCC)",
+        "scrap_dealer_rules": "Metal Scrap Dealers Rules 2013 (Ministry of Steel)",
+        "key_contacts": {
+            "CPCB": "Central Pollution Control Board — cpcb.nic.in (EPR, WEEE)",
+            "MoEFCC": "Ministry of Environment, Forest and Climate Change — moef.gov.in",
+            "DGFT": "Directorate General of Foreign Trade — dgft.gov.in (export controls)"
+        }
+    }
+}

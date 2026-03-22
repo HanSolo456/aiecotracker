@@ -1,0 +1,235 @@
+'use client';
+
+import { FormEvent, useMemo, useState } from 'react';
+import { Loader2, MessageSquare, Send } from 'lucide-react';
+import type {
+    ChatAssistantResponse,
+    GuideResult,
+    PartMetadataPayload,
+    SourceCitation,
+} from '@/types';
+
+type AssistantMessage = {
+    role: 'user' | 'assistant';
+    content: string;
+    citations?: SourceCitation[];
+};
+
+type ContextualAssistantProps = {
+    payload?: PartMetadataPayload | null;
+    guide?: GuideResult | null;
+    surface: 'scan_result' | 'guide';
+    title?: string;
+    description?: string;
+};
+
+export default function ContextualAssistant({
+    payload = null,
+    guide = null,
+    surface,
+    title = 'Ask AI Assistant',
+    description = 'Questions only. It explains the current result and guide, but does not replace scanning.',
+}: ContextualAssistantProps) {
+    const [draft, setDraft] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [messages, setMessages] = useState<AssistantMessage[]>([
+        {
+            role: 'assistant',
+            content: 'Ask about hazards, material reasoning, guide steps, PPE, or why the item was classified this way.',
+        },
+    ]);
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+
+    const initialSuggestions = useMemo(() => {
+        const next = new Set<string>();
+
+        if (surface === 'scan_result') {
+            next.add('Why did AI classify it this way?');
+            next.add('What hazards matter most here?');
+        }
+
+        if (surface === 'guide' || guide) {
+            next.add('What are the first three steps I should follow?');
+            next.add('What PPE or tools are required?');
+        }
+
+        if (payload?.material_inference.primary_material) {
+            next.add(`What does the ${payload.material_inference.primary_material.replace(/_/g, ' ')} result imply?`);
+        }
+
+        next.add('Give me a concise safety summary.');
+        return Array.from(next).slice(0, 4);
+    }, [guide, payload, surface]);
+
+    const visibleSuggestions = suggestions.length > 0 ? suggestions : initialSuggestions;
+
+    async function submitQuestion(question: string) {
+        const trimmed = question.trim();
+        if (!trimmed || loading) return;
+
+        setLoading(true);
+        setError(null);
+        setMessages((current) => [...current, { role: 'user', content: trimmed }]);
+        setDraft('');
+
+        try {
+            const res = await fetch('/api/chat-assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: trimmed,
+                    payload,
+                    guide,
+                    surface,
+                }),
+            });
+
+            const data = (await res.json()) as ChatAssistantResponse;
+            if (!res.ok || !data.success || !data.answer) {
+                throw new Error(data.error ?? 'Assistant request failed.');
+            }
+
+            setMessages((current) => [
+                ...current,
+                {
+                    role: 'assistant',
+                    content: data.answer!,
+                    citations: data.citations,
+                },
+            ]);
+            setSuggestions(data.suggested_questions ?? []);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Assistant request failed.');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        void submitQuestion(draft);
+    }
+
+    return (
+        <div className="card p-4">
+            <div className="flex items-start gap-3 mb-4">
+                <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.28)' }}
+                >
+                    <MessageSquare size={18} className="text-blue-400" />
+                </div>
+                <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                    <p className="text-xs text-secondary mt-1">{description}</p>
+                </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+                {visibleSuggestions.map((suggestion) => (
+                    <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => void submitQuestion(suggestion)}
+                        disabled={loading}
+                        className="text-xs px-3 py-1.5 rounded-full transition-colors"
+                        style={{
+                            background: 'rgba(148,163,184,0.08)',
+                            border: '1px solid rgba(148,163,184,0.18)',
+                            color: 'var(--text-secondary)',
+                            opacity: loading ? 0.6 : 1,
+                        }}
+                    >
+                        {suggestion}
+                    </button>
+                ))}
+            </div>
+
+            <div className="flex flex-col gap-3 mb-4">
+                {messages.map((message, index) => (
+                    <div
+                        key={`${message.role}-${index}`}
+                        className="rounded-2xl px-4 py-3"
+                        style={{
+                            background: message.role === 'assistant' ? 'var(--bg-elevated)' : 'rgba(132,204,22,0.12)',
+                            border: message.role === 'assistant'
+                                ? '1px solid var(--border)'
+                                : '1px solid rgba(132,204,22,0.24)',
+                            marginLeft: message.role === 'user' ? '2rem' : 0,
+                        }}
+                    >
+                        <p className="text-[11px] uppercase tracking-wide font-semibold mb-1.5" style={{ color: message.role === 'assistant' ? 'var(--text-muted)' : '#a3e635' }}>
+                            {message.role === 'assistant' ? 'Assistant' : 'You'}
+                        </p>
+                        <p className="text-sm leading-relaxed text-white whitespace-pre-wrap">{message.content}</p>
+                        {message.citations && message.citations.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {message.citations.map((citation) => (
+                                    <span
+                                        key={`${citation.namespace}-${citation.title}`}
+                                        className="text-[11px] px-2 py-1 rounded-full"
+                                        style={{
+                                            background: 'rgba(96,165,250,0.12)',
+                                            border: '1px solid rgba(96,165,250,0.22)',
+                                            color: '#bfdbfe',
+                                        }}
+                                    >
+                                        {citation.title}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                <label className="sr-only" htmlFor={`assistant-question-${surface}`}>
+                    Ask a question
+                </label>
+                <textarea
+                    id={`assistant-question-${surface}`}
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value)}
+                    placeholder="Ask about safety, classification, tools, or guide steps..."
+                    rows={3}
+                    className="w-full rounded-2xl px-4 py-3 text-sm resize-none outline-none"
+                    style={{
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)',
+                    }}
+                />
+
+                <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] text-muted">
+                        This assistant answers questions from the current context only.
+                    </p>
+                    <button
+                        type="submit"
+                        disabled={loading || !draft.trim()}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-opacity"
+                        style={{
+                            background: '#60A5FA',
+                            color: '#08111f',
+                            opacity: loading || !draft.trim() ? 0.65 : 1,
+                        }}
+                    >
+                        {loading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                        Ask
+                    </button>
+                </div>
+
+                {error && (
+                    <div
+                        className="rounded-xl px-3 py-2 text-xs"
+                        style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#fca5a5' }}
+                    >
+                        {error}
+                    </div>
+                )}
+            </form>
+        </div>
+    );
+}
