@@ -2,15 +2,19 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import {
-    browserLocalPersistence,
     getRedirectResult,
     onAuthStateChanged,
-    setPersistence,
     signOut as firebaseSignOut,
     type User,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db, firebaseReady } from '@/lib/firebase';
+import {
+    clearGoogleRedirectPending,
+    clearGoogleRedirectState,
+    hasGoogleRedirectPending,
+    saveGoogleRedirectError,
+} from '@/lib/firebase';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -149,17 +153,20 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         };
 
         void (async () => {
-            try {
-                await setPersistence(auth, browserLocalPersistence);
-            } catch {
-                /* persistence may already be configured */
-            }
-
             let redirectUser: User | null = null;
             try {
                 const redirectCred = await getRedirectResult(auth);
                 redirectUser = redirectCred?.user ?? null;
+                if (redirectUser) {
+                    clearGoogleRedirectState();
+                    if (redirectCred) {
+                        (window as any).__googleRedirectCredential = redirectCred;
+                    }
+                }
             } catch (err) {
+                const code = (err as { code?: string })?.code ?? 'auth/redirect-failed';
+                saveGoogleRedirectError(code);
+                clearGoogleRedirectPending();
                 console.warn('[AuthContext] getRedirectResult:', err);
             }
 
@@ -180,6 +187,13 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
                 /* ignore */
             }
 
+            // If we initiated redirect, came back, and still have no user, surface a concrete
+            // error code for the auth page instead of silently showing login again.
+            if (!redirectUser && !auth.currentUser && hasGoogleRedirectPending()) {
+                saveGoogleRedirectError('auth/redirect-no-user');
+                clearGoogleRedirectPending();
+            }
+
             if (cancelled) return;
 
             // If redirect already applied, we still subscribe for future changes (sign out, etc.)
@@ -188,6 +202,9 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
                     let u = firebaseUser;
                     if (u === null && auth.currentUser) {
                         u = auth.currentUser;
+                    }
+                    if (u) {
+                        clearGoogleRedirectState();
                     }
                     await applyAuthUser(u);
                 })();

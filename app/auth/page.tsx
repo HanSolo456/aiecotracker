@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Leaf, Mail, Lock, User, Eye, EyeOff, ArrowRight, ChevronLeft } from 'lucide-react';
 import { signInWithGoogle, signInWithEmail, registerWithEmail, resetPassword, signInAsGuest } from '@/lib/firebase';
+import { consumeGoogleRedirectError } from '@/lib/firebase';
 import { isTauriWebview } from '@/lib/isTauriWebview';
 import GoogleSignInTauriButton from '@/components/GoogleSignInTauriButton';
 
@@ -36,9 +37,20 @@ export default function AuthPage() {
             'auth/too-many-requests': 'Too many attempts. Please try again later.',
             'auth/unauthorized-domain':
                 'This app origin is not allowed for Firebase Auth. In Firebase Console → Authentication → Settings → Authorized domains, add both localhost and 127.0.0.1 (desktop/Tauri uses one or the other).',
+            'auth/redirect-no-user':
+                'Google sign-in returned without a Firebase session. This is usually an Authorized domains / OAuth config issue in Firebase.',
+            'auth/operation-not-allowed':
+                'Google provider is disabled in Firebase Authentication → Sign-in method. Enable it and retry.',
+            'auth/redirect-failed': 'Google redirect failed before Firebase could complete sign-in.',
         };
         return map[code] ?? 'Something went wrong. Please try again.';
     }
+
+    useEffect(() => {
+        const code = consumeGoogleRedirectError();
+        if (!code) return;
+        setError(friendlyError(code));
+    }, []);
 
     async function handleGoogle() {
         setSubmitting(true); setError('');

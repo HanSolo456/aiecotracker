@@ -11,6 +11,7 @@ import {
     signInWithRedirect,
     signInWithCredential,
     signInWithEmailAndPassword,
+    signInWithCustomToken,
     createUserWithEmailAndPassword,
     sendPasswordResetEmail,
     updateProfile,
@@ -19,6 +20,9 @@ import {
     type Auth,
 } from 'firebase/auth';
 import { isTauriWebview } from '@/lib/isTauriWebview';
+
+const GOOGLE_REDIRECT_PENDING_KEY = 'aiecotrack:google-redirect-pending';
+const GOOGLE_REDIRECT_ERROR_KEY = 'aiecotrack:google-redirect-error';
 
 const SETUP_MSG =
     'Firebase is not configured or failed to initialize. Copy `.env.local.example` to `.env.local` in the project root, set all `NEXT_PUBLIC_FIREBASE_*` values from the Firebase console, then restart the dev server.';
@@ -104,6 +108,67 @@ function assertReady(): void {
     }
 }
 
+function canUseSessionStorage(): boolean {
+    return typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined';
+}
+
+function setGoogleRedirectPending(v: boolean): void {
+    if (!canUseSessionStorage()) return;
+    try {
+        if (v) window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING_KEY, '1');
+        else window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+    } catch {
+        // ignore storage errors in restrictive WebViews
+    }
+}
+
+export function clearGoogleRedirectPending(): void {
+    setGoogleRedirectPending(false);
+}
+
+export function hasGoogleRedirectPending(): boolean {
+    if (!canUseSessionStorage()) return false;
+    try {
+        return window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING_KEY) === '1';
+    } catch {
+        return false;
+    }
+}
+
+export function saveGoogleRedirectError(code: string): void {
+    if (!canUseSessionStorage()) return;
+    try {
+        window.sessionStorage.setItem(GOOGLE_REDIRECT_ERROR_KEY, code);
+    } catch {
+        // ignore storage errors in restrictive WebViews
+    }
+}
+
+export function consumeGoogleRedirectError(): string | null {
+    if (!canUseSessionStorage()) return null;
+    try {
+        const code = window.sessionStorage.getItem(GOOGLE_REDIRECT_ERROR_KEY);
+        if (code) window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
+        return code;
+    } catch {
+        return null;
+    }
+}
+
+export function clearGoogleRedirectError(): void {
+    if (!canUseSessionStorage()) return;
+    try {
+        window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
+    } catch {
+        // ignore storage errors in restrictive WebViews
+    }
+}
+
+export function clearGoogleRedirectState(): void {
+    clearGoogleRedirectPending();
+    clearGoogleRedirectError();
+}
+
 // ── Google Sign-In ────────────────────────────────────────────────────────────
 
 /** Returned when the page is about to navigate away for Google OAuth (browser redirect flow). */
@@ -120,18 +185,28 @@ export async function signInWithGoogleIdToken(idToken: string): Promise<User> {
     return cred.user;
 }
 
+export async function signInWithGoogleAccessToken(accessToken: string): Promise<User> {
+    assertReady();
+    const credential = GoogleAuthProvider.credential(null, accessToken);
+    const cred = await signInWithCredential(auth, credential);
+    return cred.user;
+}
+
 export async function signInWithGoogle(): Promise<GoogleSignInResult> {
     assertReady();
     const googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
 
     async function redirect(): Promise<'redirect'> {
+        setGoogleRedirectPending(true);
+        clearGoogleRedirectError();
         await signInWithRedirect(auth, googleProvider);
         return 'redirect';
     }
 
     try {
         const cred = await signInWithPopup(auth, googleProvider);
+        clearGoogleRedirectState();
         return cred.user;
     } catch (e: unknown) {
         const code = (e as { code?: string })?.code;

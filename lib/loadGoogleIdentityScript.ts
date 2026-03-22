@@ -3,7 +3,7 @@ const GSI_SRC = 'https://accounts.google.com/gsi/client';
 /** Loads Google Identity Services (required for Tauri / embedded WebView Google sign-in). */
 export function loadGoogleIdentityScript(): Promise<void> {
     if (typeof window === 'undefined') return Promise.resolve();
-    if (window.google?.accounts?.id) return Promise.resolve();
+    if ((window as any).google?.accounts?.id) return Promise.resolve();
 
     return new Promise((resolve, reject) => {
         const existing = document.querySelector(`script[src="${GSI_SRC}"]`);

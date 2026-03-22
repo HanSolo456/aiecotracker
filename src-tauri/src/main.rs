@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{
+    fs,
     net::TcpStream,
     path::PathBuf,
     process::{Child, Command, Stdio},
@@ -14,6 +15,120 @@ use tauri::{AppHandle, Manager, RunEvent, State};
 const NEXT_PORT: u16 = 3000;
 
 struct NextChild(Mutex<Option<Child>>);
+
+#[derive(serde::Deserialize)]
+struct DesktopGoogleHandoff {
+    status: String,
+    #[serde(rename = "idToken")]
+    id_token: Option<String>,
+    error: Option<String>,
+    #[serde(rename = "createdAt")]
+    created_at: u64,
+    #[serde(rename = "expiresAt")]
+    expires_at: u64,
+}
+
+#[derive(serde::Serialize)]
+struct DesktopGoogleHandoffResponse {
+    status: String,
+    #[serde(rename = "idToken")]
+    id_token: Option<String>,
+    error: Option<String>,
+}
+
+fn desktop_handoff_dir() -> PathBuf {
+    std::env::temp_dir().join("aiecotrack-desktop-google-handoff")
+}
+
+fn desktop_handoff_file(request_id: &str) -> PathBuf {
+    desktop_handoff_dir().join(format!("{request_id}.json"))
+}
+
+#[tauri::command]
+fn open_external_url(url: String) -> Result<(), String> {
+    let allowed = [
+        "http://localhost",
+        "https://localhost",
+        "http://127.0.0.1",
+        "https://127.0.0.1",
+        "http://tauri.localhost",
+        "https://tauri.localhost",
+    ];
+
+    if !allowed.iter().any(|prefix| url.starts_with(prefix)) {
+        return Err("only local desktop auth URLs may be opened externally".into());
+    }
+
+    #[cfg(target_os = "macos")]
+    let mut cmd = {
+        let mut cmd = Command::new("open");
+        cmd.arg(&url);
+        cmd
+    };
+
+    #[cfg(target_os = "windows")]
+    let mut cmd = {
+        let mut cmd = Command::new("cmd");
+        cmd.args(["/C", "start", "", &url]);
+        cmd
+    };
+
+    #[cfg(all(unix, not(target_os = "macos")))]
+    let mut cmd = {
+        let mut cmd = Command::new("xdg-open");
+        cmd.arg(&url);
+        cmd
+    };
+
+    cmd.spawn()
+        .map(|_| ())
+        .map_err(|e| format!("failed to open external browser: {e}"))
+}
+
+#[tauri::command]
+fn read_desktop_google_handoff(request_id: String) -> Result<DesktopGoogleHandoffResponse, String> {
+    let file = desktop_handoff_file(&request_id);
+    let raw = match fs::read_to_string(&file) {
+        Ok(raw) => raw,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(DesktopGoogleHandoffResponse {
+                status: "expired".into(),
+                id_token: None,
+                error: None,
+            })
+        }
+        Err(err) => return Err(format!("failed to read desktop Google handoff: {err}")),
+    };
+
+    let parsed: DesktopGoogleHandoff =
+        serde_json::from_str(&raw).map_err(|e| format!("failed to parse desktop Google handoff: {e}"))?;
+
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| format!("system time error: {e}"))?
+        .as_millis() as u64;
+
+    if parsed.expires_at <= now {
+        let _ = fs::remove_file(&file);
+        return Ok(DesktopGoogleHandoffResponse {
+            status: "expired".into(),
+            id_token: None,
+            error: None,
+        });
+    }
+
+    if parsed.status == "completed" || parsed.status == "failed" {
+        let _ = fs::remove_file(&file);
+    }
+
+    let _ = parsed.created_at;
+
+    Ok(DesktopGoogleHandoffResponse {
+        status: parsed.status,
+        id_token: parsed.id_token,
+        error: parsed.error,
+    })
+}
 
 fn wait_for_port(timeout: Duration) -> bool {
     let start = Instant::now();
@@ -109,6 +224,10 @@ fn kill_next(state: &State<'_, NextChild>) {
 fn main() {
     tauri::Builder::default()
         .manage(NextChild(Mutex::new(None)))
+        .invoke_handler(tauri::generate_handler![
+            open_external_url,
+            read_desktop_google_handoff
+        ])
         .setup(|app| {
             let handle = app.handle().clone();
             let state = app.state::<NextChild>();
