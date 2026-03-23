@@ -25,8 +25,8 @@
 extern String g_device_token;
 
 // ── Factory-Burned Settings ─────────────────────────────────────────────────
-const char *DEVICE_ID_FACTORY      = "bin_1_green";
-const char *DEVICE_TOKEN_BOOTSTRAP = "38397cc900d6a8bce63159083319372a33b13ce47271c65a4f08c4de9521ee47";
+const char *DEVICE_ID_FACTORY      = "replace-with-device-id";
+const char *DEVICE_TOKEN_BOOTSTRAP = "replace-with-bootstrap-token";
 const char *SERVER_URL             = "https://aiecotracker.vercel.app/api/sensor-data";
 
 // ── SoftAP config ────────────────────────────────────────────────────────────

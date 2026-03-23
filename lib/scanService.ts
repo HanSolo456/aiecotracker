@@ -10,6 +10,7 @@ import {
     getDoc,
     onSnapshot,
     Timestamp,
+    type QueryConstraint,
     type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -206,13 +207,17 @@ export async function saveScan(
  */
 export function subscribeToRecentScans(
     limitCount: number,
-    onData: (scans: ScanRecord[]) => void
+    onData: (scans: ScanRecord[]) => void,
+    options?: { workerId?: string }
 ): Unsubscribe {
-    const q = query(
-        collection(db, 'scans'),
-        orderBy('createdAt', 'desc'),
-        limit(limitCount)
-    );
+    const constraints: QueryConstraint[] = [];
+    if (options?.workerId) {
+        constraints.push(where('workerId', '==', options.workerId));
+    }
+    constraints.push(orderBy('createdAt', 'desc'));
+    constraints.push(limit(limitCount));
+
+    const q = query(collection(db, 'scans'), ...constraints);
     return onSnapshot(
         q,
         (snap) => {

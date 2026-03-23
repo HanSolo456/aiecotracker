@@ -202,7 +202,7 @@ function ScanCard({ item }: { item: ScanRecord }) {
 
 export default function HistoryPage() {
     const router = useRouter();
-    const { profile } = useAuth();
+    const { profile, user } = useAuth();
     const { t } = useLanguage();
     const [scans, setScans] = useState<ScanRecord[]>(() => {
         const cacheMatchesOrg = historyCache?.orgId === profile?.orgId;
@@ -247,16 +247,19 @@ export default function HistoryPage() {
                 setLoading(false);
             });
             return () => unsub();
-        } else {
+        } else if (user?.uid) {
             // Personal / guest / anonymous — show their own global recent scans
             const unsub = subscribeToRecentScans(100, (data) => {
                 setScans(data);
                 historyCache = { orgId: undefined, scans: data };
                 setLoading(false);
-            });
+            }, { workerId: user.uid });
             return () => unsub();
         }
-    }, [profile?.orgId]);
+        setScans([]);
+        setLoading(false);
+        return undefined;
+    }, [profile?.orgId, user?.uid]);
 
     const stats = computeStats(scans);
     return (

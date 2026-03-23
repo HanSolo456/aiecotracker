@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { groqWithFallback } from '@/lib/groqClient';
 import { applySafetyGatekeeper } from '@/lib/safetyGatekeeper';
 import { MOCK_PART_PAYLOAD } from '@/lib/mockData';
+import { enrichPayloadForCitizenWasteGuidance } from '@/lib/wasteGuidance';
 import { checkRateLimit } from '@/lib/requestRateLimit';
 import type { PartMetadataPayload, IdentifyPartResponse } from '@/types';
 
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<IdentifyP
         // ── Mock mode ────────────────────────────────────────────────────────
         if ((!groqKey && !geminiKey) || imageBase64 === 'DEMO' || imageBase64 === 'MOCK') {
             const { payload } = applySafetyGatekeeper(MOCK_PART_PAYLOAD);
-            return NextResponse.json({ success: true, payload, mock: true });
+            return NextResponse.json({ success: true, payload: enrichPayloadForCitizenWasteGuidance(payload), mock: true });
         }
 
         const cleanBase64 = imageBase64.replace(/^data:image\/[a-z+]+;base64,/, '');
@@ -186,7 +187,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<IdentifyP
         }
 
         const { payload } = applySafetyGatekeeper(rawPayload);
-        return NextResponse.json({ success: true, payload, mock: false });
+        return NextResponse.json({ success: true, payload: enrichPayloadForCitizenWasteGuidance(payload), mock: false });
 
     } catch (error) {
         console.error('[identify-part] Error:', error);

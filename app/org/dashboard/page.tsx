@@ -728,7 +728,7 @@ export default function OrgDashboardPage() {
                 {scans.length > 0 && (
                     <>
                         {/* ── My Badges + Drop-off quick-access row ── */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-3 mb-3">
                             {/* My Badges card */}
                             <button onClick={() => router.push('/badges')}
                                 className="rounded-2xl p-4 flex flex-col gap-2 text-left relative overflow-hidden transition-all hover:opacity-90 active:scale-[0.98]"
@@ -773,6 +773,24 @@ export default function OrgDashboardPage() {
                                 </div>
                             </button>
                         </div>
+                        
+                        {/* Collection Routes Card */}
+                        <button onClick={() => router.push('/org/routes')}
+                            className="w-full rounded-2xl p-4 flex items-center justify-between relative overflow-hidden transition-all hover:opacity-90 active:scale-[0.98] mb-1"
+                            style={{ background: 'var(--bg-card)', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                            <div className="absolute inset-0 pointer-events-none"
+                                style={{ background: 'radial-gradient(ellipse at 0% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 50%)' }} />
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 flex items-center justify-center rounded-xl" style={{ background: 'rgba(56, 189, 248, 0.12)' }}>
+                                    <MapPin size={18} style={{ color: '#38bdf8' }} />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-sm font-bold text-white">Collection Routes & GPS</p>
+                                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-dim)' }}>View bin map and optimize driving routes</p>
+                                </div>
+                            </div>
+                            <ChevronRight size={16} style={{ color: 'var(--text-dim)' }} />
+                        </button>
 
                         {/* ── My Efficiency Tier card ── */}
                         {myStats && (() => {

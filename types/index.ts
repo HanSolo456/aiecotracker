@@ -33,6 +33,34 @@ export interface GeometryDescriptor {
     estimated_mass_kg?: number;
 }
 
+export type WasteCategory =
+    | 'biodegradable'
+    | 'recyclable_clean'
+    | 'recyclable_ewaste'
+    | 'hazardous'
+    | 'industrial_component'
+    | 'mixed';
+
+export interface WasteClassification {
+    waste_category: WasteCategory;
+    recyclability_score: number;
+    recommended_stream: string;
+    co2_saving_kg: number | null;
+}
+
+export type HackathonWasteCategory =
+    | 'biodegradable'
+    | 'recyclable'
+    | 'hazardous';
+
+export type SafetyLevel = 'danger' | 'caution' | 'safe';
+
+export interface HandlingSafety {
+    safety_level: SafetyLevel;
+    reason: string;
+    ppe_required: string[];
+}
+
 export interface PartMetadataPayload {
     visual_id: VisualId;
     material_inference: MaterialInference;
@@ -41,11 +69,14 @@ export interface PartMetadataPayload {
     query_intent:
     | 'disassembly_sequence_retrieval'
     | 'material_data_retrieval'
-    | 'safety_protocol_retrieval';
+    | 'safety_protocol_retrieval'
+    | 'waste_classification_and_disassembly';
     fallback_required: boolean;
     escalation_required?: boolean;
     safety_doc_filters?: string[];        // injected by gatekeeper
     injected_regulations?: string[];      // labels for injected safety docs
+    waste_classification?: WasteClassification;
+    handling_safety?: HandlingSafety;
 }
 
 // ── RAG Layer ─────────────────────────────────────────────────────────────────

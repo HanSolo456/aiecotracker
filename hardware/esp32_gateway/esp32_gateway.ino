@@ -11,9 +11,9 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 
-// ── WiFi Credentials — CHANGE THESE ──────────────────────────────────────────
-const char *WIFI_SSID = "Aqua_4th Floor";
-const char *WIFI_PASSWORD = "Orange@2025";
+// ── WiFi Credentials — replace before flashing ──────────────────────────────
+const char *WIFI_SSID = "replace-with-wifi-ssid";
+const char *WIFI_PASSWORD = "replace-with-wifi-password";
 
 // ── Server Config — CHANGE THESE ─────────────────────────────────────────────
 const char *SERVER_URL = "https://aiecotracker.vercel.app/api/sensor-data";
@@ -114,4 +114,3 @@ void postSensorData(int fill, int gas, int co, float temp, float hum, bool drop,
   Serial.println("[ESP32] POST → HTTP " + String(httpCode));
   http.end();
 }
-

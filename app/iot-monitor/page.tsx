@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Wifi, Wind, Thermometer, Droplets, Package, AlertTriangle, CheckCircle, Activity, Cpu, ChevronLeft } from 'lucide-react';
+import { Wifi, Wind, Thermometer, Droplets, Package, AlertTriangle, CheckCircle, Activity, Cpu, ChevronLeft, MapPin, Route } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 import { useAuth } from '@/lib/authContext';
+import type { HackathonWasteCategory } from '@/types';
 
 interface SensorReading {
     id: string;
     deviceId: string;
+    wasteCategory?: HackathonWasteCategory;
     fillLevel: number;
     gasPpm: number;
     coPpm: number;
@@ -18,6 +20,17 @@ interface SensorReading {
     gasAlert: boolean;
     alertLevel: 'normal' | 'warning' | 'danger';
     createdAt: string;
+}
+
+interface BinLocation {
+    deviceId: string;
+    displayName: string;
+    latitude: number | null;
+    longitude: number | null;
+    fillPct: number;
+    lastSeen: string;
+    needsCollection: boolean;
+    wasteCategory: HackathonWasteCategory;
 }
 
 let iotCache: {
@@ -31,6 +44,125 @@ function relativeTime(ts: string) {
     if (diff < 60)   return `${diff}s ago`;
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
     return `${Math.floor(diff / 3600)}h ago`;
+}
+
+function wasteCategoryColor(category?: HackathonWasteCategory) {
+    switch (category) {
+        case 'biodegradable':
+            return '#22c55e';
+        case 'hazardous':
+            return '#ef4444';
+        case 'recyclable':
+        default:
+            return '#3b82f6';
+    }
+}
+
+function wasteCategoryLabel(category?: HackathonWasteCategory) {
+    switch (category) {
+        case 'biodegradable':
+            return 'Biodegradable';
+        case 'hazardous':
+            return 'Hazardous';
+        case 'recyclable':
+        default:
+            return 'Recyclable';
+    }
+}
+
+function fillPalette(fillPct: number) {
+    if (fillPct >= 80) return '#EF4444';
+    if (fillPct >= 60) return '#F59E0B';
+    if (fillPct >= 40) return '#FACC15';
+    return '#22C55E';
+}
+
+function BinGeoMap({ bins }: { bins: BinLocation[] }) {
+    const located = bins.filter(
+        (bin) => typeof bin.latitude === 'number' && typeof bin.longitude === 'number',
+    );
+
+    if (located.length === 0) {
+        return (
+            <div className="rounded-2xl p-4 text-center" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                <p className="text-sm font-semibold text-white">No GPS-tagged bins yet</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    Set bin coordinates in Collection Routes to visualize the network here.
+                </p>
+            </div>
+        );
+    }
+
+    const W = 360;
+    const H = 220;
+    const PAD = 28;
+    const latitudes = located.map((bin) => bin.latitude as number);
+    const longitudes = located.map((bin) => bin.longitude as number);
+    const minLat = Math.min(...latitudes);
+    const maxLat = Math.max(...latitudes);
+    const minLon = Math.min(...longitudes);
+    const maxLon = Math.max(...longitudes);
+    const latRange = maxLat - minLat || 0.01;
+    const lonRange = maxLon - minLon || 0.01;
+
+    function toSvg(lat: number, lon: number): [number, number] {
+        const x = PAD + ((lon - minLon) / lonRange) * (W - PAD * 2);
+        const y = H - PAD - ((lat - minLat) / latRange) * (H - PAD * 2);
+        return [x, y];
+    }
+
+    const collectionPins = located.filter((bin) => bin.needsCollection);
+
+    return (
+        <div className="rounded-2xl overflow-hidden" style={{ background: '#07111f', border: '1px solid var(--border)' }}>
+            <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+                {[0.25, 0.5, 0.75].map((t) => (
+                    <g key={t}>
+                        <line x1={PAD + t * (W - PAD * 2)} y1={PAD} x2={PAD + t * (W - PAD * 2)} y2={H - PAD}
+                            stroke="#142132" strokeWidth="1" />
+                        <line x1={PAD} y1={PAD + t * (H - PAD * 2)} x2={W - PAD} y2={PAD + t * (H - PAD * 2)}
+                            stroke="#142132" strokeWidth="1" />
+                    </g>
+                ))}
+
+                {collectionPins.length > 1 && (
+                    <polyline
+                        points={collectionPins.map((bin) => {
+                            const [x, y] = toSvg(bin.latitude as number, bin.longitude as number);
+                            return `${x},${y}`;
+                        }).join(' ')}
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="3"
+                        strokeDasharray="6 6"
+                        opacity="0.9"
+                    />
+                )}
+
+                {located.map((bin, index) => {
+                    const [x, y] = toSvg(bin.latitude as number, bin.longitude as number);
+                    const fillColor = fillPalette(bin.fillPct);
+                    const ringColor = wasteCategoryColor(bin.wasteCategory);
+                    return (
+                        <g key={bin.deviceId}>
+                            <circle cx={x} cy={y} r="12" fill="#020617" stroke={ringColor} strokeWidth="2.5" />
+                            <circle cx={x} cy={y} r="6" fill={fillColor} />
+                            <text x={x} y={y - 18} textAnchor="middle" fill="#cbd5e1"
+                                style={{ fontSize: '8px', fontWeight: 700 }}>
+                                {index + 1}
+                            </text>
+                        </g>
+                    );
+                })}
+            </svg>
+            <div className="px-4 py-3 border-t flex flex-wrap gap-3 text-[11px]" style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full" style={{ background: '#22c55e' }} />Low fill</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full" style={{ background: '#f59e0b' }} />Medium fill</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ef4444' }} />Needs collection</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full" style={{ background: '#3b82f6' }} />Recyclable stream</span>
+            </div>
+        </div>
+    );
 }
 
 function GasWaveform({ ppm, status }: { ppm: number; status: string }) {
@@ -151,6 +283,7 @@ export default function IoTMonitorPage() {
     const [history,   setHistory]   = useState<SensorReading[]>(() => iotCache?.history ?? []);
     const [connected, setConnected] = useState(() => iotCache?.connected ?? false);
     const [loading,   setLoading]   = useState(() => !iotCache?.latest);
+    const [bins, setBins] = useState<BinLocation[]>([]);
 
     // Redirect anonymous users
     useEffect(() => {
@@ -194,6 +327,37 @@ export default function IoTMonitorPage() {
         fetchReadings();
         const interval = setInterval(fetchReadings, 5000);
         return () => { cancelled = true; clearInterval(interval); };
+    }, [user]);
+
+    useEffect(() => {
+        if (!user || user.isAnonymous) return;
+        const currentUser = user;
+        let cancelled = false;
+
+        async function fetchBins() {
+            try {
+                const idToken = await currentUser.getIdToken();
+                const res = await fetch('/api/org/devices/locations', {
+                    headers: {
+                        Authorization: `Bearer ${idToken}`,
+                    },
+                });
+                if (!res.ok) return;
+                const data = await res.json() as { bins?: BinLocation[] };
+                if (!cancelled) {
+                    setBins(data.bins ?? []);
+                }
+            } catch {
+                if (!cancelled) setBins([]);
+            }
+        }
+
+        fetchBins();
+        const interval = setInterval(fetchBins, 15000);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+        };
     }, [user]);
 
     const fillColor = !latest ? '#84cc16'
@@ -424,6 +588,9 @@ export default function IoTMonitorPage() {
                             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                                 Device: <span className="text-white font-medium">{latest.deviceId}</span>
                             </p>
+                            <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                                Stream: <span style={{ color: wasteCategoryColor(latest.wasteCategory) }}>{wasteCategoryLabel(latest.wasteCategory)}</span>
+                            </p>
                             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Last update: {relativeTime(latest.createdAt)}</p>
                         </div>
                         <div className="status-online">
@@ -432,6 +599,48 @@ export default function IoTMonitorPage() {
                                 {isLive ? 'Live' : 'Offline'}
                             </span>
                         </div>
+                    </div>
+
+                    <div className="mb-5 card p-4">
+                        <div className="flex items-center justify-between gap-3 mb-3">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <MapPin size={15} style={{ color: '#38BDF8' }} />
+                                    <p className="text-sm font-semibold text-white">Bin Map & Collection Readiness</p>
+                                </div>
+                                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                                    {bins.filter((bin) => bin.needsCollection).length} bins ready for pickup across {bins.length} monitored bins
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => router.push('/org/routes')}
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold"
+                                style={{ background: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.25)', color: '#38BDF8' }}
+                            >
+                                <Route size={13} />
+                                Plan Route
+                            </button>
+                        </div>
+                        <BinGeoMap bins={bins} />
+                        {bins.length > 0 && (
+                            <div className="mt-3 flex flex-col gap-2">
+                                {bins.slice(0, 4).map((bin) => (
+                                    <div key={bin.deviceId} className="rounded-xl px-3 py-2 flex items-center justify-between gap-3"
+                                        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-white truncate">{bin.displayName}</p>
+                                            <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+                                                <span style={{ color: wasteCategoryColor(bin.wasteCategory) }}>{wasteCategoryLabel(bin.wasteCategory)}</span> · {relativeTime(bin.lastSeen)}
+                                            </p>
+                                        </div>
+                                        <span className="text-xs font-bold px-2 py-1 rounded-full"
+                                            style={{ background: `${fillPalette(bin.fillPct)}18`, color: fillPalette(bin.fillPct) }}>
+                                            {bin.fillPct}%
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Analytics Trend Charts */}
@@ -472,6 +681,9 @@ export default function IoTMonitorPage() {
                                             <div className="flex items-center gap-4 flex-wrap">
                                                 <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                                                     Fill: <span className="text-white font-medium">{r.fillLevel}%</span>
+                                                </span>
+                                                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                                                    Stream: <span style={{ color: wasteCategoryColor(r.wasteCategory) }}>{wasteCategoryLabel(r.wasteCategory)}</span>
                                                 </span>
                                                 <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                                                     Gas: <span className="text-white font-medium">{r.gasPpm} PPM</span>

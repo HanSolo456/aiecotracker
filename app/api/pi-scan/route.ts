@@ -5,6 +5,7 @@ import { applySafetyGatekeeper } from '@/lib/safetyGatekeeper';
 import { mergeVLMResults } from '@/lib/mergeVLMResults';
 import { retrieveGuide } from '@/lib/knowledgeBase';
 import { MOCK_PART_PAYLOAD } from '@/lib/mockData';
+import { enrichPayloadForCitizenWasteGuidance } from '@/lib/wasteGuidance';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeAdmin } from '@/lib/firebaseAdmin';
 import type { PartMetadataPayload } from '@/types';
@@ -129,10 +130,11 @@ export async function POST(req: NextRequest) {
             cleanImages.map(({ b64, mimeType }) => analyseOne(b64, mimeType))
         );
         const merged = mergeVLMResults(individualResults);
-        const { payload } = applySafetyGatekeeper(merged);
+        const { payload: gatedPayload } = applySafetyGatekeeper(merged);
+        const payload = enrichPayloadForCitizenWasteGuidance(gatedPayload);
 
         // ── Step 2: RAG guide retrieval ──────────────────────────────────────
-        const guide = retrieveGuide(payload);
+        const guide = await retrieveGuide(payload);
 
         // ── Step 3: Save to Firestore as 'raspberry_pi' source ───────────────
         let scanId: string | null = null;

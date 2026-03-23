@@ -54,6 +54,56 @@ function WRIRing({ score }: { score: number }) {
     );
 }
 
+function IncentiveTransparencyCard() {
+    const rewardRows = [
+        { icon: <Star size={13} style={{ color: '#84cc16' }} />, action: 'Grade A scan', reward: '+10 pts' },
+        { icon: <Award size={13} style={{ color: '#60A5FA' }} />, action: '85%+ segregation efficiency', reward: 'Elite tier badge' },
+        { icon: <Leaf size={13} style={{ color: '#22c55e' }} />, action: '1 kg CO2 saved', reward: '+2 pts' },
+        { icon: <Trophy size={13} style={{ color: '#F59E0B' }} />, action: 'Top 3 leaderboard finish', reward: 'Trophy badge' },
+    ];
+
+    return (
+        <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid rgba(251,191,36,0.18)' }}>
+            <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                    style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.24)' }}>
+                    <Trophy size={15} style={{ color: '#FBBF24' }} />
+                </div>
+                <div>
+                    <p className="text-sm font-semibold text-white">How Rewards Work</p>
+                    <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                        Transparent points for better segregation, recovery value, and climate impact.
+                    </p>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                {rewardRows.map((row) => (
+                    <div key={row.action} className="rounded-xl px-3 py-2.5 flex items-center justify-between gap-3"
+                        style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                                style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                {row.icon}
+                            </div>
+                            <span className="text-xs text-white">{row.action}</span>
+                        </div>
+                        <span className="text-xs font-bold shrink-0" style={{ color: '#FBBF24' }}>{row.reward}</span>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-3 rounded-xl px-3 py-3"
+                style={{ background: 'rgba(132,204,22,0.08)', border: '1px solid rgba(132,204,22,0.18)' }}>
+                <p className="text-xs font-semibold" style={{ color: '#84cc16' }}>Reward Redemption Stub</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                    Demo loop: 500 pts = Rs 50 sustainability voucher. This showcases how correct segregation can convert into visible citizen rewards.
+                </p>
+            </div>
+        </div>
+    );
+}
+
 export default function DashboardPage() {
     const router = useRouter();
     const { user, profile, signOut } = useAuth();
@@ -78,8 +128,12 @@ export default function DashboardPage() {
             unsubOrg = subscribeToOrgScans(orgId, 500, (data) => setOrgScans(data));
         } else if (orgId) {
             unsub = subscribeToOrgScans(orgId, 50, (data) => { setScans(data); setLoading(false); });
+        } else if (workerId) {
+            unsub = subscribeToRecentScans(50, (data) => { setScans(data); setLoading(false); }, { workerId });
         } else {
-            unsub = subscribeToRecentScans(50, (data) => { setScans(data); setLoading(false); });
+            setScans([]);
+            setLoading(false);
+            unsub = () => {};
         }
 
         const sensorQ = query(collection(db, 'sensor_readings'), orderBy('createdAt', 'desc'), limit(1));
@@ -314,6 +368,10 @@ export default function DashboardPage() {
                             </div>
                         ))}
                     </div>
+                </div>
+
+                <div className="px-5 lg:px-10 mb-4">
+                    <IncentiveTransparencyCard />
                 </div>
 
                 {/* ── Recent Scans ── */}
@@ -560,6 +618,10 @@ export default function DashboardPage() {
                             </div>
                             <span className="text-xs font-bold shrink-0" style={{ color: '#84cc16' }}>{t('dashboard.active')}</span>
                         </div>
+                    </div>
+
+                    <div className="px-5 lg:px-0 mb-5">
+                        <IncentiveTransparencyCard />
                     </div>
 
                     {/* Recent Passports */}

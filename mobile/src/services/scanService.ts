@@ -8,8 +8,9 @@ import {
   type Unsubscribe,
   getDocs,
   where,
+  type QueryConstraint,
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { auth, db } from '../config/firebase';
 
 export interface ScanRecord {
   id?: string;
@@ -50,10 +51,16 @@ export function subscribeToRecentScans(
   limitCount: number,
   onData: (scans: ScanRecord[]) => void,
 ): Unsubscribe {
+  const constraints: QueryConstraint[] = [];
+  if (auth.currentUser?.uid) {
+    constraints.push(where('workerId', '==', auth.currentUser.uid));
+  }
+  constraints.push(orderBy('createdAt', 'desc'));
+  constraints.push(limit(limitCount));
+
   const q = query(
     collection(db, 'scans'),
-    orderBy('createdAt', 'desc'),
-    limit(limitCount),
+    ...constraints,
   );
 
   return onSnapshot(
@@ -135,4 +142,3 @@ export function relativeTime(ts: Timestamp): string {
     month: 'short',
   });
 }
-

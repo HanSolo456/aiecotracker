@@ -9,9 +9,14 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
+    function hasProfile() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
     // True if the caller belongs to the given org
     function isOrgMember(orgId) {
-      return request.auth != null && myProfile().orgId == orgId;
+      return hasProfile() && myProfile().orgId == orgId;
     }
 
     // True if the caller is an org_admin of the given org
@@ -25,20 +30,44 @@ service cloud.firestore {
         && request.auth.token.firebase.sign_in_provider != 'anonymous';
     }
 
+    function canReadScan(scan) {
+      return request.auth != null
+        && (
+          (
+            scan.orgId is string
+            && isOrgMember(scan.orgId)
+          )
+          ||
+          (
+            !(scan.orgId is string)
+            && scan.workerId is string
+            && scan.workerId == request.auth.uid
+          )
+        );
+    }
+
     // ── /scans ──────────────────────────────────────────────────────────────────
     match /scans/{scanId} {
-      // Individual document get: authenticated users only.
-      // Public QR deep-links should go through a server endpoint that returns a
-      // sanitised passport view instead of exposing the raw scan document.
-      allow get: if request.auth != null;
+      // Reads are tenant-scoped at the database layer:
+      // - org scans: only members of that org
+      // - personal/non-org scans: only the worker who created them
+      allow read: if canReadScan(resource.data);
 
-      // List: authenticated users only, including guest/anonymous app sessions.
-      allow list: if request.auth != null;
-
-      // Create: authenticated users only. The written workerId MUST equal the
-      // caller's UID — prevents a user from forging another worker's scans.
+      // Create:
+      // - workerId must match the caller
+      // - org scans must be written only into the caller's org
+      // - personal scans without orgId remain visible only to their owner
       allow create: if request.auth != null
-        && request.resource.data.workerId == request.auth.uid;
+        && request.resource.data.workerId is string
+        && request.resource.data.workerId == request.auth.uid
+        && (
+          (
+            request.resource.data.orgId is string
+            && isOrgMember(request.resource.data.orgId)
+          )
+          ||
+          !(request.resource.data.orgId is string)
+        );
 
       // Scans are immutable once written — no updates or deletes from client
       allow update, delete: if false;

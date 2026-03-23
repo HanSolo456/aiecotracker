@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { retrieveGuide } from '@/lib/knowledgeBase';
 import { checkRateLimit } from '@/lib/requestRateLimit';
+import { enrichPayloadForCitizenWasteGuidance } from '@/lib/wasteGuidance';
 import type { PartMetadataPayload, RetrieveGuideResponse } from '@/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<RetrieveG
             );
         }
 
-        const guide = await retrieveGuide(payload);
+        const guide = await retrieveGuide(enrichPayloadForCitizenWasteGuidance(payload));
 
         return NextResponse.json({ success: true, guide });
     } catch (error) {

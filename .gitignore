@@ -21,3 +21,10 @@ src-tauri/nodejs/
 # OS / editor
 .DS_Store
 *.pem
+
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+
+# TypeScript incremental build cache
+*.tsbuildinfo

@@ -24,6 +24,7 @@ class CameraController:
         self.config = config
         self._camera = None
         self._started = False
+        self.last_error: str | None = None
         self._boot_camera()
 
     def _boot_camera(self) -> None:
@@ -39,12 +40,17 @@ class CameraController:
             camera.start()
             self._camera = camera
             self._started = True
-        except Exception:  # noqa: BLE001
+            self.last_error = None
+        except Exception as exc:  # noqa: BLE001
             self._camera = None
             self._started = False
+            self.last_error = str(exc)
+
+    def ready(self) -> bool:
+        return self._camera is not None and self._started
 
     def snapshot(self) -> tuple[bytes, str]:
-        if not self._camera:
+        if not self.ready():
             return PLACEHOLDER_SVG, "image/svg+xml"
 
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as handle:
@@ -58,6 +64,10 @@ class CameraController:
                 path.unlink()
 
     def capture_base64(self) -> str:
+        if not self.ready():
+            raise RuntimeError(
+                "Camera is not available. Check camera wiring and ensure picamera2 is installed."
+            )
         payload, mime_type = self.snapshot()
         if mime_type != "image/jpeg":
             payload = self._svg_to_data_bytes(payload)
@@ -66,4 +76,3 @@ class CameraController:
     @staticmethod
     def _svg_to_data_bytes(svg_bytes: bytes) -> bytes:
         return io.BytesIO(svg_bytes).getvalue()
-

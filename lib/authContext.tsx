@@ -155,7 +155,10 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
         void (async () => {
             let redirectUser: User | null = null;
             try {
-                const redirectCred = await getRedirectResult(auth);
+                // Skip getRedirectResult centrally if we are on the desktop handoff page (it handles it).
+                const isDesktopHandoff = typeof window !== 'undefined' && window.location.pathname === '/auth/desktop-google';
+                const redirectCred = isDesktopHandoff ? null : await getRedirectResult(auth);
+                redirectUser = redirectCred?.user ?? null;
                 redirectUser = redirectCred?.user ?? null;
                 if (redirectUser) {
                     clearGoogleRedirectState();
@@ -189,7 +192,8 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
             // If we initiated redirect, came back, and still have no user, surface a concrete
             // error code for the auth page instead of silently showing login again.
-            if (!redirectUser && !auth.currentUser && hasGoogleRedirectPending()) {
+            const isDesktopHandoffPage = typeof window !== 'undefined' && window.location.pathname === '/auth/desktop-google';
+            if (!isDesktopHandoffPage && !redirectUser && !auth.currentUser && hasGoogleRedirectPending()) {
                 saveGoogleRedirectError('auth/redirect-no-user');
                 clearGoogleRedirectPending();
             }

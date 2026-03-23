@@ -9,6 +9,13 @@
 - serves a lightweight operator console on `http://<deviceId>.local:8080`
 - runs the 3-angle capture flow and submits to `/api/pi-scan`
 
+## Before you hand this folder to someone else
+- This package is not a standalone product. It must talk to a deployed AI-EcoTrack backend via `APP_BASE_URL`.
+- The backend must expose `/api/devices/bootstrap-status`, `/api/devices/claim-verify`, `/api/devices/bootstrap-finalize`, and `/api/pi-scan`.
+- The device must be pre-created in factory inventory so your friend has a valid `DEVICE_ID` and `DEVICE_BOOTSTRAP_TOKEN`.
+- A real Pi camera should be connected if you want captures to work. The preview can fall back to a placeholder, but capture now fails if no real camera is available.
+- The Pi needs outbound internet access to reach the backend during bootstrap and scan submission.
+
 ## Hardware
 | Component | Notes |
 |---|---|
@@ -49,6 +56,18 @@ Required values:
 - `DEVICE_BOOTSTRAP_TOKEN`
 
 You do not need the runtime token at install time. The Pi will fetch it after org claim confirmation.
+
+## Fresh handoff checklist
+1. Copy the `pi/` folder onto the Raspberry Pi.
+2. Install Python dependencies from `requirements.txt`.
+3. Confirm the backend URL in `APP_BASE_URL` is reachable from the Pi.
+4. Put the correct factory-issued `DEVICE_ID` and `DEVICE_BOOTSTRAP_TOKEN` into `.env`.
+5. Connect the camera and verify the Pi can access it.
+6. If you are using the fallback trigger, wire the button to GPIO 17 and GND.
+7. Start `python3 app.py` and open `http://<pi-ip>:8080`.
+8. Confirm the UI shows `Camera ready: true` before attempting a capture.
+9. Claim and confirm the device from the AI-EcoTrack web app.
+10. After bootstrap completes, use `Enable Station`, then place the item on the sensor before capturing.
 
 ## Claim flow
 1. Superadmin creates the Raspberry Pi device in factory inventory.

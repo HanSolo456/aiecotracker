@@ -11,6 +11,11 @@ import {
   Cpu,
   Ruler,
   BookOpen,
+  Recycle,
+  Leaf,
+  MapPin,
+  Shield,
+  Zap,
 } from 'lucide-react-native';
 import type { ScanRecord } from '../services/scanService';
 
@@ -44,6 +49,111 @@ export default function ScanResultScreen() {
     (visual?.subtype && visual.subtype.replace(/_/g, ' ')) ||
     scan?.subtype ||
     '';
+
+  const hazardFlags = scan?.hazardFlags ?? {};
+  const wasteCategory = payload?.waste_classification?.waste_category as string | undefined;
+  const safetyLevel = payload?.handling_safety?.safety_level as string | undefined;
+
+  const hackathonCategory: 'biodegradable' | 'recyclable' | 'hazardous' =
+    wasteCategory === 'biodegradable'
+      ? 'biodegradable'
+      : wasteCategory === 'hazardous' ||
+        safetyLevel === 'danger' ||
+        hazardFlags.asbestos_era_likelihood ||
+        hazardFlags.residual_fluid_risk === 'chemical_likely' ||
+        hazardFlags.residual_fluid_risk === 'battery_electrolyte'
+        ? 'hazardous'
+        : 'recyclable';
+
+  const detailedLabel =
+    wasteCategory === 'recyclable_ewaste'
+      ? 'E-Waste'
+      : wasteCategory === 'industrial_component'
+      ? 'Special Handling'
+      : wasteCategory === 'mixed'
+      ? 'Needs Sorting'
+      : wasteCategory === 'biodegradable'
+      ? 'Biodegradable'
+      : wasteCategory === 'hazardous'
+      ? 'Hazardous'
+      : 'Recyclable';
+
+  const accentColor =
+    hackathonCategory === 'biodegradable'
+      ? '#22c55e'
+      : hackathonCategory === 'hazardous'
+      ? '#ef4444'
+      : '#3b82f6';
+
+  const guidanceIcon =
+    hackathonCategory === 'biodegradable' ? (
+      <Leaf size={16} color={accentColor} />
+    ) : hackathonCategory === 'hazardous' ? (
+      <AlertTriangle size={16} color={accentColor} />
+    ) : wasteCategory === 'recyclable_ewaste' ? (
+      <Zap size={16} color={accentColor} />
+    ) : (
+      <Recycle size={16} color={accentColor} />
+    );
+
+  const binLabel =
+    hackathonCategory === 'biodegradable'
+      ? 'Green Bin'
+      : hackathonCategory === 'hazardous'
+      ? 'Red Hazard Bin'
+      : wasteCategory === 'recyclable_ewaste'
+      ? 'E-Waste Drop-Off'
+      : 'Blue Bin';
+
+  const primaryAction =
+    hackathonCategory === 'biodegradable'
+      ? 'Put this in the green wet-waste stream for composting.'
+      : hackathonCategory === 'hazardous'
+      ? 'Keep this out of normal bins and route it to supervised hazardous disposal.'
+      : wasteCategory === 'industrial_component'
+      ? 'Route this through supervised collection, not a public bin.'
+      : wasteCategory === 'recyclable_ewaste'
+      ? 'Keep it intact and hand it to an authorised e-waste recycler.'
+      : 'Place this in the blue dry-waste recycling stream.';
+
+  const safetyReason =
+    payload?.handling_safety?.reason ||
+    (hackathonCategory === 'hazardous'
+      ? 'Hazard indicators were detected, so this item needs careful handling.'
+      : wasteCategory === 'industrial_component'
+      ? 'Industrial parts should be handled through a supervised collection flow.'
+      : 'This item appears suitable for the recommended waste stream.');
+
+  const guidanceSteps =
+    hackathonCategory === 'biodegradable'
+      ? [
+          'Remove any plastic or foil wrapping first.',
+          'Keep it with food or garden waste only.',
+          'Send it for composting quickly to avoid contamination.',
+        ]
+      : hackathonCategory === 'hazardous'
+      ? [
+          'Avoid direct contact and keep the item sealed if it may leak.',
+          'Do not place it in household green or blue bins.',
+          'Take it to a hazardous or authorised e-waste collection point.',
+        ]
+      : wasteCategory === 'industrial_component'
+      ? [
+          'Do not attempt home disassembly.',
+          'Isolate the item from public recycling bins.',
+          'Send it to trained staff for supervised handling.',
+        ]
+      : wasteCategory === 'recyclable_ewaste'
+      ? [
+          'Store the item in a dry place and keep it intact.',
+          'Do not crush, burn, or dismantle it at home.',
+          'Drop it at an authorised e-waste collection centre.',
+        ]
+      : [
+          'Empty or wipe off visible residue first.',
+          'Keep the item dry so it stays recyclable.',
+          'Place it with other dry recyclables only.',
+        ];
 
   if (!scan) {
     return null;
@@ -87,6 +197,70 @@ export default function ScanResultScreen() {
               </Text>
             </View>
           )}
+
+        <View style={[styles.card, styles.guidanceCard, { borderTopColor: accentColor }]}>
+          <View style={styles.cardHeader}>
+            <View style={[styles.iconPill, { backgroundColor: `${accentColor}20`, borderColor: `${accentColor}66` }]}>
+              <Shield size={16} color={accentColor} />
+            </View>
+            <Text style={styles.cardLabel}>Waste Guidance</Text>
+          </View>
+
+          <View style={styles.guidanceTopRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.guidanceAction}>{primaryAction}</Text>
+              <Text style={styles.guidanceReason}>{safetyReason}</Text>
+            </View>
+            <View style={[styles.guidanceBinPill, { borderColor: `${accentColor}66`, backgroundColor: `${accentColor}22` }]}>
+              <Text style={[styles.guidanceBinTitle, { color: accentColor }]}>Use</Text>
+              <Text style={styles.guidanceBinValue}>{binLabel}</Text>
+            </View>
+          </View>
+
+          <View style={styles.guidanceSummaryRow}>
+            <View style={styles.guidanceSummaryCard}>
+              <View style={styles.guidanceSummaryHeader}>
+                {guidanceIcon}
+                <Text style={styles.guidanceSummaryLabel}>Waste Category</Text>
+              </View>
+              <Text style={styles.guidanceSummaryValue}>
+                {hackathonCategory === 'biodegradable'
+                  ? 'Biodegradable'
+                  : hackathonCategory === 'hazardous'
+                  ? 'Hazardous'
+                  : 'Recyclable'}
+              </Text>
+              <Text style={styles.guidanceSummarySub}>{detailedLabel}</Text>
+            </View>
+            <View style={styles.guidanceSummaryCard}>
+              <View style={styles.guidanceSummaryHeader}>
+                <MapPin size={16} color={accentColor} />
+                <Text style={styles.guidanceSummaryLabel}>Drop-Off</Text>
+              </View>
+              <Text style={styles.guidanceSummaryValue}>
+                {hackathonCategory === 'biodegradable'
+                  ? 'Compost / wet waste'
+                  : hackathonCategory === 'hazardous'
+                  ? 'Hazardous depot'
+                  : wasteCategory === 'recyclable_ewaste'
+                  ? 'Authorised e-waste centre'
+                  : 'Dry recycling stream'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={[styles.guidanceStepsCard, { borderColor: `${accentColor}55`, backgroundColor: `${accentColor}14` }]}>
+            <Text style={[styles.guidanceStepsTitle, { color: accentColor }]}>What To Do Now</Text>
+            {guidanceSteps.map((step, index) => (
+              <View key={step} style={styles.guidanceStepRow}>
+                <View style={[styles.guidanceStepBadge, { borderColor: `${accentColor}55`, backgroundColor: `${accentColor}24` }]}>
+                  <Text style={[styles.guidanceStepBadgeText, { color: accentColor }]}>{index + 1}</Text>
+                </View>
+                <Text style={styles.guidanceStepText}>{step}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
 
         {/* Part classification */}
         <View style={styles.card}>
@@ -441,9 +615,13 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#111827',
+    borderTopWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: '#050816',
+  },
+  guidanceCard: {
+    borderTopWidth: 2,
   },
   cardGap: {
     marginTop: 10,
@@ -481,6 +659,117 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9ca3af',
     marginTop: 2,
+  },
+  guidanceTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    columnGap: 12,
+    marginBottom: 12,
+  },
+  guidanceAction: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#f9fafb',
+    lineHeight: 22,
+  },
+  guidanceReason: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginTop: 6,
+    lineHeight: 18,
+  },
+  guidanceBinPill: {
+    minWidth: 110,
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  guidanceBinTitle: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  guidanceBinValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#f9fafb',
+    marginTop: 4,
+  },
+  guidanceSummaryRow: {
+    flexDirection: 'row',
+    columnGap: 10,
+    marginBottom: 12,
+  },
+  guidanceSummaryCard: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#111827',
+    backgroundColor: '#020617',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  guidanceSummaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 6,
+    marginBottom: 8,
+  },
+  guidanceSummaryLabel: {
+    fontSize: 11,
+    color: '#9ca3af',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    fontWeight: '600',
+  },
+  guidanceSummaryValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#f9fafb',
+  },
+  guidanceSummarySub: {
+    fontSize: 11,
+    color: '#9ca3af',
+    marginTop: 4,
+  },
+  guidanceStepsCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  guidanceStepsTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 10,
+  },
+  guidanceStepRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    columnGap: 10,
+    marginBottom: 8,
+  },
+  guidanceStepBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guidanceStepBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  guidanceStepText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#e5e7eb',
+    lineHeight: 18,
   },
   row: {
     flexDirection: 'row',
@@ -711,4 +1000,3 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
 });
-

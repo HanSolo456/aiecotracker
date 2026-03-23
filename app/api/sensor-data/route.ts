@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
             createdAt: new Date(),
             orgId: verification.device.orgId,
             deviceId: verification.device.deviceId,
+            wasteCategory: verification.device.wasteCategory ?? 'recyclable',
             fillLevel: fill_level,
             gasPpm: gas_ppm,
             coPpm: co_ppm,

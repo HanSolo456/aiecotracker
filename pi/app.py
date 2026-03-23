@@ -52,6 +52,8 @@ class StationRuntime:
         }
         payload["deviceId"] = self.config.device_id
         payload["deviceTokenStored"] = self.client.runtime_token is not None
+        payload["cameraReady"] = self.camera.ready()
+        payload["cameraError"] = self.camera.last_error
         payload["stationUrl"] = f"http://{self.config.device_id}.local:{self.config.local_port}"
         payload["resultUrl"] = (
             f"{self.config.app_base_url}/scan/result?scan={payload['scanId']}"
@@ -63,7 +65,12 @@ class StationRuntime:
 
 def build_html(payload: dict) -> str:
     state = escape(str(payload.get("state") or "off"))
-    bootstrap_message = escape(str(payload.get("bootstrap", {}).get("message") or "Waiting for bootstrap state."))
+    bootstrap = payload.get("bootstrap", {})
+    if payload.get("deviceTokenStored"):
+        bootstrap_message_raw = bootstrap.get("message") or "Bootstrap complete. Runtime token ready."
+    else:
+        bootstrap_message_raw = bootstrap.get("message") or "Waiting for bootstrap state."
+    bootstrap_message = escape(str(bootstrap_message_raw))
     bootstrap_error = escape(str(payload.get("bootstrap", {}).get("lastError") or ""))
     last_error = escape(str(payload.get("lastError") or ""))
     scan_id = escape(str(payload.get("scanId") or "Pending"))
@@ -168,6 +175,7 @@ def build_html(payload: dict) -> str:
       </div>
       <div>
         <p class="muted">Runtime token stored: {str(payload.get("deviceTokenStored")).lower()}</p>
+        <p class="muted">Camera ready: {str(payload.get("cameraReady")).lower()}</p>
         <p class="muted">Captured angles: {payload.get("capturedCount")}/{payload.get("captureCountTarget")}</p>
       </div>
     </div>
@@ -179,6 +187,7 @@ def build_html(payload: dict) -> str:
       </div>
       <div class="card">
         <h2>Diagnostics</h2>
+        <p class="muted">Camera error: {escape(str(payload.get("cameraError") or "None"))}</p>
         <p class="muted">Last bootstrap error: {bootstrap_error or "None"}</p>
         <p class="muted">Last station error: {last_error or "None"}</p>
         <p class="muted">Website launcher path: /org/stations/{escape(str(payload.get("deviceId")))}</p>

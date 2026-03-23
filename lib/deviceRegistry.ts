@@ -1,6 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from 'crypto';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeAdmin } from '@/lib/firebaseAdmin';
+import type { HackathonWasteCategory } from '@/types';
 
 export type DeviceType = 'esp32_gateway' | 'raspberry_pi';
 export type DeviceStatus = 'factory_pending' | 'claim_pending' | 'claim_verified' | 'claim_confirmed' | 'active' | 'inactive';
@@ -10,6 +11,7 @@ export interface DeviceRecord {
     orgId: string | null;
     displayName: string;
     deviceType: DeviceType;
+    wasteCategory?: HackathonWasteCategory | null;
     status: DeviceStatus;
     tokenHash: string;
     factoryBootstrapToken?: string;
@@ -92,6 +94,7 @@ function toDeviceRecord(raw: FirebaseFirestore.DocumentData): DeviceRecord {
         orgId: raw.orgId ?? null,
         displayName: raw.displayName,
         deviceType: raw.deviceType,
+        wasteCategory: raw.wasteCategory ?? null,
         status: raw.status,
         tokenHash: raw.tokenHash,
         factoryBootstrapToken: raw.factoryBootstrapToken,

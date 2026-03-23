@@ -30,7 +30,18 @@ export const MOCK_PART_PAYLOAD: PartMetadataPayload = {
         connection_type: 'flanged_ANSI_B16.5',
         estimated_mass_kg: 14.2,
     },
-    query_intent: 'disassembly_sequence_retrieval',
+    waste_classification: {
+        waste_category: 'industrial_component',
+        recyclability_score: 58,
+        recommended_stream: 'Reverse manufacturing',
+        co2_saving_kg: 39.8,
+    },
+    handling_safety: {
+        safety_level: 'caution',
+        reason: 'This industrial component may retain fluid residue and should be routed through supervised handling.',
+        ppe_required: ['nitrile_gloves', 'safety_goggles'],
+    },
+    query_intent: 'waste_classification_and_disassembly',
     fallback_required: false,
 };
 
@@ -60,6 +71,17 @@ export const MOCK_PUMP_PAYLOAD: PartMetadataPayload = {
         connection_type: 'flanged_ANSI_B73',
         estimated_mass_kg: 42.0,
     },
-    query_intent: 'disassembly_sequence_retrieval',
+    waste_classification: {
+        waste_category: 'industrial_component',
+        recyclability_score: 61,
+        recommended_stream: 'Reverse manufacturing',
+        co2_saving_kg: 117.6,
+    },
+    handling_safety: {
+        safety_level: 'caution',
+        reason: 'Industrial pumps can retain pressure and should be isolated before handling.',
+        ppe_required: ['nitrile_gloves', 'safety_goggles'],
+    },
+    query_intent: 'waste_classification_and_disassembly',
     fallback_required: false,
 };

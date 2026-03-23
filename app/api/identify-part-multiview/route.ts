@@ -4,6 +4,7 @@ import { groqWithFallback } from '@/lib/groqClient';
 import { applySafetyGatekeeper } from '@/lib/safetyGatekeeper';
 import { mergeVLMResults } from '@/lib/mergeVLMResults';
 import { MOCK_PART_PAYLOAD } from '@/lib/mockData';
+import { enrichPayloadForCitizenWasteGuidance } from '@/lib/wasteGuidance';
 import { checkRateLimit } from '@/lib/requestRateLimit';
 import type { PartMetadataPayload, IdentifyPartResponse } from '@/types';
 
@@ -204,7 +205,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<IdentifyPartR
                 ...MOCK_PART_PAYLOAD,
                 multi_view: { angle_count: images.length, avg_visual_confidence: 0.96, avg_material_confidence: 0.91, part_class_agreement: true, material_agreement: true },
             } as PartMetadataPayload);
-            return NextResponse.json({ success: true, payload, mock: true });
+            return NextResponse.json({ success: true, payload: enrichPayloadForCitizenWasteGuidance(payload), mock: true });
         }
 
         const cleanImages = images.slice(0, 3).map(img => ({
@@ -222,7 +223,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<IdentifyPartR
 
         console.log(`[multiview] Classified: ${payload.visual_id.part_class} @ ${payload.visual_id.confidence_score}`);
 
-        return NextResponse.json({ success: true, payload, mock: false });
+        return NextResponse.json({ success: true, payload: enrichPayloadForCitizenWasteGuidance(payload), mock: false });
     } catch (err) {
         console.error('[multiview] Error:', err);
         return NextResponse.json(
