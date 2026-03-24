@@ -54,6 +54,7 @@ class StationRuntime:
         payload["deviceTokenStored"] = self.client.runtime_token is not None
         payload["cameraReady"] = self.camera.ready()
         payload["cameraError"] = self.camera.last_error
+        payload["previewRefreshMs"] = int(self.camera.preview_interval_seconds() * 1000)
         payload["stationUrl"] = f"http://{self.config.device_id}.local:{self.config.local_port}"
         payload["resultUrl"] = (
             f"{self.config.app_base_url}/scan/result?scan={payload['scanId']}"
@@ -66,6 +67,7 @@ class StationRuntime:
 def build_html(payload: dict) -> str:
     state = escape(str(payload.get("state") or "off"))
     bootstrap = payload.get("bootstrap", {})
+    use_preview_stream = bool(payload.get("cameraReady"))
     if payload.get("deviceTokenStored"):
         bootstrap_message_raw = bootstrap.get("message") or "Bootstrap complete. Runtime token ready."
     else:
@@ -183,7 +185,7 @@ def build_html(payload: dict) -> str:
     <div class="grid">
       <div class="card">
         <h2>Preview</h2>
-        <img id="snapshot" src="/snapshot?t=0" alt="Pi station preview" />
+        <img id="snapshot" src="{'/stream' if use_preview_stream else '/snapshot?t=0'}" alt="Pi station preview" />
       </div>
       <div class="card">
         <h2>Diagnostics</h2>
@@ -196,6 +198,9 @@ def build_html(payload: dict) -> str:
   </div>
 
   <script>
+    const usePreviewStream = {'true' if use_preview_stream else 'false'};
+    const snapshotRefreshMs = {int(payload.get("previewRefreshMs") or 250)};
+
     async function post(path) {{
       const response = await fetch(path, {{ method: 'POST' }});
       if (!response.ok) {{
@@ -205,10 +210,43 @@ def build_html(payload: dict) -> str:
       window.location.reload();
     }}
 
-    setInterval(() => {{
+    function startPreviewLoop() {{
       const img = document.getElementById('snapshot');
-      img.src = '/snapshot?t=' + Date.now();
-    }}, 1000);
+      if (!img) return;
+
+      let pending = false;
+
+      const schedule = (delay = snapshotRefreshMs) => {{
+        window.setTimeout(loadNextFrame, delay);
+      }};
+
+      const loadNextFrame = () => {{
+        if (pending) {{
+          schedule();
+          return;
+        }}
+
+        pending = true;
+
+        img.onload = () => {{
+          pending = false;
+          schedule();
+        }};
+
+        img.onerror = () => {{
+          pending = false;
+          schedule(Math.max(snapshotRefreshMs, 1000));
+        }};
+
+        img.src = '/snapshot?t=' + Date.now();
+      }};
+
+      schedule();
+    }}
+
+    if (!usePreviewStream) {{
+      startPreviewLoop();
+    }}
   </script>
 </body>
 </html>
@@ -282,6 +320,34 @@ def create_app() -> Flask:
         payload, mime_type = runtime.camera.snapshot()
         return Response(payload, mimetype=mime_type)
 
+    @app.get("/stream")
+    def stream() -> Response:
+        def generate():
+            last_sequence = -1
+
+            while True:
+                payload, mime_type, sequence = runtime.camera.wait_for_preview_frame(
+                    last_sequence,
+                    timeout=1.0,
+                )
+
+                if sequence == last_sequence or mime_type != "image/jpeg":
+                    continue
+
+                last_sequence = sequence
+                header = (
+                    b"--frame\r\n"
+                    + f"Content-Type: {mime_type}\r\n".encode("ascii")
+                    + f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
+                )
+                yield header + payload + b"\r\n"
+
+        return Response(
+            generate(),
+            mimetype="multipart/x-mixed-replace; boundary=frame",
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"},
+        )
+
     @app.get("/open-result")
     def open_result() -> Response:
         payload = runtime.state_payload()
@@ -296,7 +362,7 @@ def create_app() -> Flask:
 def main() -> None:
     app = create_app()
     config = StationConfig.from_env()
-    app.run(host="0.0.0.0", port=config.local_port, debug=False)
+    app.run(host="0.0.0.0", port=config.local_port, debug=False, threaded=True)
 
 
 if __name__ == "__main__":

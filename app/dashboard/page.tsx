@@ -6,6 +6,7 @@ import { ScanLine, Zap, Leaf, TrendingUp, ChevronRight, ShieldCheck, Activity, W
 import BottomNav from '@/components/BottomNav';
 import { subscribeToRecentScans, subscribeToOrgScans, subscribeToWorkerScans, computeStats, getScanRecoveryValueINR, relativeTime, type ScanRecord } from '@/lib/scanService';
 import { computeLeaderboard } from '@/lib/incentiveService';
+import { flushOfflineQueue, getOfflineQueueSize } from '@/lib/offlineQueue';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '@/lib/authContext';
@@ -53,6 +54,59 @@ function WRIRing({ score }: { score: number }) {
         </svg>
     );
 }
+
+// ── Scans-per-day bar chart (last 7 days) ─────────────────────────────────────
+function ScanActivityMini({ scans }: { scans: ScanRecord[] }) {
+    const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        d.setHours(0, 0, 0, 0);
+        return d;
+    });
+    const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const counts = days.map(day =>
+        scans.filter(s => {
+            const sd = s.createdAt.toDate();
+            return sd.toDateString() === day.toDateString();
+        }).length
+    );
+    const max = Math.max(...counts, 1);
+    const todayIdx = 6;
+    return (
+        <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+            <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-semibold text-white">Scan Activity</p>
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Last 7 days</span>
+            </div>
+            <div className="flex items-end gap-1.5 h-16">
+                {counts.map((count, i) => {
+                    const isToday = i === todayIdx;
+                    const barH = Math.max(4, (count / max) * 56);
+                    return (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-1" title={`${count} scan${count !== 1 ? 's' : ''}`}>
+                            <span className="text-[9px] font-semibold"
+                                style={{ color: count > 0 ? (isToday ? '#84cc16' : 'var(--text-dim)') : 'transparent' }}>
+                                {count > 0 ? count : ''}
+                            </span>
+                            <div className="w-full rounded-t"
+                                style={{
+                                    height: `${barH}px`,
+                                    background: isToday ? '#84cc16' : count > 0 ? 'rgba(132,204,22,0.45)' : 'var(--border)',
+                                    boxShadow: isToday && count > 0 ? '0 0 6px rgba(132,204,22,0.5)' : undefined,
+                                    transition: 'height 0.5s ease',
+                                }}
+                            />
+                            <span className="text-[8px]" style={{ color: isToday ? '#84cc16' : 'var(--text-muted)' }}>
+                                {DAY_LABELS[days[i].getDay()]}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 
 function IncentiveTransparencyCard() {
     const rewardRows = [
@@ -113,6 +167,23 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [sensor, setSensor] = useState<{ fillLevel: number; gasPpm: number; temperature: number; gasAlert: boolean; lastSeenMs?: number } | null>(null);
     const [statPeriod, setStatPeriod] = useState<'month' | 'all'>('month');
+    const [pendingOffline, setPendingOffline] = useState(0);
+
+    // Flush offline queue on mount
+    useEffect(() => {
+        const size = getOfflineQueueSize();
+        if (size > 0) setPendingOffline(size);
+        async function tryFlush() {
+            if (!navigator.onLine) return;
+            const uploaded = await flushOfflineQueue();
+            if (uploaded > 0) setPendingOffline(getOfflineQueueSize());
+        }
+        tryFlush();
+        window.addEventListener('online', tryFlush);
+        return () => window.removeEventListener('online', tryFlush);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
 
     const isWorker = profile?.role === 'worker' && !!profile?.orgId;
 
@@ -202,6 +273,69 @@ export default function DashboardPage() {
 
     // ── Worker Dashboard ──────────────────────────────────────────────────────
     if (isWorker) {
+        // Full skeleton while loading
+        if (loading) return (
+            <div className="flex flex-col min-h-screen pb-28">
+                {/* Skeleton header */}
+                <div className="px-5 pt-6 pb-5">
+                    <div className="flex items-center justify-between mb-5">
+                        <div className="h-5 w-24 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
+                        <div className="h-7 w-16 rounded-xl animate-pulse" style={{ background: 'var(--border)' }} />
+                    </div>
+                    {/* Worker hero skeleton */}
+                    <div className="rounded-2xl px-5 py-4 flex items-center gap-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                        <div className="w-14 h-14 rounded-2xl animate-pulse" style={{ background: 'var(--border)' }} />
+                        <div className="flex-1 flex flex-col gap-2">
+                            <div className="h-4 w-32 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                            <div className="h-3 w-24 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                            <div className="flex gap-2">
+                                <div className="h-5 w-16 rounded-full animate-pulse" style={{ background: 'var(--border)' }} />
+                                <div className="h-5 w-14 rounded-full animate-pulse" style={{ background: 'var(--border)' }} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* Skeleton scan button */}
+                <div className="px-5 mb-4">
+                    <div className="h-14 w-full rounded-2xl animate-pulse" style={{ background: 'var(--border)' }} />
+                </div>
+                {/* Skeleton KPI row */}
+                <div className="px-5 mb-4 grid grid-cols-3 gap-3">
+                    {[0,1,2].map(i => (
+                        <div key={i} className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                            <div className="w-7 h-7 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
+                            <div className="h-6 w-3/4 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                            <div className="h-3 w-1/2 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                        </div>
+                    ))}
+                </div>
+                {/* Skeleton chart */}
+                <div className="px-5 mb-4">
+                    <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                        <div className="h-3 w-24 rounded mb-4 animate-pulse" style={{ background: 'var(--border)' }} />
+                        <div className="flex items-end gap-1.5 h-16">
+                            {[40,70,30,90,50,100,65].map((h, i) => (
+                                <div key={i} className="flex-1 rounded-t animate-pulse" style={{ height: `${h * 0.56}px`, background: 'var(--border)' }} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {/* Skeleton recent scans */}
+                <div className="px-5 mb-4 flex flex-col gap-2">
+                    {[0,1,2].map(i => (
+                        <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                            <div className="w-8 h-8 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
+                            <div className="flex-1 flex flex-col gap-2">
+                                <div className="h-3.5 w-3/4 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                                <div className="h-2.5 w-1/2 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <BottomNav />
+            </div>
+        );
+
         const workerName  = profile?.displayName ?? user?.displayName ?? 'Worker';
         const initials    = workerName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
         const rankLabel   = myRank === 0 ? '—' : `#${myRank}`;
@@ -270,7 +404,7 @@ export default function DashboardPage() {
                         <ScanLine size={18} /> {t('dashboard.start_scan')}
                     </button>
 
-                    {/* Row: Org Dashboard pill + streak */}
+                    {/* Org Dashboard pill + streak */}
                     <div className="flex items-center gap-2">
                         <button onClick={() => router.push('/org/dashboard')}
                             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-90"
@@ -285,6 +419,17 @@ export default function DashboardPage() {
                             </span>
                         </div>
                     </div>
+
+                    {/* Offline queue banner */}
+                    {pendingOffline > 0 && (
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs"
+                            style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
+                            <span style={{ color: '#F59E0B' }}>⏳</span>
+                            <span style={{ color: '#F59E0B' }} className="font-semibold">
+                                {pendingOffline} scan{pendingOffline !== 1 ? 's' : ''} queued offline — will upload when connected
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── Period Toggle ── */}
@@ -315,11 +460,17 @@ export default function DashboardPage() {
                             style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                             <div className="w-6 h-6 rounded-lg flex items-center justify-center"
                                 style={{ background: `${accent}12` }}>{icon}</div>
-                            <p className="text-base font-bold text-white leading-none" style={{ fontFamily: 'Space Grotesk' }}>{loading ? t('common.no_data') : value}</p>
+                            <p className="text-base font-bold text-white leading-none" style={{ fontFamily: 'Space Grotesk' }}>{value}</p>
                             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</p>
                         </div>
                     ))}
                 </div>
+
+                {/* ── Scan Activity Chart (7-day) ── */}
+                <div className="px-5 lg:px-10 mb-4">
+                    <ScanActivityMini scans={scans} />
+                </div>
+
 
                 {/* ── Grade Breakdown ── */}
                 {myScansCount > 0 && (
@@ -361,13 +512,26 @@ export default function DashboardPage() {
                             <div key={b.id}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
                                 style={b.earned
-                                    ? { background: 'rgba(132,204,22,0.1)', border: '1px solid rgba(132,204,22,0.25)', color: '#84cc16' }
+                                    ? {
+                                        background: 'rgba(132,204,22,0.1)',
+                                        border: '1px solid rgba(132,204,22,0.25)',
+                                        color: '#84cc16',
+                                        // Flash animation for newly earned badges
+                                        animation: 'badgeEarn 0.6s ease forwards',
+                                    }
                                     : { background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-muted)', opacity: 0.65 }}
                             >
                                 <span>{b.icon}</span> {b.label}
                             </div>
                         ))}
                     </div>
+                    <style>{`
+                        @keyframes badgeEarn {
+                            0%   { transform: scale(1); box-shadow: none; }
+                            40%  { transform: scale(1.12); box-shadow: 0 0 12px rgba(132,204,22,0.5); }
+                            100% { transform: scale(1); box-shadow: none; }
+                        }
+                    `}</style>
                 </div>
 
                 <div className="px-5 lg:px-10 mb-4">
@@ -384,9 +548,16 @@ export default function DashboardPage() {
                         </button>
                     </div>
                     {loading ? (
-                        <div className="flex justify-center py-8">
-                            <div className="w-6 h-6 rounded-full border-2 animate-spin"
-                                style={{ borderColor: 'var(--border)', borderTopColor: '#84cc16' }} />
+                        <div className="flex flex-col gap-2">
+                            {[0,1,2].map(i => (
+                                <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                                    <div className="w-8 h-8 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
+                                    <div className="flex-1 flex flex-col gap-2">
+                                        <div className="h-3.5 w-3/4 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                                        <div className="h-2.5 w-1/2 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : scans.length === 0 ? (
                         <div className="flex flex-col items-center gap-2 py-8 text-center">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     MapPin, Navigation, Loader2, ChevronLeft,
@@ -20,6 +20,9 @@ interface DropOffPoint {
 }
 
 type GeoState = 'idle' | 'locating' | 'loading' | 'ready' | 'error';
+
+type LeafletMapHandle = { remove: () => void };
+type LeafletContainer = HTMLDivElement & { _leaflet_id?: number | null };
 
 // ── Static fallback — CPCB-registered e-waste recyclers ───────────────────────
 
@@ -50,80 +53,107 @@ function mapsUrl(lat: number, lon: number, name: string): string {
     return `https://maps.google.com/maps?q=${encodeURIComponent(name)}&ll=${lat},${lon}&z=16`;
 }
 
-// ── SVG Minimap ───────────────────────────────────────────────────────────────
+// ── Leaflet Map ───────────────────────────────────────────────────────────────
 
-function Minimap({
+function LeafletMap({
     userLat, userLon, points,
 }: { userLat: number; userLon: number; points: DropOffPoint[] }) {
-    const W = 340, H = 200;
-    const PAD = 28;
+    const mapRef = useRef<HTMLDivElement>(null);
+    const leafletMapRef = useRef<LeafletMapHandle | null>(null);
 
-    // Bounding box including user position
-    const allLats = [userLat, ...points.map(p => p.lat)];
-    const allLons = [userLon, ...points.map(p => p.lon)];
-    const minLat = Math.min(...allLats), maxLat = Math.max(...allLats);
-    const minLon = Math.min(...allLons), maxLon = Math.max(...allLons);
-    const latRange = maxLat - minLat || 0.01;
-    const lonRange = maxLon - minLon || 0.01;
+    useEffect(() => {
+        if (!mapRef.current) return;
+        let isMounted = true;
 
-    function toSvg(lat: number, lon: number): [number, number] {
-        const x = PAD + ((lon - minLon) / lonRange) * (W - PAD * 2);
-        // lat increases upward on map, SVG y downward — flip
-        const y = H - PAD - ((lat - minLat) / latRange) * (H - PAD * 2);
-        return [x, y];
-    }
+        if (leafletMapRef.current) {
+            leafletMapRef.current.remove();
+            leafletMapRef.current = null;
+        }
 
-    const [ux, uy] = toSvg(userLat, userLon);
+        import('leaflet').then((L) => {
+            if (!isMounted || !mapRef.current) return;
+
+            const container = mapRef.current as LeafletContainer;
+            if (container._leaflet_id) {
+                container._leaflet_id = null;
+                container.innerHTML = '';
+            }
+
+            delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+                iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            });
+
+            const map = L.map(mapRef.current);
+            L.tileLayer(
+                'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                {
+                    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 20,
+                },
+            ).addTo(map);
+
+            // User marker
+            const userIcon = L.divIcon({
+                className: '',
+                html: `<div style="width:36px;height:36px;border-radius:18px;background:#84cc16;border:3px solid white;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(132,204,22,0.5)">
+                    <div style="width:10px;height:10px;border-radius:5px;background:white"></div>
+                </div>`,
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+            });
+            L.marker([userLat, userLon], { icon: userIcon })
+                .addTo(map)
+                .bindPopup('<b>You are here</b>');
+
+            // Drop-off markers
+            points.forEach((p, i) => {
+                const pinIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:34px;height:34px;border-radius:17px;background:#1d4ed8;border:3px solid #60a5fa;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:800;box-shadow:0 4px 12px rgba(29,78,216,0.45)">${i + 1}</div>`,
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17],
+                });
+                L.marker([p.lat, p.lon], { icon: pinIcon })
+                    .addTo(map)
+                    .bindPopup(`<b>${p.name}</b><br/>${p.distKm < 1 ? `${Math.round(p.distKm * 1000)} m away` : `${p.distKm.toFixed(1)} km away`}`);
+            });
+
+            // Fit bounds to show all markers
+            const allLatLngs: [number, number][] = [
+                [userLat, userLon],
+                ...points.map(p => [p.lat, p.lon] as [number, number]),
+            ];
+            map.fitBounds(allLatLngs, { padding: [36, 36] });
+
+            leafletMapRef.current = map;
+        });
+
+        return () => {
+            isMounted = false;
+            if (leafletMapRef.current) {
+                leafletMapRef.current.remove();
+                leafletMapRef.current = null;
+            }
+        };
+    }, [userLat, userLon, points]);
 
     return (
-        <div className="rounded-2xl overflow-hidden" style={{ background: '#111827', border: '1px solid var(--border)' }}>
-            <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
-                {/* grid lines */}
-                {[0.25, 0.5, 0.75].map(t => (
-                    <g key={t}>
-                        <line x1={PAD + t * (W - PAD * 2)} y1={PAD} x2={PAD + t * (W - PAD * 2)} y2={H - PAD}
-                            stroke="#1f2937" strokeWidth="1" />
-                        <line x1={PAD} y1={PAD + t * (H - PAD * 2)} x2={W - PAD} y2={PAD + t * (H - PAD * 2)}
-                            stroke="#1f2937" strokeWidth="1" />
-                    </g>
-                ))}
-
-                {/* lines from user to each point */}
-                {points.map(p => {
-                    const [px, py] = toSvg(p.lat, p.lon);
-                    return (
-                        <line key={p.id} x1={ux} y1={uy} x2={px} y2={py}
-                            stroke="#374151" strokeWidth="1" strokeDasharray="3 3" />
-                    );
-                })}
-
-                {/* drop-off pins */}
-                {points.map((p, i) => {
-                    const [px, py] = toSvg(p.lat, p.lon);
-                    return (
-                        <g key={p.id}>
-                            <circle cx={px} cy={py} r="7" fill="#1d4ed8" stroke="#60a5fa" strokeWidth="1.5" />
-                            <text x={px} y={py + 4} textAnchor="middle" fill="white"
-                                style={{ fontSize: '8px', fontWeight: 700 }}>{i + 1}</text>
-                        </g>
-                    );
-                })}
-
-                {/* user dot */}
-                <circle cx={ux} cy={uy} r="10" fill="#84cc1630" />
-                <circle cx={ux} cy={uy} r="5" fill="#84cc16" stroke="white" strokeWidth="1.5" />
-                <text x={ux} y={uy - 13} textAnchor="middle" fill="#84cc16"
-                    style={{ fontSize: '8px', fontWeight: 700 }}>YOU</text>
-            </svg>
-            <div className="flex items-center gap-3 px-4 py-2 border-t"
-                style={{ borderColor: 'var(--border)' }}>
+        <div className="rounded-2xl overflow-hidden" style={{ height: 260, position: 'relative', isolation: 'isolate', border: '1px solid var(--border)' }}>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+            <div ref={mapRef} style={{ height: '100%', width: '100%' }} />
+            <div className="absolute bottom-0 left-0 right-0 flex items-center gap-4 px-4 py-2 pointer-events-none"
+                style={{ background: 'linear-gradient(to top, rgba(17,24,39,0.85) 0%, transparent 100%)' }}>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                    <span className="text-[10px]" style={{ color: 'var(--text-dim)' }}>You</span>
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#84cc16' }} />
+                    <span className="text-[10px] font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>You</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                    <span className="text-[10px]" style={{ color: 'var(--text-dim)' }}>Drop-off point</span>
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#3b82f6' }} />
+                    <span className="text-[10px] font-semibold" style={{ color: 'rgba(255,255,255,0.8)' }}>Drop-off point</span>
                 </div>
             </div>
         </div>
@@ -140,11 +170,21 @@ export default function DropOffPage() {
     const [userLon, setUserLon] = useState<number | null>(null);
     const [points, setPoints] = useState<DropOffPoint[]>([]);
     const [usedFallback, setUsedFallback] = useState(false);
+    // Prevent double-fetch (React StrictMode fires effects twice in dev)
+    const fetchingRef = useRef(false);
+    const abortRef = useRef<AbortController | null>(null);
 
     async function fetchNearby(lat: number, lon: number) {
+        if (fetchingRef.current) return; // already in flight — skip
+        fetchingRef.current = true;
+
+        // Cancel any previous in-flight requests
+        abortRef.current?.abort();
+        abortRef.current = new AbortController();
+        const { signal } = abortRef.current;
+
         setGeoState('loading');
 
-        // Three public Overpass mirrors — try fastest first
         const MIRRORS = [
             'https://overpass.kumi.systems/api/interpreter',
             'https://overpass.openstreetmap.ru/api/interpreter',
@@ -155,19 +195,19 @@ export default function DropOffPage() {
 
         let data: { elements: { id: number; lat: number; lon: number; tags?: Record<string, string> }[] } | null = null;
 
-        for (const mirror of MIRRORS) {
-            try {
-                const res = await fetch(
-                    `${mirror}?data=${encodeURIComponent(q)}`,
-                    { signal: AbortSignal.timeout(10000) },
-                );
-                if (!res.ok) continue; // try next mirror
-                data = await res.json();
-                break; // success — stop trying
-            } catch {
-                // timeout or network error → try next mirror
-                continue;
-            }
+        // Race all mirrors in parallel — first successful response wins
+        try {
+            data = await Promise.any(
+                MIRRORS.map(mirror =>
+                    fetch(`${mirror}?data=${encodeURIComponent(q)}`, { signal }).then(res => {
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        return res.json() as Promise<typeof data>;
+                    })
+                )
+            );
+        } catch (err) {
+            if ((err as Error)?.name === 'AbortError') return; // superceded by a newer call
+            // All mirrors failed — data stays null, fallback kicks in below
         }
 
         try {
@@ -198,9 +238,10 @@ export default function DropOffPage() {
                 distKm: haversineKm(lat, lon, p.lat, p.lon),
             })).sort((a, b) => a.distKm - b.distKm));
             setGeoState('ready');
+        } finally {
+            fetchingRef.current = false;
         }
     }
-
 
     function locate() {
         if (!navigator.geolocation) {
@@ -209,6 +250,8 @@ export default function DropOffPage() {
             return;
         }
         setGeoState('locating');
+
+        // Fast low-accuracy pass first — gives a result almost instantly
         navigator.geolocation.getCurrentPosition(
             pos => {
                 const { latitude, longitude } = pos.coords;
@@ -223,19 +266,20 @@ export default function DropOffPage() {
                         ? 'Location access denied. Showing nationwide drop-off centres.'
                         : 'Could not determine your location. Try again.',
                 );
-                // On deny — still show static list
                 setUsedFallback(true);
                 setPoints(STATIC_FALLBACK.map(p => ({ ...p, distKm: 999 })));
                 setGeoState('ready');
             },
-            { enableHighAccuracy: true, timeout: 10000 },
+            // Low accuracy = much faster (uses network/cell instead of GPS)
+            { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 },
         );
     }
 
     // Auto-locate on mount
     useEffect(() => { locate(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const canShowMap = geoState === 'ready' && userLat !== null && userLon !== null && !usedFallback;
+    // Show the real map whenever we have the user's coordinates — even in fallback mode
+    const canShowMap = geoState === 'ready' && userLat !== null && userLon !== null;
 
     return (
         <div className="flex flex-col min-h-screen pb-28 lg:pb-0" style={{ background: 'var(--bg-primary)' }}>
@@ -299,9 +343,14 @@ export default function DropOffPage() {
                     </div>
                 )}
 
-                {/* SVG minimap */}
-                {canShowMap && points.length > 0 && (
-                    <Minimap userLat={userLat!} userLon={userLon!} points={points} />
+                {/* Leaflet map */}
+                {canShowMap && (
+                    <LeafletMap
+                        userLat={userLat!}
+                        userLon={userLon!}
+                        // Don't plot nationwide fallback pins — they'd be 1000s of km away
+                        points={usedFallback ? [] : points}
+                    />
                 )}
 
                 {/* Fallback notice */}
@@ -315,7 +364,7 @@ export default function DropOffPage() {
                     </div>
                 )}
 
-                {/* Results list */}
+                {/* Empty state */}
                 {geoState === 'ready' && points.length === 0 && (
                     <div className="rounded-2xl p-10 flex flex-col items-center gap-3 text-center"
                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
@@ -332,6 +381,7 @@ export default function DropOffPage() {
                     </div>
                 )}
 
+                {/* Results list */}
                 {geoState === 'ready' && points.length > 0 && (
                     <div className="flex flex-col gap-3">
                         {points.map((p, i) => {
@@ -352,7 +402,6 @@ export default function DropOffPage() {
                                 <div key={p.id}
                                     className="rounded-xl p-4 flex items-start gap-4"
                                     style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                                    {/* index badge */}
                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
                                         style={{ background: 'rgba(96,165,250,0.15)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.25)' }}>
                                         {i + 1}
@@ -376,7 +425,7 @@ export default function DropOffPage() {
                     </div>
                 )}
 
-                {/* Idle state — button */}
+                {/* Idle state */}
                 {geoState === 'idle' && (
                     <div className="rounded-2xl p-8 flex flex-col items-center gap-4"
                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>

@@ -6,6 +6,7 @@ import { Camera, Upload, X, ChevronLeft, Zap, Plus, Layers, SwitchCamera } from 
 import BottomNav from '@/components/BottomNav';
 import type { DigitalProductPassport, PartMetadataPayload } from '@/types';
 import { saveScan, type ScanContext } from '@/lib/scanService';
+import { enqueueOfflineScan, flushOfflineQueue, getOfflineQueueSize } from '@/lib/offlineQueue';
 import { useAuth } from '@/lib/authContext';
 import { setSessionJSON, setSessionValue } from '@/lib/sessionState';
 
@@ -38,6 +39,26 @@ export default function ScanPage() {
     const [scanState, setScanState] = useState<ScanState>('idle');
     const [error, setError] = useState<string | null>(null);
     const [analysisStep, setAnalysisStep] = useState(0);
+    const [offlineQueued, setOfflineQueued] = useState(false);
+    const [pendingOffline, setPendingOffline] = useState(0);
+
+    // Flush any pending offline scans when we come back online
+    useEffect(() => {
+        const size = getOfflineQueueSize();
+        if (size > 0) setPendingOffline(size);
+
+        async function tryFlush() {
+            if (!navigator.onLine) return;
+            const uploaded = await flushOfflineQueue();
+            if (uploaded > 0) {
+                setPendingOffline(getOfflineQueueSize());
+            }
+        }
+        tryFlush();
+        window.addEventListener('online', tryFlush);
+        return () => window.removeEventListener('online', tryFlush);
+    }, []);
+
 
     // ── Camera viewfinder state ───────────────────────────────────────────────
     const [cameraOpen, setCameraOpen] = useState(false);
@@ -254,8 +275,17 @@ export default function ScanPage() {
             };
 
             const [scanId] = await Promise.all([
-                saveScan(identifyData.payload, previewImage, 'single', guideData.guide ?? {}, dppData.dpp, 'web', undefined, scanCtx).catch((err: unknown) => {
+                saveScan(identifyData.payload, previewImage, 'single', guideData.guide ?? {}, dppData.dpp, 'web', undefined, scanCtx).catch(async (err: unknown) => {
                     console.error('[EcoTrack] Firestore save failed:', (err as Error)?.message ?? err);
+                    // If offline, queue for later upload
+                    if (!navigator.onLine) {
+                        enqueueOfflineScan(
+                            identifyData.payload!, previewImage, 'single',
+                            guideData.guide ?? {}, dppData.dpp, 'web', undefined, scanCtx
+                        );
+                        setOfflineQueued(true);
+                        setPendingOffline(getOfflineQueueSize());
+                    }
                     return null;
                 }),
                 new Promise((resolve) => setTimeout(resolve, 600)),

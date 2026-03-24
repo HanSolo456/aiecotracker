@@ -33,6 +33,8 @@ class StationConfig:
     arm_timeout_seconds: int
     camera_width: int
     camera_height: int
+    preview_width: int
+    preview_height: int
     preview_refresh_seconds: float
     button_pin: int
 
@@ -64,7 +66,9 @@ class StationConfig:
             arm_timeout_seconds=int(os.environ.get("ARM_TIMEOUT_SECONDS", "600")),
             camera_width=int(os.environ.get("CAMERA_CAPTURE_WIDTH", "1280")),
             camera_height=int(os.environ.get("CAMERA_CAPTURE_HEIGHT", "720")),
-            preview_refresh_seconds=float(os.environ.get("PREVIEW_REFRESH_SECONDS", "1.0")),
+            preview_width=int(os.environ.get("PREVIEW_WIDTH", "640")),
+            preview_height=int(os.environ.get("PREVIEW_HEIGHT", "360")),
+            preview_refresh_seconds=float(os.environ.get("PREVIEW_REFRESH_SECONDS", "0.12")),
             button_pin=int(os.environ.get("BUTTON_PIN", "17")),
         )
 
@@ -77,4 +81,3 @@ class StationConfig:
     def write_runtime_token(self, token: str) -> None:
         self.device_token_path.parent.mkdir(parents=True, exist_ok=True)
         self.device_token_path.write_text(token.strip() + "\n")
-

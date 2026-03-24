@@ -41,7 +41,7 @@ function BottomNavInner() {
             if (isAnonymous) return href === '/auth';
             return href === '/dashboard';
         }
-        if (href === '/org/dashboard') return pathname.startsWith('/org');
+        if (href === '/org/dashboard') return pathname.startsWith('/org') || pathname.startsWith('/drop-off');
         return pathname === href || pathname.startsWith(`${href}/`);
     };
 
@@ -96,7 +96,7 @@ function BottomNavInner() {
     if (isPublicRoute) return null;
 
     return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 safe-bottom" style={{ willChange: 'transform' }}>
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[2000] safe-bottom" style={{ willChange: 'transform' }}>
             {/* Reduced side padding so 5 tabs fit comfortably */}
             <div className="px-2 pb-2">
                 <div

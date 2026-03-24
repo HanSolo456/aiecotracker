@@ -414,7 +414,7 @@ export default function RoutesPage() {
 
   return (
     <div
-      className="min-h-screen pb-28 lg:pb-10"
+      className="min-h-screen pb-32 lg:pb-10"
       style={{ background: "var(--bg-primary)" }}
     >
       <link
@@ -660,8 +660,8 @@ export default function RoutesPage() {
         )}
 
         <div
-          className="card overflow-hidden"
-          style={{ height: "360px", position: "relative" }}
+          className="card overflow-hidden mb-3 sm:mb-0 h-[280px] sm:h-[320px] lg:h-[360px]"
+          style={{ position: "relative", isolation: "isolate" }}
         >
           {locatedCount === 0 && (
             <div
