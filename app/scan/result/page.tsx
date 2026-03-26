@@ -25,6 +25,7 @@ import type { PartMetadataPayload, SafetyLevel } from "@/types";
 import { getSessionJSON, getSessionValue } from "@/lib/sessionState";
 import { getScanById, restoreScanToSession } from "@/lib/scanService";
 import { buildCitizenWasteGuidance } from "@/lib/wasteGuidance";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type ScanResultPayload = PartMetadataPayload & {
   multi_view?: {
@@ -37,6 +38,7 @@ type ScanResultPayload = PartMetadataPayload & {
 function ScanResultPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
   const fromHistory = searchParams.get("from") === "history";
   const scanId = searchParams.get("scan");
   const [payload, setPayload] = useState<PartMetadataPayload | null>(null);
@@ -101,7 +103,7 @@ function ScanResultPageInner() {
           onClick={() => router.push("/scan")}
           className="btn-primary mt-2"
         >
-          Back to Scan
+          {t("scan.try_again")}
         </button>
       </div>
     );
@@ -222,7 +224,7 @@ function ScanResultPageInner() {
       bg: "rgba(239,68,68,0.12)",
       border: "#EF4444",
       icon: "🚫",
-      title: "DO NOT HANDLE",
+      title: t("result.danger"),
       subtitle:
         "Hazardous item detected. Use full PPE. Contact supervisor before proceeding.",
       textColor: "#EF4444",
@@ -231,7 +233,7 @@ function ScanResultPageInner() {
       bg: "rgba(245,158,11,0.1)",
       border: "#F59E0B",
       icon: "⚠️",
-      title: "HANDLE WITH CARE",
+      title: t("result.caution"),
       subtitle:
         "Wear protective gloves and mask. Follow safety protocol before handling.",
       textColor: "#F59E0B",
@@ -240,7 +242,7 @@ function ScanResultPageInner() {
       bg: "rgba(132,204,22,0.08)",
       border: "#84cc16",
       icon: "✅",
-      title: "SAFE TO HANDLE",
+      title: t("result.safe"),
       subtitle:
         "Standard recycling procedures apply. Route to appropriate collection stream.",
       textColor: "#84cc16",
@@ -264,7 +266,7 @@ function ScanResultPageInner() {
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold text-white">Item Classified</h1>
+            <h1 className="text-base font-bold text-white">{t("result.classified")}</h1>
             {multiView && (
               <span className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/25">
                 <Layers size={9} />
@@ -366,7 +368,7 @@ function ScanResultPageInner() {
               <Shield size={14} style={{ color: citizenGuidance.binColor }} />
             </div>
             <p className="text-xs font-semibold text-secondary uppercase tracking-wide">
-              Citizen Guidance
+              {t("result.citizen_guide")}
             </p>
           </div>
           <div className="flex flex-col gap-2.5 mb-3 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -434,7 +436,7 @@ function ScanResultPageInner() {
               className="text-[11px] font-semibold uppercase tracking-wide mb-2"
               style={{ color: citizenGuidance.binColor }}
             >
-              What To Do Now
+              {t("result.what_to_do")}
             </p>
             <div className="flex flex-col gap-2">
               {citizenGuidance.steps.map((step, index) => (
@@ -480,7 +482,7 @@ function ScanResultPageInner() {
               }}
             >
               <MapPin size={15} />
-              Find Nearby Drop-Off Points
+              {t("result.drop_off")}
             </button>
           )}
         </div>
@@ -575,7 +577,7 @@ function ScanResultPageInner() {
               <Package size={14} className="text-brand-green" />
             </div>
             <p className="text-xs font-semibold text-secondary uppercase tracking-wide">
-              Part Classification
+              {t("result.classification")}
             </p>
           </div>
           <p className="text-lg font-bold text-white capitalize">
@@ -599,7 +601,7 @@ function ScanResultPageInner() {
               <Cpu size={14} className="text-blue-400" />
             </div>
             <p className="text-xs font-semibold text-secondary uppercase tracking-wide">
-              Material Inference
+              {t("result.material")}
             </p>
           </div>
           <div className="flex flex-col gap-1">
@@ -643,7 +645,7 @@ function ScanResultPageInner() {
                 <Ruler size={14} className="text-purple-400" />
               </div>
               <p className="text-xs font-semibold text-secondary uppercase tracking-wide">
-                Geometry
+                {t("result.geometry")}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -682,7 +684,7 @@ function ScanResultPageInner() {
               <AlertTriangle size={14} className="text-red-400" />
             </div>
             <p className="text-xs font-semibold text-secondary uppercase tracking-wide">
-              Hazard Assessment
+              {t("result.hazard_assess")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -740,8 +742,8 @@ function ScanResultPageInner() {
             <BookOpen size={18} />
             {wasteClass.waste_category === "industrial_component" ||
             wasteClass.waste_category === "hazardous"
-              ? "View Detailed Handling Guide"
-              : "View Disposal & Recycling Guide"}
+              ? t("result.view_guide")
+              : t("result.view_dispose")}
             <ChevronRight size={16} className="ml-auto" />
           </button>
         )}

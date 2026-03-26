@@ -26,6 +26,9 @@ class StationConfig:
     device_id: str
     bootstrap_token: str
     device_token_path: Path
+    camera_backend: str
+    usb_camera_index: int
+    usb_fourcc: str
     local_port: int
     capture_count: int
     pressure_threshold_grams: float
@@ -36,6 +39,8 @@ class StationConfig:
     preview_width: int
     preview_height: int
     preview_refresh_seconds: float
+    preview_jpeg_quality: int
+    capture_jpeg_quality: int
     button_pin: int
 
     @classmethod
@@ -59,6 +64,9 @@ class StationConfig:
             device_id=device_id,
             bootstrap_token=bootstrap_token,
             device_token_path=device_token_path,
+            camera_backend=os.environ.get("CAMERA_BACKEND", "auto").strip().lower(),
+            usb_camera_index=int(os.environ.get("USB_CAMERA_INDEX", "0")),
+            usb_fourcc=os.environ.get("USB_FOURCC", "MJPG").strip().upper()[:4] or "MJPG",
             local_port=int(os.environ.get("STATION_PORT", "8080")),
             capture_count=max(1, min(int(os.environ.get("CAPTURE_COUNT", "3")), 3)),
             pressure_threshold_grams=float(os.environ.get("PRESSURE_THRESHOLD_GRAMS", "50")),
@@ -69,6 +77,8 @@ class StationConfig:
             preview_width=int(os.environ.get("PREVIEW_WIDTH", "640")),
             preview_height=int(os.environ.get("PREVIEW_HEIGHT", "360")),
             preview_refresh_seconds=float(os.environ.get("PREVIEW_REFRESH_SECONDS", "0.12")),
+            preview_jpeg_quality=max(30, min(int(os.environ.get("PREVIEW_JPEG_QUALITY", "60")), 95)),
+            capture_jpeg_quality=max(60, min(int(os.environ.get("CAPTURE_JPEG_QUALITY", "92")), 100)),
             button_pin=int(os.environ.get("BUTTON_PIN", "17")),
         )
 

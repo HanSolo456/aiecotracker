@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EcoTrack — Onboarding Tour Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ── Reset & tokens ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0f14;
+    --bg-card: #141720;
+    --bg-elevated: #1a1f2e;
+    --border: #1e2433;
+    --text: #f1f5f9;
+    --muted: #64748b;
+    --dim: #334155;
+    --green: #84cc16;
+    --blue: #60a5fa;
+    --amber: #f59e0b;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  h1,h2,h3 { font-family: 'Space Grotesk', sans-serif; }
+
+  /* ── Fake dashboard layout ── */
+  .page { max-width: 420px; margin: 0 auto; padding: 0 0 120px; }
+  @media (min-width: 768px) { .page { max-width: 800px; } }
+
+  /* Header */
+  .header {
+    padding: 24px 20px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+  }
+  .logo { font-family: 'Space Grotesk',sans-serif; font-weight:700; font-size:16px; color: var(--green); }
+  .avatar {
+    width:36px; height:36px; border-radius:10px;
+    background: linear-gradient(135deg,#84cc16 0%,#3b82f6 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:#fff;
+  }
+
+  /* Hero card */
+  .hero-card {
+    margin: 20px 20px 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 18px 20px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .hero-avatar {
+    width:56px; height:56px; border-radius:16px;
+    background: linear-gradient(135deg,#84cc16 0%,#3b82f6 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; font-weight:700; color:#fff; flex-shrink:0;
+  }
+  .hero-info { flex:1; }
+  .hero-name { font-size:15px; font-weight:700; color:var(--text); }
+  .hero-sub  { font-size:12px; color:var(--muted); margin-top:2px; }
+  .hero-pills { display:flex; gap:6px; margin-top:8px; }
+  .pill {
+    padding: 3px 10px; border-radius:99px; font-size:11px; font-weight:600;
+    background: rgba(132,204,22,.1); border: 1px solid rgba(132,204,22,.25); color: var(--green);
+  }
+  .pill.blue { background: rgba(96,165,250,.1); border-color: rgba(96,165,250,.25); color: var(--blue); }
+
+  /* Scan CTA */
+  .scan-btn {
+    margin: 14px 20px 0;
+    width: calc(100% - 40px);
+    padding: 16px; border-radius:18px; border:none; cursor:pointer;
+    background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+    color: #0d0f14; font-family:'Space Grotesk',sans-serif;
+    font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow: 0 4px 20px rgba(132,204,22,.3);
+    transition: transform .15s;
+  }
+  .scan-btn:hover { transform:scale(1.02); }
+
+  /* KPI row */
+  .kpi-row {
+    margin: 14px 20px 0;
+    display: grid; grid-template-columns: repeat(3,1fr); gap:10px;
+  }
+  .kpi {
+    background: var(--bg-card); border:1px solid var(--border);
+    border-radius:16px; padding:14px 12px;
+  }
+  .kpi-icon { font-size:16px; margin-bottom:6px; }
+  .kpi-val { font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; color:var(--text); }
+  .kpi-lbl { font-size:10px; color:var(--muted); margin-top:2px; }
+
+  /* Chart */
+  .chart-card {
+    margin: 14px 20px 0;
+    background: var(--bg-card); border:1px solid var(--border);
+    border-radius:20px; padding:16px;
+  }
+  .chart-head { display:flex; justify-content:space-between; margin-bottom:14px; }
+  .chart-title { font-size:12px; font-weight:600; color:var(--text); }
+  .chart-sub { font-size:11px; color:var(--muted); }
+  .bars { display:flex; align-items:flex-end; gap:6px; height:70px; }
+  .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .bar {
+    width:100%; border-radius:4px 4px 0 0;
+    transition: height .5s ease;
+  }
+  .bar-lbl { font-size:9px; color:var(--muted); }
+
+  /* Badges */
+  .badges-section { margin: 14px 20px 0; }
+  .section-label { font-size:11px; font-weight:600; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px; }
+  .badge-list { display:flex; flex-wrap:wrap; gap:8px; }
+  .badge {
+    padding: 6px 12px; border-radius:12px; font-size:11px; font-weight:600;
+    display:flex; align-items:center; gap:6px;
+  }
+  .badge.earned { background:rgba(132,204,22,.1); border:1px solid rgba(132,204,22,.25); color:var(--green); }
+  .badge.locked { background:var(--bg-elevated); border:1px solid var(--border); color:var(--dim); opacity:.6; }
+
+  /* Recent scans */
+  .recent-section { margin: 14px 20px 0; }
+  .scan-item {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:12px; margin-bottom:8px;
+  }
+  .scan-icon { width:34px; height:34px; border-radius:10px; background:rgba(132,204,22,.08); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .scan-info { flex:1; }
+  .scan-name { font-size:13px; font-weight:600; color:var(--text); }
+  .scan-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+  .grade { padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700; }
+  .grade.A { background:rgba(132,204,22,.15); color:var(--green); }
+  .grade.B { background:rgba(245,158,11,.15); color:var(--amber); }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:420px;
+    background:rgba(13,15,20,.92); backdrop-filter:blur(12px);
+    border-top:1px solid var(--border);
+    display:flex; padding:10px 0 20px;
+  }
+  @media(min-width:768px){ .bottom-nav { max-width:800px; } }
+  .nav-item {
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-size:10px; font-weight:600; color:var(--muted); cursor:pointer; padding:4px 0;
+  }
+  .nav-item.active { color:var(--green); }
+  .nav-icon { font-size:18px; line-height:1; }
+
+  /* ══════════════════════════════════════════
+     TOUR OVERLAY
+  ══════════════════════════════════════════ */
+
+  /* Scrim — click-blocker only, NO background (spotlight box-shadow handles dimming) */
+  #tour-scrim {
+    display: none;
+    position: fixed; inset: 0; z-index: 8000;
+  }
+  #tour-scrim.active { display: block; }
+
+  /* Spotlight — transparent rect; box-shadow fans out dark around it */
+  #tour-spotlight {
+    display: none;
+    position: fixed; z-index: 8001; pointer-events: none;
+    border-radius: 14px;
+    box-shadow: 0 0 0 9999px rgba(6,8,14,.82);
+    outline: 2.5px solid var(--green);
+    transition: top .35s cubic-bezier(.4,0,.2,1),
+                left .35s cubic-bezier(.4,0,.2,1),
+                width .35s cubic-bezier(.4,0,.2,1),
+                height .35s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── Tooltip — DESKTOP: floats next to element ── */
+  #tour-tooltip {
+    position: fixed; z-index: 8002;
+    background: var(--bg-elevated);
+    border: 1px solid rgba(132,204,22,.35);
+    border-radius: 18px;
+    padding: 18px 20px;
+    width: 280px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(132,204,22,.08);
+    transition: top .35s cubic-bezier(.4,0,.2,1), left .35s cubic-bezier(.4,0,.2,1);
+    animation: tooltipIn .25s ease;
+  }
+  @keyframes tooltipIn {
+    from { opacity:0; transform:scale(.94) translateY(4px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  /* ── Tooltip — MOBILE: bottom sheet ── */
+  @media (max-width: 600px) {
+    #tour-tooltip {
+      /* override JS positioning — always anchored to bottom */
+      left: 12px !important;
+      right: 12px !important;
+      width: auto !important;
+      top: auto !important;
+      bottom: 100px !important; /* above bottom nav */
+      border-radius: 20px;
+      animation: sheetIn .3s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes sheetIn {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+  }
+
+  .tour-step-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:10px; font-weight:700; color:var(--green);
+    background:rgba(132,204,22,.1); border:1px solid rgba(132,204,22,.2);
+    padding:3px 8px; border-radius:99px; margin-bottom:10px;
+  }
+  .tour-title { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .tour-desc  { font-size:12px; line-height:1.6; color:#94a3b8; }
+  .tour-actions { display:flex; align-items:center; justify-content:space-between; margin-top:16px; }
+  .tour-skip { font-size:11px; color:var(--muted); cursor:pointer; padding:4px 0; border:none; background:none; color:#64748b; }
+  .tour-skip:hover { color:#94a3b8; }
+  .tour-btns { display:flex; gap:8px; }
+  .tour-prev {
+    padding:8px 14px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer;
+    background:var(--bg-card); border:1px solid var(--border); color:var(--muted);
+  }
+  .tour-next {
+    padding:8px 18px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;
+    background:var(--green); border:none; color:#0d0f14;
+  }
+  .tour-dots { display:flex; gap:5px; align-items:center; margin-top:14px; justify-content:center; }
+  .dot { width:6px; height:6px; border-radius:99px; background:var(--border); transition:all .25s; }
+  .dot.active { width:18px; background:var(--green); }
+  .dot.done   { background:rgba(132,204,22,.45); }
+
+  /* Confetti burst on finish */
+  .confetti-piece {
+    position:fixed; pointer-events:none; font-size:22px; z-index:9999;
+    animation: confettiFall 1.4s ease forwards;
+  }
+  @keyframes confettiFall {
+    0%   { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
+    100% { opacity:0; transform:translateY(160px) rotate(720deg) scale(.3); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ░░ FAKE DASHBOARD ░░ -->
+<div class="page">
+  <!-- Header -->
+  <div class="header" id="t-header">
+    <div class="logo">⚡ EcoTrack</div>
+    <div class="avatar">SR</div>
+  </div>
+
+  <!-- Hero card (tour step 1) -->
+  <div class="hero-card" id="t-hero">
+    <div class="hero-avatar">SR</div>
+    <div class="hero-info">
+      <div class="hero-name">Saumitra Ratta</div>
+      <div class="hero-sub">🏆 Rank #2 · Bangalore Org</div>
+      <div class="hero-pills">
+        <span class="pill">340 pts</span>
+        <span class="pill blue">🔥 3d streak</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scan button (tour step 2) -->
+  <button class="scan-btn" id="t-scan-btn">
+    ⚡ Start New Scan
+  </button>
+
+  <!-- KPI row (tour step 3) -->
+  <div class="kpi-row" id="t-kpi">
+    <div class="kpi">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-val">28</div>
+      <div class="kpi-lbl">Scans</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">🌿</div>
+      <div class="kpi-val">35 kg</div>
+      <div class="kpi-lbl">CO₂ Saved</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-val">₹2,400</div>
+      <div class="kpi-lbl">Recovery</div>
+    </div>
+  </div>
+
+  <!-- Chart (tour step 4) -->
+  <div class="chart-card" id="t-chart">
+    <div class="chart-head">
+      <span class="chart-title">Scan Activity</span>
+      <span class="chart-sub">Last 7 days</span>
+    </div>
+    <div class="bars">
+      <div class="bar-col"><div class="bar" style="height:22px;background:rgba(132,204,22,.4)"></div><div class="bar-lbl">Mo</div></div>
+      <div class="bar-col"><div class="bar" style="height:40px;background:rgba(132,204,22,.4)"></div><div class="bar-lbl">Tu</div></div>
+      <div class="bar-col"><div class="bar" style="height:16px;background:rgba(132,204,22,.4)"></div><div class="bar-lbl">We</div></div>
+      <div class="bar-col"><div class="bar" style="height:52px;background:rgba(132,204,22,.4)"></div><div class="bar-lbl">Th</div></div>
+      <div class="bar-col"><div class="bar" style="height:34px;background:rgba(132,204,22,.4)"></div><div class="bar-lbl">Fr</div></div>
+      <div class="bar-col"><div class="bar" style="height:28px;background:rgba(132,204,22,.4)"></div><div class="bar-lbl">Sa</div></div>
+      <div class="bar-col"><div class="bar" style="height:60px;background:#84cc16;box-shadow:0 0 8px rgba(132,204,22,.5)"></div><div class="bar-lbl" style="color:#84cc16">Su</div></div>
+    </div>
+  </div>
+
+  <!-- Badges (tour step 5) -->
+  <div class="badges-section" id="t-badges">
+    <div class="section-label">Milestone Badges</div>
+    <div class="badge-list">
+      <div class="badge earned">🌱 First Scan</div>
+      <div class="badge earned">⚡ 10 Scans</div>
+      <div class="badge earned">⭐ Grade A</div>
+      <div class="badge locked">🔥 50 Scans</div>
+      <div class="badge locked">🌎 25 kg CO₂</div>
+    </div>
+  </div>
+
+  <!-- Recent scans -->
+  <div class="recent-section">
+    <div class="section-label" style="margin-top:20px">Recent Scans</div>
+    <div class="scan-item">
+      <div class="scan-icon">🔩</div>
+      <div class="scan-info">
+        <div class="scan-name">Industrial Valve</div>
+        <div class="scan-meta">Steel · 2h ago</div>
+      </div>
+      <span class="grade A">A</span>
+    </div>
+    <div class="scan-item">
+      <div class="scan-icon">⚙️</div>
+      <div class="scan-info">
+        <div class="scan-name">Gear Assembly</div>
+        <div class="scan-meta">Cast Iron · 5h ago</div>
+      </div>
+      <span class="grade B">B</span>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <div class="nav-item active"><div class="nav-icon">🏠</div>Dashboard</div>
+  <div class="nav-item"><div class="nav-icon">⚡</div>Scan</div>
+  <div class="nav-item"><div class="nav-icon">📋</div>History</div>
+  <div class="nav-item"><div class="nav-icon">🗺️</div>Drop-off</div>
+</div>
+
+<!-- ══ TOUR OVERLAY ══ -->
+<div id="tour-scrim"></div>
+<div id="tour-spotlight"></div>
+<div id="tour-tooltip" style="display:none">
+  <div class="tour-step-badge" id="tour-badge">Step 1 of 5</div>
+  <div class="tour-title" id="tour-title">Your Profile Card</div>
+  <div class="tour-desc"  id="tour-desc">This is you! See your name, leaderboard rank, streak, and current points. The higher your rank, the more parts you've recycled.</div>
+  <div class="tour-dots"  id="tour-dots"></div>
+  <div class="tour-actions">
+    <button class="tour-skip" onclick="endTour(true)">Skip tour</button>
+    <div class="tour-btns">
+      <button class="tour-prev" id="tour-prev-btn" onclick="prevStep()">← Back</button>
+      <button class="tour-next" id="tour-next-btn" onclick="nextStep()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  {
+    targetId: 't-hero',
+    title: '👋 Your Profile Card',
+    desc: 'This shows your name, leaderboard rank, current streak, and total incentive points. The higher your rank, the more parts you\'ve helped recycle!',
+    scrollBlock: 'start',
+  },
+  {
+    targetId: 't-scan-btn',
+    title: '⚡ Start a Scan',
+    desc: 'Tap this to identify any industrial part using your camera. Our AI analyses up to 3 angles and generates a full Digital Product Passport.',
+    scrollBlock: 'center',
+  },
+  {
+    targetId: 't-kpi',
+    title: '📊 Your Stats',
+    desc: 'Track your total scans, CO\u2082 saved by keeping parts out of landfill, and the estimated recovery value of the parts you\'ve processed.',
+    scrollBlock: 'center',
+  },
+  {
+    targetId: 't-chart',
+    title: '📅 Scan Activity',
+    desc: 'A 7-day bar chart of your daily scan count. The bright bar is today. Consistent scanning earns you streak bonuses and extra points!',
+    scrollBlock: 'center',
+  },
+  {
+    targetId: 't-badges',
+    title: '🏅 Milestone Badges',
+    desc: 'Earn badges as you hit goals — first scan, 10 scans, Grade A part, and more. Badges light up when earned and flash to celebrate your milestone.',
+    scrollBlock: 'start',
+  },
+];
+
+let current = 0;
+
+const scrim     = document.getElementById('tour-scrim');
+const spotlight = document.getElementById('tour-spotlight');
+const tooltip   = document.getElementById('tour-tooltip');
+const titleEl   = document.getElementById('tour-title');
+const descEl    = document.getElementById('tour-desc');
+const badgeEl   = document.getElementById('tour-badge');
+const dotsEl    = document.getElementById('tour-dots');
+const prevBtn   = document.getElementById('tour-prev-btn');
+const nextBtn   = document.getElementById('tour-next-btn');
+
+function isMobile() { return window.innerWidth <= 600; }
+
+function buildDots() {
+  dotsEl.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
+    dotsEl.appendChild(d);
+  });
+}
+
+function positionTooltip(rect) {
+  if (isMobile()) {
+    // Mobile: always bottom sheet — CSS handles position
+    tooltip.style.left = '';
+    tooltip.style.top  = '';
+    return;
+  }
+
+  // Desktop: float beside or above/below target
+  const GAP = 16;
+  const TW  = 280; // tooltip width
+  const TH  = 200; // approx tooltip height
+  const vw  = window.innerWidth;
+  const vh  = window.innerHeight;
+
+  // Prefer right of element
+  let left = rect.right + GAP;
+  let top  = rect.top + rect.height / 2 - TH / 2;
+
+  // Flip left if overflows right edge
+  if (left + TW > vw - 12) {
+    left = rect.left - TW - GAP;
+  }
+  // Flip to below if overflows left edge
+  if (left < 12) {
+    left = rect.left + rect.width / 2 - TW / 2;
+    top  = rect.bottom + GAP;
+  }
+  // Clamp vertically
+  top = Math.max(12, Math.min(top, vh - TH - 12));
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top  + 'px';
+}
+
+function applySpotlight(el) {
+  const PAD  = isMobile() ? 4 : 8;
+  const rect = el.getBoundingClientRect();
+  spotlight.style.top    = (rect.top    - PAD) + 'px';
+  spotlight.style.left   = (rect.left   - PAD) + 'px';
+  spotlight.style.width  = (rect.width  + PAD * 2) + 'px';
+  spotlight.style.height = (rect.height + PAD * 2) + 'px';
+  positionTooltip(rect);
+}
+
+function showStep(idx) {
+  const step = STEPS[idx];
+  const el   = document.getElementById(step.targetId);
+  if (!el) return;
+
+  titleEl.textContent = step.title;
+  descEl.textContent  = step.desc;
+  badgeEl.textContent = `Step ${idx + 1} of ${STEPS.length}`;
+  prevBtn.style.display = idx === 0 ? 'none' : '';
+  nextBtn.textContent   = idx === STEPS.length - 1 ? '🎉 Done!' : 'Next →';
+  buildDots();
+
+  // 1. Scroll element into view using step's preferred block position
+  el.scrollIntoView({ behavior: 'smooth', block: step.scrollBlock || 'center' });
+
+  // 2. Wait for scroll to finish, THEN position spotlight on settled coords
+  clearTimeout(window._tourScrollTimer);
+  window._tourScrollTimer = setTimeout(() => {
+    applySpotlight(el);
+    // Re-key tooltip animation
+    tooltip.style.animation = 'none';
+    tooltip.offsetHeight;
+    tooltip.style.animation = '';
+  }, 340);
+}
+
+// Keep spotlight in sync if user manually scrolls during tour
+window.addEventListener('scroll', () => {
+  if (tooltip.style.display === 'none') return;
+  const el = document.getElementById(STEPS[current].targetId);
+  if (el) applySpotlight(el);
+}, { passive: true });
+
+
+function startTour() {
+  current = 0;
+  scrim.classList.add('active');
+  spotlight.style.display = 'block';
+  tooltip.style.display   = 'block';
+  showStep(0);
+}
+
+function nextStep() {
+  if (current < STEPS.length - 1) {
+    current++;
+    showStep(current);
+  } else {
+    endTour(false);
+  }
+}
+
+function prevStep() {
+  if (current > 0) { current--; showStep(current); }
+}
+
+function endTour(skipped) {
+  scrim.classList.remove('active');
+  spotlight.style.display = 'none';
+  tooltip.style.display   = 'none';
+  if (!skipped) launchConfetti();
+}
+
+function launchConfetti() {
+  const emojis = ['🎉','⚡','🌿','🏅','✨','💚'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.textContent = emojis[i % emojis.length];
+    el.style.left = (15 + Math.random() * 70) + 'vw';
+    el.style.top  = (10 + Math.random() * 40) + 'vh';
+    el.style.animationDelay = (Math.random() * .4) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1800);
+  }
+}
+
+// Reposition on resize
+window.addEventListener('resize', () => { if (tooltip.style.display !== 'none') showStep(current); });
+
+// Auto-start after a short delay
+setTimeout(startTour, 600);
+</script>
+</body>
+</html>

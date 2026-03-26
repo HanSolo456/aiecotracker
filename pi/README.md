@@ -38,6 +38,11 @@ cd /path/to/aiecotracker/pi
 python3 -m pip install -r requirements.txt
 ```
 
+For USB webcams such as Logitech webcams, install OpenCV for the system Python:
+```bash
+sudo apt install -y python3-opencv v4l-utils
+```
+
 Enable the camera if you are using the Pi camera module:
 ```bash
 sudo raspi-config
@@ -56,6 +61,12 @@ Required values:
 - `DEVICE_BOOTSTRAP_TOKEN`
 
 You do not need the runtime token at install time. The Pi will fetch it after org claim confirmation.
+
+Camera settings:
+- `CAMERA_BACKEND=auto` tries USB first and then Picamera2
+- `CAMERA_BACKEND=usb` forces USB webcam capture via OpenCV/V4L2
+- `USB_CAMERA_INDEX=0` usually matches `/dev/video0`
+- `USB_FOURCC=MJPG` is a good default for 1080p USB webcams
 
 ## Fresh handoff checklist
 1. Copy the `pi/` folder onto the Raspberry Pi.

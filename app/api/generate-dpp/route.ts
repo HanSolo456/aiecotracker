@@ -463,9 +463,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateD
                 const { getFirestore } = await import('firebase-admin/firestore');
 
                 if (!getApps().length) {
-                    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON ?? '{}');
+                    // Robust service account parser:
+                    // - strips leading/trailing quotes added by some dotenv parsers
+                    // - converts literal \n sequences to real newlines (needed for private_key)
+                    let rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON ?? '{}';
+                    rawJson = rawJson.trim();
+                    if ((rawJson.startsWith("'") && rawJson.endsWith("'")) ||
+                        (rawJson.startsWith('"') && rawJson.endsWith('"'))) {
+                        rawJson = rawJson.slice(1, -1);
+                    }
+                    rawJson = rawJson.replace(/\\n/g, '\n');
+                    const serviceAccount = JSON.parse(rawJson) as Record<string, unknown>;
                     if (serviceAccount.project_id) {
-                        initializeApp({ credential: cert(serviceAccount) });
+                        initializeApp({ credential: cert(serviceAccount as Parameters<typeof cert>[0]) });
                     } else {
                         initializeApp({ projectId });
                     }

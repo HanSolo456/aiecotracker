@@ -10,15 +10,36 @@ import { generateAIGuide } from '@/lib/aiGuideGenerator';
 import disassemblyGuides from '@/data/knowledge/disassembly_guides.json';
 import safetyRegulations from '@/data/knowledge/safety_regulations.json';
 import materialDataSheets from '@/data/knowledge/material_data_sheets.json';
+import partClassAliasesRaw from '@/data/knowledge/part_class_aliases.json';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Knowledge Base Retrieval — RAG Simulation Layer
+// Knowledge Base Retrieval — RAG Layer
 //
-// Production: This queries Pinecone/Weaviate with semantic embeddings.
-// Prototype: Metadata-filtered JSON lookup that faithfully replicates
-//            the production retrieval architecture without external vector DB.
+// v2 upgrades over v1:
+//   1. Alias expansion  — 100+ common names → canonical part_class before lookup
+//   2. Firestore cache  — AI-generated guides are persisted and re-used (30-day TTL)
+//   3. Richer citations — alias-hit flag surfaced in citation metadata
+//
+// Production path: swap static JSON retrieval for vector embedding search
+// against Pinecone / Weaviate using the same GuideResult interface.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Alias map ────────────────────────────────────────────────────────────────
+const PART_CLASS_ALIASES: Record<string, string> =
+    (partClassAliasesRaw as { aliases: Record<string, string> }).aliases;
+
+/**
+ * Resolve a raw VLM part_class to its canonical form using the alias map.
+ * Returns the original value unchanged if no alias is found.
+ */
+function resolveAlias(partClass: string): { resolved: string; aliasUsed: boolean } {
+    const key = partClass.toLowerCase().replace(/[\s-]/g, '_');
+    const resolved = PART_CLASS_ALIASES[key];
+    if (resolved) return { resolved, aliasUsed: true };
+    return { resolved: key, aliasUsed: false };
+}
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type SafetyRegRecord = {
     id: string;
@@ -144,8 +165,12 @@ const EWASTE_CLASS_MAP: Record<string, string> = {
 function retrieveDisassemblyGuide(payload: PartMetadataPayload): {
     guide: GuideRecord | null;
     citation: SourceCitation | null;
+    aliasUsed: boolean;
 } {
-    const partClass = payload.visual_id.part_class.toLowerCase().replace(/[\s-]/g, '_');
+    // ── Step 1: alias resolution ──────────────────────────────────────────────
+    const rawPartClass = payload.visual_id.part_class.toLowerCase().replace(/[\s-]/g, '_');
+    const { resolved: partClass, aliasUsed } = resolveAlias(rawPartClass);
+
     const materialFamily = payload.material_inference.primary_material
         .toLowerCase()
         .replace(/[\s-]/g, '_');
@@ -164,23 +189,25 @@ function retrieveDisassemblyGuide(payload: PartMetadataPayload): {
 
     const guides = disassemblyGuides as GuideRecord[];
 
-    // Check if this is a known e-waste type — map to correct guide part_class
+    // ── Step 2: e-waste class map ──────────────────────────────────────────────
     const ewasteGuideClass = EWASTE_CLASS_MAP[partClass];
     if (ewasteGuideClass) {
         const ewasteGuide = guides.find(g => g.part_class === ewasteGuideClass);
         if (ewasteGuide) {
             return {
                 guide: ewasteGuide,
+                aliasUsed,
                 citation: {
                     title: ewasteGuide.source,
                     namespace: 'disassembly_guides',
-                    relevance_score: 0.95,
+                    relevance_score: aliasUsed ? 0.90 : 0.95,
                     standard_id: ewasteGuide.id,
                 },
             };
         }
     }
 
+    // ── Step 3: scored lookup ──────────────────────────────────────────────────
     let bestMatch: GuideRecord | null = null;
     let bestScore = -1;
 
@@ -219,14 +246,15 @@ function retrieveDisassemblyGuide(payload: PartMetadataPayload): {
         bestScore = 0.30;
     }
 
-    if (!bestMatch) return { guide: null, citation: null };
+    if (!bestMatch) return { guide: null, citation: null, aliasUsed };
 
     return {
         guide: bestMatch,
+        aliasUsed,
         citation: {
             title: bestMatch.source,
             namespace: 'disassembly_guides',
-            relevance_score: bestScore,
+            relevance_score: aliasUsed ? Math.max(bestScore - 0.05, 0.25) : bestScore,
             standard_id: bestMatch.id,
         },
     };
@@ -317,37 +345,140 @@ function retrieveMaterialSheet(payload: PartMetadataPayload): {
     };
 }
 
+// ── Firestore guide cache ────────────────────────────────────────────────────
+// AI-generated guides are persisted for 30 days to avoid redundant API calls.
+// Reading uses the Firebase Admin SDK (server-side only).
+
+const AI_GUIDE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+type CachedAIGuide = {
+    steps: DisassemblyStep[];
+    safety_protocols: string[];
+    generatedAt: number; // Unix ms
+    part_class: string;
+};
+
+/**
+ * Try to load an AI-generated guide from Firestore (server-side only).
+ * Returns null if not found or expired.
+ */
+async function getAIGuideFromCache(partClass: string): Promise<CachedAIGuide | null> {
+    try {
+        // Dynamic import to avoid bundling Admin SDK on the client
+        const { getFirestore } = await import('firebase-admin/firestore');
+        const db = getFirestore();
+        const docRef = db.collection('ai_guides').doc(partClass);
+        const snap = await docRef.get();
+
+        if (!snap.exists) return null;
+
+        const data = snap.data() as CachedAIGuide;
+        const age = Date.now() - (data.generatedAt ?? 0);
+        if (age > AI_GUIDE_TTL_MS) {
+            console.log(`[knowledgeBase] Cache EXPIRED for "${partClass}" (age: ${Math.round(age / 86400000)}d) — regenerating`);
+            return null;
+        }
+
+        console.log(`[knowledgeBase] Cache HIT for "${partClass}"`);
+        return data;
+    } catch (err) {
+        // Non-fatal: if Admin SDK isn't initialised (e.g. local dev without service account), skip cache
+        console.warn('[knowledgeBase] Firestore cache read skipped:', (err as Error).message);
+        return null;
+    }
+}
+
+/**
+ * Persist an AI-generated guide to Firestore so future scans skip the API call.
+ */
+async function saveAIGuideToCache(
+    partClass: string,
+    steps: DisassemblyStep[],
+    safety_protocols: string[],
+): Promise<void> {
+    try {
+        const { getFirestore } = await import('firebase-admin/firestore');
+        const db = getFirestore();
+        const payload: CachedAIGuide = {
+            part_class: partClass,
+            steps,
+            safety_protocols,
+            generatedAt: Date.now(),
+        };
+        await db.collection('ai_guides').doc(partClass).set(payload);
+        console.log(`[knowledgeBase] Cached AI guide for "${partClass}"`);
+    } catch (err) {
+        // Non-fatal — cache miss on next scan is better than a broken scan pipeline
+        console.warn('[knowledgeBase] Firestore cache write skipped:', (err as Error).message);
+    }
+}
+
 /**
  * Main RAG retrieval entry point.
  * Combines disassembly guide retrieval, safety regulation retrieval,
  * and material data sheet lookup into a unified GuideResult.
- * Falls back to AI-generated guide if no static guide is found.
+ *
+ * Retrieval order:
+ *  1. Static knowledge base (exact / scored match)
+ *  2. Firestore AI guide cache (30-day TTL)
+ *  3. Live AI generation via Groq/Gemini → persisted to cache
  */
 export async function retrieveGuide(payload: PartMetadataPayload): Promise<GuideResult> {
-    const { guide, citation: guideCitation } = retrieveDisassemblyGuide(payload);
+    const { guide, citation: guideCitation, aliasUsed } = retrieveDisassemblyGuide(payload);
     const { protocols, citations: regCitations } = retrieveSafetyRegulations(payload);
     const { citation: matCitation } = retrieveMaterialSheet(payload);
 
     let steps: DisassemblyStep[];
-    let aiGeneratedCitation: SourceCitation | null = null;
+    const extraCitations: SourceCitation[] = [];
 
     if (guide) {
         steps = guide.steps;
-    } else {
-        // No static guide found — call AI to generate one
-        console.log(`[knowledgeBase] No static guide for "${payload.visual_id.part_class}" — calling AI fallback`);
-        const aiGuide = await generateAIGuide(payload);
-        steps = aiGuide.steps;
-        // Merge AI safety protocols
-        for (const p of aiGuide.safety_protocols) {
-            if (!protocols.includes(p)) protocols.push(p);
+
+        // Surface alias expansion in citations for transparency
+        if (aliasUsed && guideCitation) {
+            extraCitations.push({
+                title: `Alias match: "${payload.visual_id.part_class}" → "${guide.part_class}"`,
+                namespace: 'alias_expansion',
+                relevance_score: 0.88,
+                standard_id: `alias_${payload.visual_id.part_class}`,
+            });
         }
-        aiGeneratedCitation = {
-            title: 'AI-Generated Guide (Groq/Gemini — not in static knowledge base)',
-            namespace: 'ai_generated',
-            relevance_score: 0.80,
-            standard_id: `ai_guide_${payload.visual_id.part_class}`,
-        };
+    } else {
+        // No static guide — check Firestore cache first
+        const cacheKey = payload.visual_id.part_class.toLowerCase().replace(/[\s-]/g, '_');
+        const cached = await getAIGuideFromCache(cacheKey);
+
+        if (cached) {
+            steps = cached.steps;
+            for (const p of cached.safety_protocols) {
+                if (!protocols.includes(p)) protocols.push(p);
+            }
+            extraCitations.push({
+                title: 'AI-Generated Guide (cached — Groq/Gemini)',
+                namespace: 'ai_generated_cached',
+                relevance_score: 0.82,
+                standard_id: `ai_guide_cached_${cacheKey}`,
+            });
+        } else {
+            // No cache hit — call AI and persist the result
+            console.log(`[knowledgeBase] No static guide for "${payload.visual_id.part_class}" — calling AI`);
+            const aiGuide = await generateAIGuide(payload);
+            steps = aiGuide.steps;
+
+            for (const p of aiGuide.safety_protocols) {
+                if (!protocols.includes(p)) protocols.push(p);
+            }
+
+            // Persist for future scans (fire-and-forget, non-blocking)
+            void saveAIGuideToCache(cacheKey, steps, aiGuide.safety_protocols);
+
+            extraCitations.push({
+                title: 'AI-Generated Guide (Groq/Gemini — not in static knowledge base)',
+                namespace: 'ai_generated',
+                relevance_score: 0.80,
+                standard_id: `ai_guide_${payload.visual_id.part_class}`,
+            });
+        }
     }
 
     // Inject safety refs from gatekeeper into first step if not already there
@@ -357,7 +488,7 @@ export async function retrieveGuide(payload: PartMetadataPayload): Promise<Guide
 
     const allCitations: SourceCitation[] = [
         ...(guideCitation ? [guideCitation] : []),
-        ...(aiGeneratedCitation ? [aiGeneratedCitation] : []),
+        ...extraCitations,
         ...regCitations,
         ...(matCitation ? [matCitation] : []),
     ];
@@ -370,44 +501,4 @@ export async function retrieveGuide(payload: PartMetadataPayload): Promise<Guide
         source_citations: allCitations,
         estimated_total_time_min: totalTime,
     };
-}
-
-function getFallbackSteps(): DisassemblyStep[] {
-    return [
-        {
-            step: 1,
-            action: 'De-energize and isolate all energy sources. Apply LOTO procedure.',
-            tool_required: 'loto_kit',
-            safety_ref: 'OSHA_1910.147',
-            estimated_time_min: 10,
-        },
-        {
-            step: 2,
-            action: 'Drain any residual fluids. Collect in approved container.',
-            tool_required: 'drain_kit',
-            safety_ref: null,
-            estimated_time_min: 15,
-        },
-        {
-            step: 3,
-            action: 'Remove fasteners using cross-pattern sequence. Label and store.',
-            tool_required: 'wrench_set',
-            safety_ref: null,
-            estimated_time_min: 20,
-        },
-        {
-            step: 4,
-            action: 'Disassemble primary components. Inspect condition. Photograph for DPP record.',
-            tool_required: 'camera_and_inspection_tools',
-            safety_ref: null,
-            estimated_time_min: 25,
-        },
-        {
-            step: 5,
-            action: 'Segregate materials into labelled recovery bins by grade (A/B/C).',
-            tool_required: null,
-            safety_ref: null,
-            estimated_time_min: 10,
-        },
-    ];
 }

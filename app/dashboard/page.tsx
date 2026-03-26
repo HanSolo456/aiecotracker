@@ -108,12 +108,184 @@ function ScanActivityMini({ scans }: { scans: ScanRecord[] }) {
 }
 
 
+// ── CO₂ Trend Chart (7-day area sparkline) ────────────────────────────────────
+function Co2TrendChart({ scans }: { scans: ScanRecord[] }) {
+    const { t, lang } = useLanguage();
+    const W = 280, H = 80, PAD = 6;
+
+    const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        d.setHours(0, 0, 0, 0);
+        return d;
+    });
+
+    const DAY_LABELS = lang === 'hi'
+        ? ['रवि', 'सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि']
+        : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    // kg CO₂ saved per day = totalMassKg * 2.5
+    const values = days.map(day =>
+        parseFloat((scans.filter(s => s.createdAt.toDate().toDateString() === day.toDateString())
+            .reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0) * 2.5).toFixed(2))
+    );
+
+    const maxVal = Math.max(...values, 0.1);
+    const totalCo2 = values.reduce((a, b) => a + b, 0).toFixed(1);
+    const todayCo2 = values[6].toFixed(1);
+    const hasPeak = maxVal > 0.1;
+
+    // Map to SVG coords — value=0 sits at H-PAD (bottom); value=maxVal sits at PAD (top)
+    const toY = (v: number) => PAD + ((maxVal - v) / maxVal) * (H - PAD * 2);
+    const toX = (i: number) => PAD + (i / 6) * (W - PAD * 2);
+
+
+    const areaPath = [
+        `M ${toX(0)},${H - PAD}`,
+        ...values.map((v, i) => `L ${toX(i)},${toY(v)}`),
+        `L ${toX(6)},${H - PAD}`,
+        'Z',
+    ].join(' ');
+    const linePath = [`M ${toX(0)},${toY(values[0])}`, ...values.map((v, i) => i > 0 ? `L ${toX(i)},${toY(v)}` : '')].filter(Boolean).join(' ');
+
+    // Find peak day index
+    const peakIdx = values.indexOf(maxVal);
+
+    return (
+        <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid rgba(34,197,94,0.18)' }}>
+            <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                    <Leaf size={13} style={{ color: '#22c55e' }} />
+                    <p className="text-xs font-semibold text-white">{t('dashboard.co2_saved')}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                        {t('dashboard.today')} <span className="text-white font-semibold">{todayCo2} kg</span>
+                    </span>
+                    <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                        {t('dashboard.total')} <span style={{ color: '#22c55e' }} className="font-bold">{totalCo2} kg</span>
+                    </span>
+                </div>
+            </div>
+
+            {/* SVG Chart */}
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: 'visible' }}>
+                <defs>
+                    <linearGradient id="co2grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0.35" />
+                        <stop offset="100%" stopColor="#22c55e" stopOpacity="0.02" />
+                    </linearGradient>
+                </defs>
+
+                {/* Horizontal guide lines */}
+                {[0.25, 0.5, 0.75].map(frac => (
+                    <line
+                        key={frac}
+                        x1={PAD} y1={toY(maxVal * frac)} x2={W - PAD} y2={toY(maxVal * frac)}
+                        stroke="rgba(255,255,255,0.04)" strokeWidth="1"
+                    />
+                ))}
+
+                {/* Area fill */}
+                {hasPeak && (
+                    <path d={areaPath} fill="url(#co2grad)" />
+                )}
+
+                {/* Line */}
+                {hasPeak && (
+                    <path
+                        d={linePath}
+                        fill="none"
+                        stroke="#22c55e"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                )}
+
+                {/* Dots */}
+                {values.map((v, i) => {
+                    const isToday = i === 6;
+                    const isPeak = i === peakIdx && hasPeak;
+                    const cx = toX(i);
+                    const cy = toY(v);
+                    if (v === 0) return (
+                        <circle key={i} cx={cx} cy={H - PAD} r={2} fill="rgba(255,255,255,0.1)" />
+                    );
+                    return (
+                        <g key={i}>
+                            {isToday && (
+                                <circle cx={cx} cy={cy} r={6} fill="rgba(34,197,94,0.15)" />
+                            )}
+                            <circle
+                                cx={cx} cy={cy}
+                                r={isToday ? 3.5 : isPeak ? 3 : 2.5}
+                                fill={isToday || isPeak ? '#22c55e' : '#15803d'}
+                                stroke={isToday ? 'rgba(34,197,94,0.5)' : 'none'}
+                                strokeWidth={isToday ? '2' : '0'}
+                            />
+                            {/* Value label above peak & today */}
+                            {(isToday || isPeak) && v > 0 && (
+                                <text
+                                    x={cx} y={cy - 7}
+                                    textAnchor="middle"
+                                    fill="#22c55e"
+                                    fontSize="8"
+                                    fontFamily="Space Grotesk"
+                                    fontWeight="600"
+                                >
+                                    {v}
+                                </text>
+                            )}
+                        </g>
+                    );
+                })}
+            </svg>
+
+            {/* Day labels */}
+            <div className="flex justify-between px-1 mt-0.5">
+                {days.map((d, i) => {
+                    const isToday = i === 6;
+                    return (
+                        <span
+                            key={i}
+                            className="text-[9px] text-center flex-1"
+                            style={{ color: isToday ? '#22c55e' : 'var(--text-muted)', fontWeight: isToday ? 700 : 400 }}
+                        >
+                            {DAY_LABELS[d.getDay()]}
+                        </span>
+                    );
+                })}
+            </div>
+
+            {/* Environmental equivalency badge */}
+            {parseFloat(totalCo2) > 0 && (
+                <div
+                    className="mt-3 rounded-xl px-3 py-2 flex items-center gap-2"
+                    style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.15)' }}
+                >
+                    <span className="text-base">🌱</span>
+                    <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                        {t('dashboard.equivalent_to_planting')}
+                        <span className="font-bold text-white">
+                            {Math.max(1, Math.round(parseFloat(totalCo2) / 21))}{t('dashboard.trees')}
+                        </span>
+                        {t('dashboard.tree_avg')}
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+}
+
 function IncentiveTransparencyCard() {
+    const { t } = useLanguage();
+    
     const rewardRows = [
-        { icon: <Star size={13} style={{ color: '#84cc16' }} />, action: 'Grade A scan', reward: '+10 pts' },
-        { icon: <Award size={13} style={{ color: '#60A5FA' }} />, action: '85%+ segregation efficiency', reward: 'Elite tier badge' },
-        { icon: <Leaf size={13} style={{ color: '#22c55e' }} />, action: '1 kg CO2 saved', reward: '+2 pts' },
-        { icon: <Trophy size={13} style={{ color: '#F59E0B' }} />, action: 'Top 3 leaderboard finish', reward: 'Trophy badge' },
+        { icon: <Star size={13} style={{ color: '#84cc16' }} />, action: t('dashboard.action_grade_a'), reward: t('dashboard.reward_10pts') },
+        { icon: <Award size={13} style={{ color: '#60A5FA' }} />, action: t('dashboard.action_elite'), reward: t('dashboard.reward_elite') },
+        { icon: <Leaf size={13} style={{ color: '#22c55e' }} />, action: t('dashboard.action_co2'), reward: t('dashboard.reward_2pts') },
+        { icon: <Trophy size={13} style={{ color: '#F59E0B' }} />, action: t('dashboard.action_trophy'), reward: t('dashboard.reward_trophy') },
     ];
 
     return (
@@ -124,9 +296,9 @@ function IncentiveTransparencyCard() {
                     <Trophy size={15} style={{ color: '#FBBF24' }} />
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-white">How Rewards Work</p>
+                    <p className="text-sm font-semibold text-white">{t('dashboard.how_rewards_work')}</p>
                     <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                        Transparent points for better segregation, recovery value, and climate impact.
+                        {t('dashboard.rewards_desc')}
                     </p>
                 </div>
             </div>
@@ -181,7 +353,7 @@ export default function DashboardPage() {
         tryFlush();
         window.addEventListener('online', tryFlush);
         return () => window.removeEventListener('online', tryFlush);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
@@ -204,7 +376,7 @@ export default function DashboardPage() {
         } else {
             setScans([]);
             setLoading(false);
-            unsub = () => {};
+            unsub = () => { };
         }
 
         const sensorQ = query(collection(db, 'sensor_readings'), orderBy('createdAt', 'desc'), limit(1));
@@ -216,16 +388,16 @@ export default function DashboardPage() {
             }
         }, (err) => console.warn('[dashboard] sensor error:', err.code));
         return () => { unsub(); unsubOrg?.(); unsubSensor(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [profile?.orgId, profile?.role, user?.uid]);
 
-    const stats        = computeStats(scans);
-    const recentScans  = scans.slice(0, 5);
-    const fillColor    = !sensor ? '#84cc16' : sensor.fillLevel > 80 ? '#EF4444' : sensor.fillLevel > 50 ? '#F59E0B' : '#84cc16';
-    const totalMassKg  = scans.reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0);
-    const co2SavedKg   = (totalMassKg * 2.5).toFixed(1);
+    const stats = computeStats(scans);
+    const recentScans = scans.slice(0, 5);
+    const fillColor = !sensor ? '#84cc16' : sensor.fillLevel > 80 ? '#EF4444' : sensor.fillLevel > 50 ? '#F59E0B' : '#84cc16';
+    const totalMassKg = scans.reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0);
+    const co2SavedKg = (totalMassKg * 2.5).toFixed(1);
     const sensorIsStale = !!sensor && (Date.now() - (sensor.lastSeenMs ?? 0)) > 5 * 60 * 1000;
-    const sensorIsLive  = !!sensor && !sensorIsStale;
+    const sensorIsLive = !!sensor && !sensorIsStale;
 
     // ── Worker-specific computed stats ────────────────────────────────────────
     const now = new Date();
@@ -233,20 +405,20 @@ export default function DashboardPage() {
         ? scans.filter(s => { const d = s.createdAt.toDate(); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); })
         : scans;
 
-    const myScansCount    = periodScans.length;
-    const myTotalMassKg   = periodScans.reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0);
-    const myCo2Saved      = (myTotalMassKg * 2.5).toFixed(1);
-    const myRecoveryInr   = Math.round(periodScans.reduce((sum, s) => sum + getScanRecoveryValueINR(s), 0));
-    const myGradeA        = periodScans.filter(s => s.grade === 'A').length;
-    const myGradeB        = periodScans.filter(s => s.grade === 'B').length;
-    const myGradeC        = periodScans.filter(s => s.grade === 'C').length;
-    const myGradeAPct     = myScansCount > 0 ? Math.round((myGradeA / myScansCount) * 100) : 0;
+    const myScansCount = periodScans.length;
+    const myTotalMassKg = periodScans.reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0);
+    const myCo2Saved = (myTotalMassKg * 2.5).toFixed(1);
+    const myRecoveryInr = Math.round(periodScans.reduce((sum, s) => sum + getScanRecoveryValueINR(s), 0));
+    const myGradeA = periodScans.filter(s => s.grade === 'A').length;
+    const myGradeB = periodScans.filter(s => s.grade === 'B').length;
+    const myGradeC = periodScans.filter(s => s.grade === 'C').length;
+    const myGradeAPct = myScansCount > 0 ? Math.round((myGradeA / myScansCount) * 100) : 0;
 
     // Leaderboard rank — computed from ALL org scans
-    const leaderboard     = computeLeaderboard(orgScans);
-    const myRank          = leaderboard.findIndex(w => w.workerId === user?.uid) + 1;
-    const myPoints        = leaderboard.find(w => w.workerId === user?.uid)?.points ?? 0;
-    const totalWorkers    = leaderboard.length;
+    const leaderboard = computeLeaderboard(orgScans);
+    const myRank = leaderboard.findIndex(w => w.workerId === user?.uid) + 1;
+    const myPoints = leaderboard.find(w => w.workerId === user?.uid)?.points ?? 0;
+    const totalWorkers = leaderboard.length;
 
     // Streak — consecutive calendar days with at least 1 scan
     const streak = (() => {
@@ -259,16 +431,16 @@ export default function DashboardPage() {
     })();
 
     // Milestone badges
-    const allTimeScans    = scans.length;
-    const allTimeCo2      = parseFloat((scans.reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0) * 2.5).toFixed(1));
+    const allTimeScans = scans.length;
+    const allTimeCo2 = parseFloat((scans.reduce((sum, s) => sum + (s.estimatedMassKg ?? 0.5), 0) * 2.5).toFixed(1));
     const badges = [
         { id: 'first', icon: '🌱', label: t('dashboard.badge_first'), earned: allTimeScans >= 1 },
-        { id: 's10',   icon: '⚡', label: t('dashboard.badge_10'),    earned: allTimeScans >= 10 },
-        { id: 's50',   icon: '🔥', label: t('dashboard.badge_50'),    earned: allTimeScans >= 50 },
+        { id: 's10', icon: '⚡', label: t('dashboard.badge_10'), earned: allTimeScans >= 10 },
+        { id: 's50', icon: '🔥', label: t('dashboard.badge_50'), earned: allTimeScans >= 50 },
         { id: 'co2_5', icon: '🌿', label: t('dashboard.badge_co2_5'), earned: allTimeCo2 >= 5 },
-        { id: 'co2_25',icon: '🌎', label: t('dashboard.badge_co2_25'),earned: allTimeCo2 >= 25 },
-        { id: 'gradeA',icon: '⭐', label: t('dashboard.badge_grade_a'),earned: scans.some(s => s.grade === 'A') },
-        { id: 'top3',  icon: '🏆', label: t('dashboard.badge_top3'),  earned: myRank > 0 && myRank <= 3 },
+        { id: 'co2_25', icon: '🌎', label: t('dashboard.badge_co2_25'), earned: allTimeCo2 >= 25 },
+        { id: 'gradeA', icon: '⭐', label: t('dashboard.badge_grade_a'), earned: scans.some(s => s.grade === 'A') },
+        { id: 'top3', icon: '🏆', label: t('dashboard.badge_top3'), earned: myRank > 0 && myRank <= 3 },
     ];
 
     // ── Worker Dashboard ──────────────────────────────────────────────────────
@@ -301,7 +473,7 @@ export default function DashboardPage() {
                 </div>
                 {/* Skeleton KPI row */}
                 <div className="px-5 mb-4 grid grid-cols-3 gap-3">
-                    {[0,1,2].map(i => (
+                    {[0, 1, 2].map(i => (
                         <div key={i} className="rounded-2xl p-4 flex flex-col gap-2" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                             <div className="w-7 h-7 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
                             <div className="h-6 w-3/4 rounded animate-pulse" style={{ background: 'var(--border)' }} />
@@ -314,7 +486,7 @@ export default function DashboardPage() {
                     <div className="rounded-2xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                         <div className="h-3 w-24 rounded mb-4 animate-pulse" style={{ background: 'var(--border)' }} />
                         <div className="flex items-end gap-1.5 h-16">
-                            {[40,70,30,90,50,100,65].map((h, i) => (
+                            {[40, 70, 30, 90, 50, 100, 65].map((h, i) => (
                                 <div key={i} className="flex-1 rounded-t animate-pulse" style={{ height: `${h * 0.56}px`, background: 'var(--border)' }} />
                             ))}
                         </div>
@@ -322,7 +494,7 @@ export default function DashboardPage() {
                 </div>
                 {/* Skeleton recent scans */}
                 <div className="px-5 mb-4 flex flex-col gap-2">
-                    {[0,1,2].map(i => (
+                    {[0, 1, 2].map(i => (
                         <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                             <div className="w-8 h-8 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
                             <div className="flex-1 flex flex-col gap-2">
@@ -336,10 +508,10 @@ export default function DashboardPage() {
             </div>
         );
 
-        const workerName  = profile?.displayName ?? user?.displayName ?? 'Worker';
-        const initials    = workerName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
-        const rankLabel   = myRank === 0 ? '—' : `#${myRank}`;
-        const rankColor   = myRank === 1 ? '#F59E0B' : myRank === 2 ? 'var(--text-secondary)' : myRank === 3 ? '#CD7F32' : '#60A5FA';
+        const workerName = profile?.displayName ?? user?.displayName ?? 'Worker';
+        const initials = workerName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+        const rankLabel = myRank === 0 ? '—' : `#${myRank}`;
+        const rankColor = myRank === 1 ? '#F59E0B' : myRank === 2 ? 'var(--text-secondary)' : myRank === 3 ? '#CD7F32' : '#60A5FA';
 
         return (
             <div className="flex flex-col min-h-screen pb-28 lg:pb-0">
@@ -452,8 +624,8 @@ export default function DashboardPage() {
                 {/* ── KPI Row ── */}
                 <div className="px-5 lg:px-10 mb-4 grid grid-cols-3 gap-3">
                     {[
-                        { label: t('dashboard.scans'),    value: myScansCount,                            icon: <ScanLine size={13} style={{ color: '#84cc16' }} />, accent: '#84cc16' },
-                        { label: t('dashboard.co2_saved'),value: `${myCo2Saved} kg`,                      icon: <Wind size={13} style={{ color: '#60A5FA' }} />, accent: '#60A5FA' },
+                        { label: t('dashboard.scans'), value: myScansCount, icon: <ScanLine size={13} style={{ color: '#84cc16' }} />, accent: '#84cc16' },
+                        { label: t('dashboard.co2_saved'), value: `${myCo2Saved} kg`, icon: <Wind size={13} style={{ color: '#60A5FA' }} />, accent: '#60A5FA' },
                         { label: t('dashboard.recovery'), value: `₹${myRecoveryInr.toLocaleString('en-IN')}`, icon: <TrendingUp size={13} style={{ color: '#F59E0B' }} />, accent: '#F59E0B' },
                     ].map(({ label, value, icon, accent }) => (
                         <div key={label} className="rounded-2xl p-3 flex flex-col gap-1.5"
@@ -471,6 +643,10 @@ export default function DashboardPage() {
                     <ScanActivityMini scans={scans} />
                 </div>
 
+                {/* ── CO₂ Trend Chart (7-day) ── */}
+                <div className="px-5 lg:px-10 mb-4">
+                    <Co2TrendChart scans={scans} />
+                </div>
 
                 {/* ── Grade Breakdown ── */}
                 {myScansCount > 0 && (
@@ -482,9 +658,9 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex flex-col gap-2">
                                 {[
-                                    { grade: 'A', count: myGradeA, color: '#84cc16',  bg: 'rgba(132,204,22,0.12)' },
-                                    { grade: 'B', count: myGradeB, color: '#F59E0B',  bg: 'rgba(245,158,11,0.12)' },
-                                    { grade: 'C', count: myGradeC, color: '#EF4444',  bg: 'rgba(239,68,68,0.12)'  },
+                                    { grade: 'A', count: myGradeA, color: '#84cc16', bg: 'rgba(132,204,22,0.12)' },
+                                    { grade: 'B', count: myGradeB, color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' },
+                                    { grade: 'C', count: myGradeC, color: '#EF4444', bg: 'rgba(239,68,68,0.12)' },
                                 ].map(({ grade, count, color, bg }) => {
                                     const pct = myScansCount > 0 ? Math.round((count / myScansCount) * 100) : 0;
                                     return (
@@ -549,7 +725,7 @@ export default function DashboardPage() {
                     </div>
                     {loading ? (
                         <div className="flex flex-col gap-2">
-                            {[0,1,2].map(i => (
+                            {[0, 1, 2].map(i => (
                                 <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                                     <div className="w-8 h-8 rounded-lg animate-pulse" style={{ background: 'var(--border)' }} />
                                     <div className="flex-1 flex flex-col gap-2">
@@ -570,7 +746,7 @@ export default function DashboardPage() {
                                 const gradeColors: Record<string, { bg: string; color: string }> = {
                                     A: { bg: 'rgba(132,204,22,0.12)', color: '#84cc16' },
                                     B: { bg: 'rgba(245,158,11,0.12)', color: '#F59E0B' },
-                                    C: { bg: 'rgba(239,68,68,0.12)',  color: '#EF4444' },
+                                    C: { bg: 'rgba(239,68,68,0.12)', color: '#EF4444' },
                                 };
                                 const gc = gradeColors[scan.grade] ?? gradeColors.C;
                                 return (
@@ -737,7 +913,13 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
+                    {/* ── CO₂ Trend Chart (7-day) ── */}
+                    <div className="px-5 lg:px-0 mb-5">
+                        <Co2TrendChart scans={scans} />
+                    </div>
+
                     {/* Scan CTA */}
+
                     <div className="px-5 lg:px-0 mb-5">
                         <button
                             onClick={() => router.push('/scan')}
@@ -968,8 +1150,8 @@ export default function DashboardPage() {
                                 </div>
                                 <span className="text-xs font-semibold text-white">Live Bin Status</span>
                                 <span className="flex items-center gap-1">
-                                            <span className={`w-1.5 h-1.5 rounded-full ${sensorIsLive ? 'bg-[#84cc16] animate-pulse' : 'bg-red-400'}`} />
-                                        </span>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${sensorIsLive ? 'bg-[#84cc16] animate-pulse' : 'bg-red-400'}`} />
+                                </span>
                             </div>
                             {sensor.gasAlert && <span className="text-xs text-red-400 font-semibold">⚠ Gas Alert</span>}
                         </div>

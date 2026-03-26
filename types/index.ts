@@ -313,6 +313,8 @@ export interface ChatAssistantRequest {
     payload?: PartMetadataPayload | null;
     guide?: GuideResult | null;
     surface?: 'scan_result' | 'guide';
+    /** Prior conversation turns (last 6 max) — enables session memory in the assistant */
+    history?: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
 export interface ChatAssistantResponse {

@@ -9,7 +9,7 @@ const nextConfig = {
     ],
   },
   // Dev HMR: allow Tauri/WebView and LAN origins (hostname only, no port). Add your machine IP if Next warns.
-  allowedDevOrigins: ['192.168.0.101', '10.105.0.56', '127.0.0.1', 'localhost'],
+  allowedDevOrigins: ['192.168.0.101', '10.105.0.56', '127.0.0.1', 'localhost', '10.23.202.23'],
 };
 
 export default nextConfig;

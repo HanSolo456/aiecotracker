@@ -74,17 +74,31 @@ function PassportPageInner() {
         async function load() {
             if (passportIdParam) {
                 try {
+                    // Primary: server-side read via Admin SDK (works for public viewers
+                    // who aren't logged in and bypasses Firestore client security rules)
+                    const apiRes = await fetch(`/api/get-passport?id=${encodeURIComponent(passportIdParam)}`);
+                    if (apiRes.ok) {
+                        const apiData = await apiRes.json() as { success: boolean; dpp?: DigitalProductPassport; error?: string };
+                        if (apiData.success && apiData.dpp) {
+                            if (!cancelled) setDpp(apiData.dpp);
+                            return;
+                        }
+                    }
+
+                    // Fallback: client-side Firestore query (works when user is logged in
+                    // and the DPP was stored on the scan record)
                     const record = await getScanByPassportId(passportIdParam);
                     if (!record?.dpp) {
-                        if (!cancelled) setLoadError('Passport not found.');
+                        if (!cancelled) setLoadError('Passport not found. It may not have been saved yet, or the link may have expired.');
                         return;
                     }
-                    setDpp(JSON.parse(record.dpp));
+                    if (!cancelled) setDpp(JSON.parse(record.dpp) as DigitalProductPassport);
                 } catch {
-                    if (!cancelled) setLoadError('Failed to load passport.');
+                    if (!cancelled) setLoadError('Failed to load passport. Please check your connection and try again.');
                 }
                 return;
             }
+
 
             let d = getSessionJSON<DigitalProductPassport>('ecotrack_dpp');
             if (!d && scanIdParam) {

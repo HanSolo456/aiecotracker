@@ -11,6 +11,44 @@ import type {
     SourceCitation,
 } from '@/types';
 
+// ── Live knowledge context injected into the system prompt ────────────────────
+// Prices sourced from scrap_pricing_india.json (Mumbai MIDC hub, March 2026)
+import scrapPricingRaw from '@/data/knowledge/scrap_pricing_india.json';
+import safetyRegsRaw from '@/data/knowledge/safety_regulations.json';
+
+type ScrapMaterial = {
+    id: string;
+    common_names: string[];
+    recycler_category: string;
+    recyclability_class: string;
+    regional_rates_inr_per_kg: Record<string, number>;
+    gst_rate_pct: number;
+};
+
+type SafetyReg = {
+    id: string;
+    title: string;
+    summary: string;
+};
+
+function buildScrapPricingContext(): string {
+    const materials = (scrapPricingRaw as { materials: ScrapMaterial[] }).materials;
+    const lines = materials.map(m => {
+        const hub = 'Mumbai_MIDC';
+        const rate = m.regional_rates_inr_per_kg?.[hub] ?? '—';
+        const name = m.common_names?.[0] ?? m.id;
+        return `- ${name}: ₹${rate}/kg (${m.recycler_category}, recyclability ${m.recyclability_class})`;
+    });
+    return lines.join('\n');
+}
+
+function buildSafetyRegsContext(): string {
+    const regs = safetyRegsRaw as SafetyReg[];
+    return regs
+        .map(r => `- ${r.id}: ${r.title} — ${r.summary}`)
+        .join('\n');
+}
+
 const SYSTEM_PROMPT = `You are AI-EcoTrack's assistant — an expert in waste management, circular economy, e-waste disposal, and sustainable manufacturing.
 
 ## Core Expertise
@@ -25,15 +63,17 @@ const SYSTEM_PROMPT = `You are AI-EcoTrack's assistant — an expert in waste ma
 - Plastic: 2.53 kg CO₂/kg  |  Steel/Iron: 1.46 kg CO₂/kg  |  Glass: 0.31 kg CO₂/kg
 - Paper/Cardboard: 1.08 kg CO₂/kg  |  Battery (Li-ion): 5.4 kg CO₂/kg
 
-### Recovery Value (approx. market rate INR/kg, India)
-- Aluminium: ₹120/kg  |  Copper: ₹450/kg  |  PCB: ₹180/kg  |  Plastic: ₹20/kg
-- Glass: ₹10/kg  |  Paper: ₹12/kg  |  Battery: ₹30/kg  |  Generic metal: ₹40/kg
+### Live Scrap Market Rates (India — Mumbai MIDC, March 2026, prices in INR/kg excl. GST)
+${buildScrapPricingContext()}
+
+### Key Indian Waste Regulations
+${buildSafetyRegsContext()}
 
 ### E-Waste Regulations (India)
 - E-Waste Management Rules 2022 mandate Extended Producer Responsibility (EPR).
 - Producers must register on CPCB portal and meet collection targets (10% → 80% over 10 years).
 - Consumers must deposit e-waste at authorized collection points — not in general waste.
-- Key restricted substances under E-waste Rules: Lead, Cadmium, Mercury, Hexavalent Chromium, PBB, PBDE.
+- Key restricted substances: Lead, Cadmium, Mercury, Hexavalent Chromium, PBB, PBDE.
 - WEEE Directive (EU equivalent) bans e-waste in landfill and mandates 85% recovery rate.
 
 ### Digital Product Passport (DPP)
@@ -282,16 +322,19 @@ function getDirectAnswer(
     return null;
 }
 
+type ConversationTurn = { role: 'user' | 'assistant'; content: string };
+
 async function generateAssistantAnswer(
     question: string,
     payload: PartMetadataPayload | null,
     guide: GuideResult | null,
+    history: ConversationTurn[],
 ): Promise<string> {
     const directAnswer = getDirectAnswer(question, payload, guide);
     if (directAnswer) return directAnswer;
 
     const context = buildContextSummary(payload, guide);
-    const prompt = context
+    const userMessage = context
         ? `Answer the user's question using the context below and your domain expertise.
 
 CONTEXT
@@ -317,9 +360,11 @@ RESPONSE RULES
 - Be specific with numbers and regulations when you know them.
 - If uncertain about a specific regulation, say so.`;
 
-
     const groqAvailable = !!(process.env.GROQ_API_KEY_1 ?? process.env.GROQ_API_KEY);
     const geminiKey = process.env.GEMINI_API_KEY;
+
+    // Build message history for LLMs (cap at last 6 turns to control token usage)
+    const recentHistory = history.slice(-6);
 
     if (groqAvailable) {
         try {
@@ -328,7 +373,12 @@ RESPONSE RULES
                     model: 'meta-llama/llama-4-scout-17b-16e-instruct',
                     messages: [
                         { role: 'system', content: SYSTEM_PROMPT },
-                        { role: 'user', content: prompt },
+                        // Inject prior conversation turns for memory
+                        ...recentHistory.map(turn => ({
+                            role: turn.role as 'user' | 'assistant',
+                            content: turn.content,
+                        })),
+                        { role: 'user', content: userMessage },
                     ],
                     temperature: 0.2,
                     max_tokens: 300,
@@ -345,7 +395,19 @@ RESPONSE RULES
         try {
             const genAI = new GoogleGenerativeAI(geminiKey);
             const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
-            const result = await model.generateContent(`${SYSTEM_PROMPT}\n\n${prompt}`);
+
+            // Build Gemini conversation history
+            const geminiHistory = recentHistory.map(turn => ({
+                role: turn.role === 'assistant' ? 'model' as const : 'user' as const,
+                parts: [{ text: turn.content }],
+            }));
+
+            const chat = model.startChat({
+                systemInstruction: SYSTEM_PROMPT,
+                history: geminiHistory,
+            });
+
+            const result = await chat.sendMessage(userMessage);
             const answer = result.response.text().trim();
             if (answer) return answer;
         } catch (error) {
@@ -390,7 +452,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<ChatAssis
             guide = await retrieveGuide(payload);
         }
 
-        const answer = await generateAssistantAnswer(question, payload, guide);
+        // Conversation history (up to last 6 turns, provided by client)
+        const history: ConversationTurn[] = (body.history ?? []).slice(-6);
+
+        const answer = await generateAssistantAnswer(question, payload, guide, history);
         const citations = buildCitations(payload, guide);
         const suggestedQuestions = buildSuggestedQuestions(payload, guide, body.surface);
 

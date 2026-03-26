@@ -176,5 +176,23 @@ service cloud.firestore {
                              && resource.data.userId == request.auth.uid;
     }
 
+    // ── /ai_guides ───────────────────────────────────────────────────────────────
+    // AI-generated disassembly guides cached server-side via Firebase Admin SDK.
+    // Reads: any authenticated user (guides are not sensitive).
+    // Writes: Admin SDK only (server-side — never from client).
+    match /ai_guides/{partClass} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // ── /passports ───────────────────────────────────────────────────────────────
+    // Digital Product Passports written by the generate-dpp API (Admin SDK).
+    // Public read — anyone with the passport ID (e.g. via QR code) can view it.
+    // Writes: Admin SDK only (server-side generate-dpp route).
+    match /passports/{passportId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
   }
 }

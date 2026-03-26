@@ -4,6 +4,7 @@ import base64
 import io
 import threading
 import time
+from typing import Any
 
 from config import StationConfig
 
@@ -22,7 +23,9 @@ PLACEHOLDER_SVG = """
 class CameraController:
     def __init__(self, config: StationConfig) -> None:
         self.config = config
+        self._backend = "none"
         self._camera = None
+        self._cv2: Any | None = None
         self._started = False
         self._preview_config = None
         self._still_config = None
@@ -39,6 +42,35 @@ class CameraController:
         self._start_preview_loop()
 
     def _boot_camera(self) -> None:
+        requested = self.config.camera_backend
+        attempts: list[str] = []
+
+        # USB webcams need a different stack from Picamera2, so allow explicit forcing
+        # and also fall back automatically when the preferred backend is unavailable.
+        if requested in {"usb", "auto"}:
+            usb_error = self._boot_usb_camera()
+            if usb_error is None:
+                return
+            attempts.append(f"usb: {usb_error}")
+            if requested == "usb":
+                self.last_error = usb_error
+                return
+
+        if requested in {"picamera2", "auto"}:
+            picamera_error = self._boot_picamera2_camera()
+            if picamera_error is None:
+                return
+            attempts.append(f"picamera2: {picamera_error}")
+            if requested == "picamera2":
+                self.last_error = picamera_error
+                return
+
+        self._camera = None
+        self._cv2 = None
+        self._started = False
+        self.last_error = " | ".join(attempts) if attempts else "No camera backend could be initialized."
+
+    def _boot_picamera2_camera(self) -> str | None:
         try:
             from libcamera import Transform
             from picamera2 import Picamera2
@@ -57,15 +89,53 @@ class CameraController:
             camera.configure(self._preview_config)
             camera.start()
             self._camera = camera
+            self._backend = "picamera2"
             self._started = True
             self.last_error = None
+            return None
         except Exception as exc:  # noqa: BLE001
-            self._camera = None
-            self._started = False
-            self.last_error = str(exc)
+            return str(exc)
+
+    def _boot_usb_camera(self) -> str | None:
+        try:
+            import cv2
+
+            capture = cv2.VideoCapture(self.config.usb_camera_index, cv2.CAP_V4L2)
+            if not capture.isOpened():
+                capture.release()
+                capture = cv2.VideoCapture(self.config.usb_camera_index)
+
+            if not capture.isOpened():
+                return f"Unable to open USB camera index {self.config.usb_camera_index}."
+
+            capture.set(
+                cv2.CAP_PROP_FOURCC,
+                cv2.VideoWriter_fourcc(*self.config.usb_fourcc),
+            )
+            capture.set(cv2.CAP_PROP_FRAME_WIDTH, self.config.camera_width)
+            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.camera_height)
+            capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
+            for _ in range(6):
+                ok, _frame = capture.read()
+                if ok:
+                    break
+                time.sleep(0.05)
+
+            self._camera = capture
+            self._cv2 = cv2
+            self._backend = "usb"
+            self._started = True
+            self.last_error = None
+            return None
+        except Exception as exc:  # noqa: BLE001
+            return str(exc)
 
     def ready(self) -> bool:
         return self._camera is not None and self._started
+
+    def backend_name(self) -> str:
+        return self._backend
 
     def snapshot(self) -> tuple[bytes, str]:
         with self._preview_lock:
@@ -122,6 +192,16 @@ class CameraController:
                 "Camera is not available. Check camera wiring and ensure picamera2 is installed."
             )
 
+        if self._backend == "usb":
+            return self._capture_usb_jpeg_bytes(still=still)
+        if self._backend == "picamera2":
+            return self._capture_picamera2_jpeg_bytes(still=still)
+        raise RuntimeError("Camera backend is not initialized.")
+
+    def _capture_picamera2_jpeg_bytes(self, *, still: bool) -> bytes:
+        if self._camera is None:
+            raise RuntimeError("Picamera2 backend is not available.")
+
         output = io.BytesIO()
 
         with self._camera_lock:
@@ -142,6 +222,61 @@ class CameraController:
                 self._camera.capture_file(output, format="jpeg")
 
         return output.getvalue()
+
+    def _capture_usb_jpeg_bytes(self, *, still: bool) -> bytes:
+        if self._camera is None or self._cv2 is None:
+            raise RuntimeError("USB camera backend is not available.")
+
+        frame = self._read_usb_frame(still=still)
+        if still:
+            return self._encode_usb_frame(frame, quality=self.config.capture_jpeg_quality)
+        return self._encode_usb_frame(
+            frame,
+            quality=self.config.preview_jpeg_quality,
+            size=(self.config.preview_width, self.config.preview_height),
+        )
+
+    def _read_usb_frame(self, *, still: bool) -> Any:
+        if self._camera is None or self._cv2 is None:
+            raise RuntimeError("USB camera backend is not available.")
+
+        frame = None
+        with self._camera_lock:
+            reads = 4 if still else 1
+            for _ in range(reads):
+                ok, candidate = self._camera.read()
+                if ok and candidate is not None:
+                    frame = candidate
+                if still:
+                    time.sleep(0.02)
+
+        if frame is None:
+            raise RuntimeError("USB webcam did not return a frame.")
+
+        return self._cv2.flip(frame, 1)
+
+    def _encode_usb_frame(
+        self,
+        frame: Any,
+        *,
+        quality: int,
+        size: tuple[int, int] | None = None,
+    ) -> bytes:
+        if self._cv2 is None:
+            raise RuntimeError("OpenCV is not available for USB frame encoding.")
+
+        working = frame
+        if size is not None:
+            working = self._cv2.resize(frame, size, interpolation=self._cv2.INTER_AREA)
+
+        ok, buffer = self._cv2.imencode(
+            ".jpg",
+            working,
+            [int(self._cv2.IMWRITE_JPEG_QUALITY), int(quality)],
+        )
+        if not ok:
+            raise RuntimeError("Failed to encode USB webcam frame as JPEG.")
+        return buffer.tobytes()
 
     def capture_base64(self) -> str:
         if not self.ready():

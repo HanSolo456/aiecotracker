@@ -54,6 +54,7 @@ class StationRuntime:
         payload["deviceTokenStored"] = self.client.runtime_token is not None
         payload["cameraReady"] = self.camera.ready()
         payload["cameraError"] = self.camera.last_error
+        payload["cameraBackend"] = self.camera.backend_name()
         payload["previewRefreshMs"] = int(self.camera.preview_interval_seconds() * 1000)
         payload["stationUrl"] = f"http://{self.config.device_id}.local:{self.config.local_port}"
         payload["resultUrl"] = (
@@ -176,6 +177,7 @@ def build_html(payload: dict) -> str:
         </div>
       </div>
       <div>
+        <p class="muted">Camera backend: {escape(str(payload.get("cameraBackend") or "unknown"))}</p>
         <p class="muted">Runtime token stored: {str(payload.get("deviceTokenStored")).lower()}</p>
         <p class="muted">Camera ready: {str(payload.get("cameraReady")).lower()}</p>
         <p class="muted">Captured angles: {payload.get("capturedCount")}/{payload.get("captureCountTarget")}</p>

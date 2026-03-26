@@ -9,6 +9,7 @@ import { saveScan, type ScanContext } from '@/lib/scanService';
 import { enqueueOfflineScan, flushOfflineQueue, getOfflineQueueSize } from '@/lib/offlineQueue';
 import { useAuth } from '@/lib/authContext';
 import { setSessionJSON, setSessionValue } from '@/lib/sessionState';
+import { useLanguage } from '@/components/LanguageProvider';
 
 type ScanState = 'idle' | 'analysing' | 'done' | 'error' | 'no_match';
 
@@ -31,6 +32,7 @@ const ANALYSIS_STEPS = [
 
 export default function ScanPage() {
     const router = useRouter();
+    const { t } = useLanguage();
     const { user, profile } = useAuth();
     const fileRef = useRef<HTMLInputElement>(null);
     const activeSlotRef = useRef<number>(0);
@@ -320,10 +322,10 @@ export default function ScanPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-0.5">
                         <Layers size={14} style={{ color: '#84cc16' }} />
-                        <span className="page-label">Multi-View Scan</span>
+                        <span className="page-label">{t('scan.multi_view')}</span>
                     </div>
-                    <h1 className="page-title text-2xl lg:text-3xl text-white">Identify Part</h1>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>Up to 3 angles → merged AI analysis</p>
+                    <h1 className="page-title text-2xl lg:text-3xl text-white">{t('scan.identify_part')}</h1>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{t('scan.subtitle')}</p>
                 </div>
             </div>
 
@@ -346,7 +348,7 @@ export default function ScanPage() {
                                 {ANALYSIS_STEPS[analysisStep]}
                             </p>
                             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                                Analysing {filledAngles.length} angle{filledAngles.length !== 1 ? 's' : ''} · Llama 4 Scout VLM
+                                {t('common.loading')} · Llama 4 Scout VLM
                             </p>
                         </div>
                         {/* Step dots */}
@@ -373,7 +375,7 @@ export default function ScanPage() {
                             style={{ background: '#84cc16' }}>
                             <Zap size={22} style={{ color: 'var(--bg-primary)' }} />
                         </div>
-                        <p className="font-heading text-sm font-600" style={{ color: '#84cc16' }}>Analysis Complete</p>
+                        <p className="font-heading text-sm font-600" style={{ color: '#84cc16' }}>{t('scan.golden_thread')}</p>
                     </div>
                 )}
 
@@ -385,19 +387,19 @@ export default function ScanPage() {
                             🔍
                         </div>
                         <div>
-                            <p className="text-base font-bold text-white mb-1">Part Not Recognised</p>
+                            <p className="text-base font-bold text-white mb-1">{t('scan.part_not_rec')}</p>
                             <p className="text-sm text-secondary leading-relaxed">
-                                The AI couldn&apos;t identify an industrial component in this image. Make sure you&apos;re pointing at a real mechanical part.
+                                {t('scan.part_not_rec_desc')}
                             </p>
                         </div>
                         <div className="w-full rounded-xl p-4 text-left flex flex-col gap-2"
                             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <p className="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">Tips for a better scan</p>
+                            <p className="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t('scan.tips_for_better_scan')}</p>
                             {[
-                                '📸  Get close — fill the frame with the part',
-                                '💡  Ensure good lighting, avoid glare',
-                                '🔩  Point at an actual industrial component (valve, pump, motor…)',
-                                '📐  Capture multiple angles for confidence',
+                                t('scan.tip_get_close'),
+                                t('scan.tip_good_lighting'),
+                                t('scan.tip_actual_component'),
+                                t('scan.tip_multiple_angles'),
                             ].map((tip, i) => (
                                 <p key={i} className="text-xs text-muted">{tip}</p>
                             ))}
@@ -406,7 +408,7 @@ export default function ScanPage() {
                             onClick={() => setScanState('idle')}
                             className="btn-primary w-full"
                         >
-                            Try Again
+                            {t('scan.try_again')}
                         </button>
                     </div>
                 )}
@@ -418,7 +420,7 @@ export default function ScanPage() {
                         {/* Photo Slot Grid */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <p className="page-label">Photo Angles</p>
+                                <p className="page-label">{t('scan.photo_angles')}</p>
                                 <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                                     style={{ background: 'rgba(132,204,22,0.1)', color: '#84cc16', border: '1px solid rgba(132,204,22,0.2)' }}>
                                     {filledAngles.length} / 3
@@ -461,7 +463,7 @@ export default function ScanPage() {
                                                 <div className="flex items-center gap-1.5">
                                                     <button
                                                         onClick={() => openCamera(i)}
-                                                        title="Use camera"
+                                                        title={t('scan.use_camera')}
                                                         className="w-7 h-7 rounded-lg flex items-center justify-center transition-all active:scale-90"
                                                         style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.3)' }}
                                                     >
@@ -469,7 +471,7 @@ export default function ScanPage() {
                                                     </button>
                                                     <button
                                                         onClick={() => openPickerForSlot(i)}
-                                                        title="Upload image"
+                                                        title={t('scan.upload_image')}
                                                         className="w-7 h-7 rounded-lg flex items-center justify-center transition-all active:scale-90"
                                                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
                                                     >
