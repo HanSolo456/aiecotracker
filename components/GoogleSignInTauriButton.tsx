@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     firebaseReady,
     signInWithGoogle,
@@ -34,12 +35,12 @@ function TauriGoogleRedirectFallback({ className = '' }: Props) {
                     : code.startsWith('auth/requests-from-referer')
                         ? 'Firebase blocked this app URL (common with packaged Tauri). Prefer tauri dev on localhost, or set NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID for embedded Google sign-in.'
                         : code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request'
-                      ? 'Sign-in was interrupted. Please try again.'
-                      : code === 'auth/network-request-failed'
-                        ? 'Network error. Check your connection and try again.'
-                        : code
-                          ? `Google sign-in failed (${code}). Try email/password or check Firebase Auth settings.`
-                          : 'Google sign-in failed. Try email/password or verify Firebase Auth.';
+                            ? 'Sign-in was interrupted. Please try again.'
+                            : code === 'auth/network-request-failed'
+                                ? 'Network error. Check your connection and try again.'
+                                : code
+                                    ? `Google sign-in failed (${code}). Try email/password or check Firebase Auth settings.`
+                                    : 'Google sign-in failed. Try email/password or verify Firebase Auth.';
             setError(msg);
             console.error('[GoogleSignInTauri redirect]', code, err?.message, e);
         } finally {
@@ -113,6 +114,7 @@ export default function GoogleSignInTauriButton({ className = '' }: Props) {
 
 function GoogleIdentityServicesInner({ className, clientId }: Props & { clientId: string }) {
     const activeRequestRef = useRef(true);
+    const router = useRouter();
     const [submitting, setSubmitting] = useState(false);
     const [hint, setHint] = useState<string | null>(null);
 
@@ -168,11 +170,15 @@ function GoogleIdentityServicesInner({ className, clientId }: Props & { clientId
                     try {
                         await signInWithGoogleIdToken(poll.idToken);
                     } catch (fbErr) {
-                        throw new Error(`Firebase error: ${fbErr instanceof Error ? fbErr.message : String(fbErr)}`);
+                        console.error('[DesktopGoogleAuth] signInWithGoogleIdToken failed:', fbErr);
+                        throw new Error(`Firebase sign-in error: ${fbErr instanceof Error ? fbErr.message : String(fbErr)}`);
                     }
 
                     if (activeRequestRef.current) {
                         setSubmitting(false);
+                        // Explicit navigation in case PostAuthRedirect doesn't trigger
+                        // (e.g. if auth state change fires after component unmounts).
+                        router.push('/dashboard');
                     }
                     return;
                 }
@@ -233,9 +239,6 @@ function GoogleIdentityServicesInner({ className, clientId }: Props & { clientId
                 </svg>
                 {submitting ? 'Waiting for browser…' : 'Continue with Google'}
             </button>
-            <p className="text-[11px] mt-2 px-1 leading-snug" style={{ color: 'var(--text-muted)' }}>
-                Opens Google sign-in in your default browser, then securely hands the result back to the desktop app.
-            </p>
         </div>
     );
 }

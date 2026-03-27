@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { auth, firebaseReady } from '@/lib/firebase';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, UserCredential } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, type UserCredential } from 'firebase/auth';
 
-type Step = 'loading' | 'redirecting' | 'verifying' | 'done' | 'error';
+type Step = 'loading' | 'signing-in' | 'verifying' | 'done' | 'error';
 
 export default function DesktopGoogleAuthPage() {
     const searchParams = useSearchParams();
@@ -31,9 +31,7 @@ export default function DesktopGoogleAuthPage() {
 
         async function processHandoff() {
             try {
-                const storedRequestId = sessionStorage.getItem('desktop_google_request_id');
-                const redirectSent = sessionStorage.getItem('desktop_google_redirect_sent');
-                const requestId = urlRequestId || storedRequestId;
+                const requestId = urlRequestId;
 
                 if (!requestId) {
                     setStep('error');
@@ -41,92 +39,59 @@ export default function DesktopGoogleAuthPage() {
                     return;
                 }
 
-                if (redirectSent) {
-                    // We just returned from Google. We are verifying the login.
-                    setStep('verifying');
-                    setMessage('Checking sign-in status…');
-                    
-                    // Do NOT immediately remove redirectSent here, because React StrictMode 
-                    // will run this twice in dev and kill the second run. 
-                    // Wait up to 5 seconds for AuthContext to populate __googleRedirectCredential
-                    // or directly call getRedirectResult. Calling it directly is safer here.
-                    let redirectCred = await getRedirectResult(auth);
-                    
-                    if (!redirectCred) {
-                        for (let i = 0; i < 50; i++) {
-                            redirectCred = (window as any).__googleRedirectCredential;
-                            if (redirectCred) break;
-                            await new Promise((r) => setTimeout(r, 100));
-                        }
-                    }
+                // Use signInWithPopup — no page navigation, no cross-origin state issues.
+                // signInWithRedirect is broken in Chrome 115+ due to cross-site iframe restrictions.
+                setStep('signing-in');
+                setMessage('Opening Google sign-in…');
 
-                    if (redirectCred) {
-                        setMessage('Authenticating and linking back to desktop…');
-                        const credential = GoogleAuthProvider.credentialFromResult(redirectCred);
-                        const idToken = await redirectCred.user.getIdToken();
+                const provider = new GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
 
-                        if (!idToken) {
-                            throw new Error('Google did not return a valid ID token. Try signing in again.');
-                        }
+                const popupCred = await signInWithPopup(auth, provider);
 
-                        // Hand it off!
-                        const res = await fetch('/api/desktop-auth/google', {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ requestId, idToken }),
-                        });
+                setStep('verifying');
+                setMessage('Authenticating and linking back to desktop…');
 
-                        if (!res.ok) {
-                            const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-                            throw new Error(payload?.error || `HTTP error ${res.status} when handing off sign-in.`);
-                        }
-
-                        sessionStorage.removeItem('desktop_google_request_id');
-                        sessionStorage.removeItem('desktop_google_redirect_sent');
-                        if (!mountedRef.current) return;
-                        setStep('done');
-                        setMessage('Google sign-in is complete. Return to the AI-EcoTrack desktop app. This window will close automatically.');
-                        setTimeout(() => window.close(), 1500);
-                        return;
-                    }
-
-                    throw new Error('Sign-in failed or took too long to synchronize. Please try again from the app.');
+                // credentialFromResult gives the Google OAuth ID token (issued by accounts.google.com).
+                // user.getIdToken() gives a Firebase ID token — NOT accepted by GoogleAuthProvider.credential().
+                const oauthCredential = GoogleAuthProvider.credentialFromResult(popupCred);
+                const idToken = oauthCredential?.idToken;
+                if (!idToken) {
+                    throw new Error('Google did not return a valid OAuth ID token. Try signing in again.');
                 }
 
-                // If we haven't sent the redirect yet, send it now
-                if (urlRequestId) {
-                    setStep('redirecting');
-                    setMessage('Forwarding to Google…');
-                    sessionStorage.setItem('desktop_google_request_id', urlRequestId);
-                    sessionStorage.setItem('desktop_google_redirect_sent', 'true');
-                    
-                    const provider = new GoogleAuthProvider();
-                    provider.setCustomParameters({ prompt: 'select_account' });
-                    
-                    await signInWithRedirect(auth, provider);
-                    return; // execution will leave the page immediately
+                // Hand it off to the desktop app via the API route.
+                const res = await fetch('/api/desktop-auth/google', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requestId, idToken }),
+                });
+
+                if (!res.ok) {
+                    const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+                    throw new Error(payload?.error || `HTTP error ${res.status} when handing off sign-in.`);
                 }
 
-                // No url param, no redirect cred -> probably a reload.
-                throw new Error('Sign-in flow was interrupted. Please try again from the app.');
+                if (!mountedRef.current) return;
+                setStep('done');
+                setMessage('Google sign-in is complete. Return to the AI-EcoTrack desktop app. This window will close automatically.');
+                setTimeout(() => window.close(), 1500);
 
             } catch (err) {
                 const errMsg = err instanceof Error ? err.message : 'Unknown error during sign-in.';
-                
-                const reqId = urlRequestId || sessionStorage.getItem('desktop_google_request_id');
-                if (reqId) {
+
+                // Report error back to the desktop app so it can stop polling.
+                if (urlRequestId) {
                     await fetch('/api/desktop-auth/google', {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ requestId: reqId, error: errMsg }),
+                        body: JSON.stringify({ requestId: urlRequestId, error: errMsg }),
                     }).catch(() => undefined);
                 }
 
                 if (!mountedRef.current) return;
                 setStep('error');
                 setMessage(`Error: ${errMsg}`);
-                sessionStorage.removeItem('desktop_google_request_id');
-                sessionStorage.removeItem('desktop_google_redirect_sent');
             }
         }
 
