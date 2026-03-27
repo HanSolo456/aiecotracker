@@ -111,7 +111,7 @@ function ScanActivityMini({ scans }: { scans: ScanRecord[] }) {
 // ── CO₂ Trend Chart (7-day area sparkline) ────────────────────────────────────
 function Co2TrendChart({ scans }: { scans: ScanRecord[] }) {
     const { t, lang } = useLanguage();
-    const W = 280, H = 80, PAD = 6;
+    const W = 280, H = 90, PAD_X = 6, PAD_TOP = 18, PAD_BOT = 6;
 
     const days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date();
@@ -135,15 +135,15 @@ function Co2TrendChart({ scans }: { scans: ScanRecord[] }) {
     const todayCo2 = values[6].toFixed(1);
     const hasPeak = maxVal > 0.1;
 
-    // Map to SVG coords — value=0 sits at H-PAD (bottom); value=maxVal sits at PAD (top)
-    const toY = (v: number) => PAD + ((maxVal - v) / maxVal) * (H - PAD * 2);
-    const toX = (i: number) => PAD + (i / 6) * (W - PAD * 2);
+    // Map to SVG coords — value=0 sits at H-PAD_BOT (bottom); value=maxVal sits at PAD_TOP (top)
+    const toY = (v: number) => PAD_TOP + ((maxVal - v) / maxVal) * (H - PAD_TOP - PAD_BOT);
+    const toX = (i: number) => PAD_X + (i / 6) * (W - PAD_X * 2);
 
 
     const areaPath = [
-        `M ${toX(0)},${H - PAD}`,
+        `M ${toX(0)},${H - PAD_BOT}`,
         ...values.map((v, i) => `L ${toX(i)},${toY(v)}`),
-        `L ${toX(6)},${H - PAD}`,
+        `L ${toX(6)},${H - PAD_BOT}`,
         'Z',
     ].join(' ');
     const linePath = [`M ${toX(0)},${toY(values[0])}`, ...values.map((v, i) => i > 0 ? `L ${toX(i)},${toY(v)}` : '')].filter(Boolean).join(' ');
@@ -181,7 +181,7 @@ function Co2TrendChart({ scans }: { scans: ScanRecord[] }) {
                 {[0.25, 0.5, 0.75].map(frac => (
                     <line
                         key={frac}
-                        x1={PAD} y1={toY(maxVal * frac)} x2={W - PAD} y2={toY(maxVal * frac)}
+                        x1={PAD_X} y1={toY(maxVal * frac)} x2={W - PAD_X} y2={toY(maxVal * frac)}
                         stroke="rgba(255,255,255,0.04)" strokeWidth="1"
                     />
                 ))}
@@ -210,7 +210,7 @@ function Co2TrendChart({ scans }: { scans: ScanRecord[] }) {
                     const cx = toX(i);
                     const cy = toY(v);
                     if (v === 0) return (
-                        <circle key={i} cx={cx} cy={H - PAD} r={2} fill="rgba(255,255,255,0.1)" />
+                        <circle key={i} cx={cx} cy={H - PAD_BOT} r={2} fill="rgba(255,255,255,0.1)" />
                     );
                     return (
                         <g key={i}>
@@ -224,10 +224,10 @@ function Co2TrendChart({ scans }: { scans: ScanRecord[] }) {
                                 stroke={isToday ? 'rgba(34,197,94,0.5)' : 'none'}
                                 strokeWidth={isToday ? '2' : '0'}
                             />
-                            {/* Value label above peak & today */}
+                            {/* Value label — clamped so it never floats outside the SVG */}
                             {(isToday || isPeak) && v > 0 && (
                                 <text
-                                    x={cx} y={cy - 7}
+                                    x={cx} y={Math.max(PAD_TOP - 4, cy - 7)}
                                     textAnchor="middle"
                                     fill="#22c55e"
                                     fontSize="8"
