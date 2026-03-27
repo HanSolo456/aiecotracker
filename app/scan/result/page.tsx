@@ -336,12 +336,15 @@ function ScanResultPageInner() {
       <div className="px-5 flex flex-col gap-4">
         {/* Captured image thumbnail */}
         {capturedImage && (
-          <div className="w-full h-40 rounded-2xl overflow-hidden border border-surface-border">
+          <div
+            className="w-full rounded-2xl overflow-hidden border border-surface-border flex items-center justify-center"
+            style={{ background: 'rgba(0,0,0,0.25)', maxHeight: '320px' }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={capturedImage}
               alt="Scanned part"
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-h-[320px] object-contain rounded-2xl"
             />
           </div>
         )}

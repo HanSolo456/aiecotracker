@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, UserPlus, Link as LinkIcon, Clock, ChevronLeft, Leaf, Copy, Check, X } from 'lucide-react';
+import { Users, UserPlus, Link as LinkIcon, Clock, ChevronLeft, Leaf, Copy, Check, X, Search } from 'lucide-react';
 import { useAuth } from '@/lib/authContext';
 import { getOrg } from '@/lib/orgService';
 import { generateInvite } from '@/lib/inviteService';
@@ -28,6 +28,7 @@ export default function WorkersPage() {
     const [inviteCode, setInviteCode]   = useState('');
     const [generating, setGenerating]   = useState(false);
     const [copied, setCopied]           = useState(false);
+    const [search, setSearch]           = useState('');
 
     const isAdmin = profile?.role === 'org_admin';
 
@@ -122,20 +123,56 @@ export default function WorkersPage() {
                 </div>
             </div>
 
+            {/* Search bar */}
+            <div className="px-5 lg:px-10 mb-4 max-w-2xl">
+                <div className="flex items-center gap-2 rounded-xl px-3 py-2.5"
+                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                    <Search size={14} style={{ color: 'var(--text-dim)', flexShrink: 0 }} />
+                    <input
+                        type="text"
+                        placeholder="Search by name or email…"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="flex-1 bg-transparent outline-none text-sm text-white placeholder:text-[var(--text-dim)]"
+                    />
+                    {search && (
+                        <button onClick={() => setSearch('')}
+                            className="p-0.5 rounded"
+                            style={{ color: 'var(--text-dim)' }}>
+                            <X size={12} />
+                        </button>
+                    )}
+                </div>
+            </div>
+
             {/* Worker list */}
             <div className="px-5 lg:px-10 flex flex-col gap-3 max-w-2xl">
-                {workers.length === 0 ? (
-                    <div className="rounded-2xl p-8 flex flex-col items-center gap-3 text-center"
-                        style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center"
-                            style={{ background: 'var(--border)' }}>
-                            <Users size={20} style={{ color: '#4B5563' }} />
+                {(() => {
+                    const q = search.toLowerCase();
+                    const filtered = workers.filter(w =>
+                        (w.displayName ?? '').toLowerCase().includes(q) ||
+                        (w.email ?? '').toLowerCase().includes(q)
+                    );
+                    if (workers.length === 0) return (
+                        <div className="rounded-2xl p-8 flex flex-col items-center gap-3 text-center"
+                            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                                style={{ background: 'var(--border)' }}>
+                                <Users size={20} style={{ color: '#4B5563' }} />
+                            </div>
+                            <p className="text-sm font-semibold text-white">No workers yet</p>
+                            <p className="text-xs" style={{ color: 'var(--text-dim)' }}>Generate an invite link and share it with your team.</p>
                         </div>
-                        <p className="text-sm font-semibold text-white">No workers yet</p>
-                        <p className="text-xs" style={{ color: 'var(--text-dim)' }}>Generate an invite link and share it with your team.</p>
-                    </div>
-                ) : (
-                    workers.map(w => (
+                    );
+                    if (filtered.length === 0) return (
+                        <div className="rounded-2xl p-8 flex flex-col items-center gap-3 text-center"
+                            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                            <Search size={20} style={{ color: '#4B5563' }} />
+                            <p className="text-sm font-semibold text-white">No results</p>
+                            <p className="text-xs" style={{ color: 'var(--text-dim)' }}>No workers match &ldquo;{search}&rdquo;</p>
+                        </div>
+                    );
+                    return filtered.map(w => (
                         <div key={w.uid}
                             className="flex items-center gap-4 rounded-xl px-4 py-3"
                             style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
@@ -155,8 +192,8 @@ export default function WorkersPage() {
                                 {w.role === 'org_admin' ? 'Admin' : 'Worker'}
                             </span>
                         </div>
-                    ))
-                )}
+                    ));
+                })()}
             </div>
 
             {showModal && (

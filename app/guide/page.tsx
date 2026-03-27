@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Shield, Wrench, Clock, AlertTriangle, BookOpen, ExternalLink, Droplets, CheckCircle2, Volume2, VolumeX, Loader2, Square } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
@@ -26,7 +27,10 @@ function GuidePageInner() {
     const [ttsStatus, setTtsStatus] = useState<TtsStatus>('idle');
     const [ttsError, setTtsError] = useState<string | null>(null);
     const [loadError, setLoadError] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => { setMounted(true); }, []);
 
     useEffect(() => {
         let cancelled = false;
@@ -218,12 +222,14 @@ function GuidePageInner() {
     return (
         <div className="flex flex-col min-h-screen pb-28">
 
-            {/* Hazardous Fluid Disposal Modal */}
-            {fluidInfo && !fluidConfirmed && (
-                <div className="fixed inset-0 z-[60] flex flex-col"
+            {/* Hazardous Fluid Disposal Modal — portal to document.body so it escapes
+             the PageTransition will-change stacking context and sits above sidebar (z-40)
+             and BottomNav (z-[2000]) alike */}
+            {mounted && fluidInfo && !fluidConfirmed && createPortal(
+                <div className="fixed inset-0 z-[9999] flex flex-col"
                     style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(8px)' }}>
                     <div className="w-full h-1 shrink-0" style={{ background: fluidInfo.color }} />
-                    <div className="flex-1 overflow-y-auto px-5 pt-6 pb-4">
+                    <div className="flex-1 overflow-y-auto px-5 pt-6 pb-4 lg:max-w-2xl lg:mx-auto lg:w-full">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                                 style={{ background: fluidInfo.bg, border: `1.5px solid ${fluidInfo.border}` }}>
@@ -258,7 +264,7 @@ function GuidePageInner() {
                             ))}
                         </div>
                     </div>
-                    <div className="shrink-0 px-5 pt-3 pb-6"
+                    <div className="shrink-0 px-5 pt-3 pb-6 safe-bottom lg:max-w-2xl lg:mx-auto lg:w-full"
                         style={{ background: 'rgba(13,15,20,0.97)', borderTop: `1px solid ${fluidInfo.border}` }}>
                         <button
                             onClick={() => setFluidConfirmed(true)}
@@ -268,7 +274,8 @@ function GuidePageInner() {
                             {t('guide.area_secured')}
                         </button>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* Header */}

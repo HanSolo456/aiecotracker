@@ -39,10 +39,10 @@ const WASTE_CATEGORY_OPTIONS: Array<{
   label: string;
   color: string;
 }> = [
-  { value: "recyclable", label: "Recyclable", color: "#3B82F6" },
-  { value: "biodegradable", label: "Biodegradable", color: "#22C55E" },
-  { value: "hazardous", label: "Hazardous", color: "#EF4444" },
-];
+    { value: "recyclable", label: "Recyclable", color: "#3B82F6" },
+    { value: "biodegradable", label: "Biodegradable", color: "#22C55E" },
+    { value: "hazardous", label: "Hazardous", color: "#EF4444" },
+  ];
 
 function wasteCategoryColor(category: HackathonWasteCategory) {
   return (
@@ -150,9 +150,9 @@ export default function RoutesPage() {
   const routeLookup = stopLookupFromPlan(routePlan);
   const optimizedRouteUrl = routePlan
     ? buildGoogleMapsRouteUrl(
-        routePlan.stops.map((stop) => stop.bin),
-        routePlan.origin,
-      )
+      routePlan.stops.map((stop) => stop.bin),
+      routePlan.origin,
+    )
     : null;
 
   useEffect(() => {
@@ -247,25 +247,25 @@ export default function RoutesPage() {
         const stop = routeLookupForMap.get(bin.deviceId);
         const icon = stop
           ? L.divIcon({
-              className: "",
-              html: `
+            className: "",
+            html: `
                             <div style="width:40px;height:40px;border-radius:20px;background:#0f172a;border:3px solid ${color};display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:800;box-shadow:0 10px 25px rgba(15,23,42,0.35)">
                                 ${stop.order}
                             </div>
                         `,
-              iconSize: [40, 40],
-              iconAnchor: [20, 20],
-            })
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+          })
           : L.divIcon({
-              className: "",
-              html: `
+            className: "",
+            html: `
                             <div style="background:${color};width:32px;height:32px;border-radius:16px;border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#0f172a;box-shadow:0 10px 25px rgba(15,23,42,0.25)">
                                 ${bin.fillPct}%
                             </div>
                         `,
-              iconSize: [32, 32],
-              iconAnchor: [16, 16],
-            });
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+          });
 
         const routeDetails = stop
           ? `<br/>Stop #${stop.order} · Leg ${formatDistance(stop.legDistanceKm)}`
@@ -536,7 +536,7 @@ export default function RoutesPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="card p-4 aspect-square flex flex-col justify-between">
+          <div className="card p-4 min-h-[160px] flex flex-col justify-between">
             <p
               className="text-[11px] uppercase tracking-wider"
               style={{ color: "var(--text-dim)" }}
@@ -558,7 +558,7 @@ export default function RoutesPage() {
               </p>
             </div>
           </div>
-          <div className="card p-4 aspect-square flex flex-col justify-between">
+          <div className="card p-4 min-h-[160px] flex flex-col justify-between">
             <p
               className="text-[11px] uppercase tracking-wider"
               style={{ color: "var(--text-dim)" }}
@@ -582,7 +582,7 @@ export default function RoutesPage() {
               </p>
             </div>
           </div>
-          <div className="card p-4 aspect-square flex flex-col justify-between">
+          <div className="card p-4 min-h-[160px] flex flex-col justify-between">
             <div className="flex items-center gap-2">
               <TrendingDown size={13} style={{ color: "#4ADE80" }} />
               <p
@@ -607,7 +607,7 @@ export default function RoutesPage() {
               </p>
             </div>
           </div>
-          <div className="card p-4 aspect-square flex flex-col justify-between">
+          <div className="card p-4 min-h-[160px] flex flex-col justify-between">
             <div className="flex items-center gap-2">
               <Leaf size={13} style={{ color: "#4ADE80" }} />
               <p
@@ -801,10 +801,10 @@ export default function RoutesPage() {
                     {stop.bin.fillPct}%
                   </div>
                 </div>
-                  <div
-                    className="grid sm:grid-cols-3 gap-2 text-xs"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
+                <div
+                  className="grid sm:grid-cols-3 gap-2 text-xs"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   <div>
                     Stream:{" "}
                     <span style={{ color: wasteCategoryColor(stop.bin.wasteCategory) }}>

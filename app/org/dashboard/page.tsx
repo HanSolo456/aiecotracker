@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    ScanLine, TrendingUp, Leaf, DollarSign,
+    ScanLine, TrendingUp, Leaf, IndianRupee,
     Users, ChevronLeft, BarChart2, Award, Trophy,
     AlertTriangle, Zap, Droplets, ShieldAlert, Activity,
     Recycle, MapPin, ChevronRight, Settings, Cpu, SlidersHorizontal, LogOut,
@@ -847,7 +847,7 @@ export default function OrgDashboardPage() {
                                 sub={`${scans.length} all time`}
                             />
                             <StatCard
-                                icon={<DollarSign size={14} />}
+                                icon={<IndianRupee size={14} />}
                                 label="Recovery Value"
                                 value={`₹${totalRecoveryINR.toLocaleString('en-IN')}`}
                                 sub="est. scrap market"
@@ -896,7 +896,7 @@ export default function OrgDashboardPage() {
                         <ChartCard
                             title="Cumulative Recovery ₹"
                             sub="Running total estimated scrap value (INR)"
-                            icon={<DollarSign size={16} />}>
+                            icon={<IndianRupee size={16} />}>
                             <CumulativeRecoveryChart scans={scans} />
                         </ChartCard>
 
