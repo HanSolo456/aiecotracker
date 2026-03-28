@@ -1,245 +1,178 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" style=""><head>
+<html lang="en"><head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>AI-EcoTrack Live Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Product Passport</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0A0F1E;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        .font-heading {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .text-eco-green { color: #00FF88; }
-        .text-eco-cyan { color: #00D4FF; }
-        .bg-eco-green { background-color: #00FF88; }
-        .bg-eco-cyan { background-color: #00D4FF; }
-        .bg-eco-red { background-color: #FF4A4A; }
-        .text-eco-red { color: #FF4A4A; }
-        
-        /* Circuit pattern */
-        .circuit-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L20 10 L20 20' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Cpath d='M80 80 L70 80 L70 90' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23374151'/%3E%3Ccircle cx='70' cy='90' r='1.5' fill='%23374151'/%3E%3C/svg%3E");
-            opacity: 0.3;
-            z-index: 0;
-        }
-
-        /* Glow effects */
-        .glow-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.15;
-            z-index: 0;
-        }
-        
-        /* Mockup Container */
-        .mockup-window {
-            background: rgba(17, 24, 39, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-            height: 420px;
-        }
-        
-        .mockup-header {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .dot {
-            width: 10px; height: 10px; border-radius: 50%; margin-right: 6px;
-        }
-        
-        .mockup-body {
-            flex: 1;
-            padding: 16px;
-            overflow: hidden;
-            position: relative;
-            border-radius: 0 0 16px 16px;
-        }
-
-        /* Dashboard widgets */
-        .widget-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        /* Progress Circle */
-        .progress-circle {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: conic-gradient(#00FF88 85%, #374151 0);
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-        }
-        .progress-inner {
-            width: 65px; height: 65px; border-radius: 50%;
-            background: #111827;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* Scan Overlay */
-        .scan-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, rgba(0,0,0,0) 50%);
-            pointer-events: none;
-        }
-        .scan-line {
-            width: 100%; height: 2px; background: #00FF88;
-            position: absolute; top: 20%;
-            box-shadow: 0 0 10px #00FF88;
-            animation: scanMove 3s infinite linear;
-        }
-        @keyframes scanMove {
-            0% { top: 0%; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        .slide-number {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 80px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.03);
-            z-index: 0;
-            line-height: 1;
-        }
-
-        /* Photo card styles */
-        .photo-card {
-            background: rgba(17, 24, 39, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: box-shadow 0.3s ease, border-color 0.3s ease;
-            height: 100%;
-            min-height: 0;
-        }
-        .photo-card:hover {
-            box-shadow: 0 30px 60px rgba(0, 255, 136, 0.15);
-            border-color: rgba(0, 255, 136, 0.3);
-        }
-        .photo-wrapper {
-            flex: 1;
-            overflow: hidden;
-            background: #0d1117;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .photo-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-        .photo-card-label {
-            background: rgba(10, 15, 30, 0.85);
-            backdrop-filter: blur(8px);
-            padding: 10px 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            flex-shrink: 0;
-        }
-    </style>
+  :root { --green:#00FF88; --cyan:#00D4FF; --purple:#A78BFA; --yellow:#FBBF24; }
+  body { font-family:'Inter',sans-serif; background:#0A0F1E; color:#fff; margin:0; overflow:hidden; width:100vw; height:100vh; }
+  .font-heading { font-family:'Space Grotesk',sans-serif; }
+  .glass { background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:14px; }
+  .grid-bg { position:absolute; top:0; left:0; width:100%; height:100%; background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px); background-size:40px 40px; z-index:0; }
+  .glow { position:absolute; border-radius:50%; filter:blur(160px); z-index:0; }
+  .mat-row { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-radius:8px; margin-bottom:4px; font-size:12px; }
+  .grade-a { background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.15); }
+  .grade-b { background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.15); }
+  .grade-c { background:rgba(156,163,175,0.06); border:1px solid rgba(156,163,175,0.12); }
+  .compliance-tag { display:inline-flex; align-items:center; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:600; font-family:'Space Grotesk',sans-serif; margin:2px; }
+  .wri-bar { height:8px; border-radius:4px; background:linear-gradient(90deg,#00FF88,#00D4FF); }
+</style>
 </head>
-<body style="">
-<div class="relative w-full h-full flex flex-col p-6 overflow-hidden" style="width: 100vw; height: 100vh;">
-<!-- Background Elements -->
-<div class="circuit-overlay"></div>
-<div class="glow-orb bg-eco-green" style="top: -100px; left: -100px; width: 600px; height: 600px; opacity: 0.1;"></div>
-<div class="glow-orb bg-eco-cyan" style="bottom: -100px; right: -100px; width: 600px; height: 600px; opacity: 0.1;"></div>
-<div class="slide-number">05</div>
-<!-- Header -->
-<header class="relative z-10 mb-3 flex justify-between items-end border-b border-gray-800 pb-3">
-<div>
-<h2 class="font-heading text-3xl font-bold text-white mb-1">
-                    See It In <span class="text-eco-green">Action</span>
-</h2>
-<p class="text-gray-400 font-light tracking-wide text-xs">
-                    LIVE SYSTEM DEMO • WEB DASHBOARD VIEW
-                </p>
-</div>
-<div class="flex items-center space-x-2">
-<div class="w-2 h-2 rounded-full bg-eco-green animate-pulse"></div>
-<p class="font-mono text-xs text-eco-green uppercase">System Online</p>
-</div>
-</header>
-<!-- Main Content: 3 Photo Cards -->
-<div class="flex-1 relative z-10 grid grid-cols-3 gap-6 px-2" style="min-height: 0; overflow: hidden;">
+<body>
+<div class="relative flex flex-col" style="width:100vw;height:100vh;">
+  <div class="grid-bg"></div>
+  <div class="glow" style="top:-60px;right:20%;width:500px;height:300px;background:var(--purple);opacity:0.07"></div>
+  <div class="glow" style="bottom:-60px;left:15%;width:400px;height:300px;background:var(--green);opacity:0.07"></div>
 
-    <!-- Photo 1 -->
-    <div class="photo-card">
-        <div class="photo-wrapper">
-            <img src="photo1.png" alt="Demo Photo 1">
+  <!-- Header -->
+  <header class="relative z-10 w-full px-10 pt-8 pb-4 flex justify-between items-center border-b border-gray-800 border-opacity-50">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-recycle text-xl" style="color:var(--green)"></i>
+      <h2 class="font-heading text-lg font-bold">AI-EcoTrack</h2>
+    </div>
+    <div class="text-sm font-mono text-gray-500">05 / 12</div>
+  </header>
+
+  <main class="relative z-10 flex-1 flex flex-row px-10 pt-5 pb-5 gap-8">
+
+    <!-- Left: DPP Overview -->
+    <div class="flex-1 flex flex-col">
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-1">
+          <i class="fas fa-passport text-sm" style="color:var(--purple)"></i>
+          <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--purple)">Auto-Generated</span>
         </div>
-        <div class="photo-card-label">
-            <p class="font-heading text-sm font-bold text-white">IoT Sensor Monitor</p>
-            <p class="text-xs text-gray-400 mt-0.5 font-mono">Live bin fill · Air quality · Temp · Humidity</p>
+        <h1 class="font-heading text-3xl font-bold text-white">Digital Product Passport</h1>
+        <p class="text-gray-400 text-sm mt-1">Permanent, compliant record for every scanned item — EU ESPR 2024 · India EPR 2022</p>
+      </div>
+
+      <!-- BOM Materials with prices -->
+      <div class="glass p-4 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Bill of Materials — India Scrap Prices (Mumbai MIDC)</span>
+          <span class="text-xs font-mono" style="color:var(--green)">Live Pricing DB</span>
         </div>
+        <div class="mat-row grade-a">
+          <span class="font-semibold text-white">Copper Alloy C110</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(0,255,136,0.15);color:var(--green)">Grade A</span>
+            <span class="font-bold" style="color:var(--green)">₹880/kg</span>
+          </div>
+        </div>
+        <div class="mat-row grade-a">
+          <span class="font-semibold text-white">316L Stainless Steel</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(0,255,136,0.15);color:var(--green)">Grade A</span>
+            <span class="font-bold" style="color:var(--green)">₹142/kg</span>
+          </div>
+        </div>
+        <div class="mat-row grade-a">
+          <span class="font-semibold text-white">Ti-6Al-4V Titanium</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(0,255,136,0.15);color:var(--green)">Grade A</span>
+            <span class="font-bold" style="color:var(--green)">₹3,150/kg</span>
+          </div>
+        </div>
+        <div class="mat-row grade-a">
+          <span class="font-semibold text-white">Inconel 625</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-0.5 rounded" style="background:rgba(0,255,136,0.15);color:var(--green)">Grade A</span>
+            <span class="font-bold" style="color:var(--green)">₹1,850/kg</span>
+          </div>
+        </div>
+        <div class="mat-row grade-b">
+          <span class="font-semibold text-white">Carbon Steel ASTM A216</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-0.5 rounded text-yellow-400" style="background:rgba(251,191,36,0.15)">Grade B</span>
+            <span class="font-bold text-yellow-400">₹25/kg</span>
+          </div>
+        </div>
+        <div class="mat-row grade-c">
+          <span class="font-semibold text-gray-400">PTFE Seat Ring</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-0.5 rounded text-gray-500" style="background:rgba(156,163,175,0.1)">Grade C</span>
+            <span class="font-bold text-gray-500">₹8/kg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- WRI Score -->
+      <div class="glass p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Weighted Recyclability Index (WRI)</span>
+          <span class="font-heading text-2xl font-bold" style="color:var(--green)">82 / 100</span>
+        </div>
+        <div class="wri-bar" style="width:82%"></div>
+        <p class="text-xs text-gray-500 mt-2">Custom scoring algorithm for circular economy reporting and regulatory compliance</p>
+      </div>
     </div>
 
-    <!-- Photo 2 -->
-    <div class="photo-card">
-        <div class="photo-wrapper">
-            <img src="photo2.png" alt="Demo Photo 2">
+    <!-- Right: Compliance & Standards -->
+    <div class="w-72 flex flex-col gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <i class="fas fa-certificate text-sm" style="color:var(--cyan)"></i>
+          <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--cyan)">Compliance Profile</span>
         </div>
-        <div class="photo-card-label">
-            <p class="font-heading text-sm font-bold text-white">Multi-View AI Scan</p>
-            <p class="text-xs text-gray-400 mt-0.5 font-mono">ESP32-CAM trigger · Golden Thread flow</p>
+        <h2 class="font-heading text-xl font-bold text-white">Auto-checked Standards</h2>
+      </div>
+
+      <div class="glass p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Regulatory Frameworks</p>
+        <div class="flex flex-wrap">
+          <span class="compliance-tag" style="background:rgba(0,255,136,0.1);color:var(--green)">RoHS3</span>
+          <span class="compliance-tag" style="background:rgba(0,212,255,0.1);color:var(--cyan)">REACH Annex XVII</span>
+          <span class="compliance-tag" style="background:rgba(167,139,250,0.1);color:var(--purple)">EU ESPR 2024</span>
+          <span class="compliance-tag" style="background:rgba(251,191,36,0.1);color:var(--yellow)">WEEE Directive</span>
+          <span class="compliance-tag" style="background:rgba(0,255,136,0.1);color:var(--green)">BIS India Standards</span>
+          <span class="compliance-tag" style="background:rgba(0,212,255,0.1);color:var(--cyan)">India E-Waste Rules 2022</span>
+          <span class="compliance-tag" style="background:rgba(167,139,250,0.1);color:var(--purple)">OSHA 1910.147</span>
+          <span class="compliance-tag" style="background:rgba(251,191,36,0.1);color:var(--yellow)">ATEX 2014/34/EU</span>
         </div>
+      </div>
+
+      <div class="glass p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Every DPP Contains</p>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>UUID-based permanent identifier</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>Full BOM with mass fractions</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>Recovery value in ₹</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>SVHC substance count (REACH)</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>Recyclability class (A/B/C)</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>End-of-life route recommendation</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-300">
+            <i class="fas fa-check-circle text-xs" style="color:var(--green)"></i>
+            <span>Stored permanently in Firebase Firestore</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-xl" style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2)">
+        <p class="text-xs font-bold" style="color:var(--purple)">No barcode. No label. No lab.</p>
+        <p class="text-xs text-gray-400 mt-1">Just a photograph → full DPP in under 3 seconds.</p>
+      </div>
     </div>
-
-    <!-- Photo 3 -->
-    <div class="photo-card">
-        <div class="photo-wrapper">
-            <img src="photo3.png" alt="Demo Photo 3">
-        </div>
-        <div class="photo-card-label">
-            <p class="font-heading text-sm font-bold text-white">AI Part Identification</p>
-            <p class="text-xs text-gray-400 mt-0.5 font-mono">Valve · Carbon Steel · 80% confidence</p>
-        </div>
-    </div>
-
+  </main>
 </div>
-<!-- Caption -->
-<div class="mt-3 text-center relative z-10">
-<div class="inline-flex items-center bg-gray-800 bg-opacity-50 rounded-full px-6 py-2 border border-gray-700 backdrop-filter backdrop-blur-sm">
-<i class="fas fa-camera text-eco-green mr-3"></i>
-<p class="text-sm text-gray-300">
-                    Built, wired & tested — <span class="text-white font-bold">real hardware, real AI, real results</span>
-                </p>
-</div>
-</div>
-</div>
-
 </body></html>

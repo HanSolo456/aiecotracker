@@ -24,9 +24,9 @@
 // ── Extern: g_device_token is defined in provisioning.ino ──
 extern String g_device_token;
 
-// ── Factory-Burned Settings ─────────────────────────────────────────────────
-const char *DEVICE_ID_FACTORY      = "replace-with-device-id";
-const char *DEVICE_TOKEN_BOOTSTRAP = "replace-with-bootstrap-token";
+// ── Factory-Burned Settings ────────────────────────────────────────────────
+const char *DEVICE_ID_FACTORY      = "bin_green_1";
+const char *DEVICE_TOKEN_BOOTSTRAP = "e175967cde6d0ba66ddc3df46bcc501582b6c1b3928e9eb88280837860224341";
 const char *SERVER_URL             = "https://aiecotracker.vercel.app/api/sensor-data";
 
 // ── SoftAP config ────────────────────────────────────────────────────────────

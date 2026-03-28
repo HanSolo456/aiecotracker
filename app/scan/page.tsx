@@ -610,7 +610,7 @@ export default function ScanPage() {
             )}
 
 
-            <BottomNav />
+            {!cameraOpen && <BottomNav />}
         </div>
     );
 }

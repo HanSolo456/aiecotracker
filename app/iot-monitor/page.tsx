@@ -34,8 +34,7 @@ interface BinLocation {
 }
 
 let iotCache: {
-    latest: SensorReading | null;
-    history: SensorReading[];
+    rawReadings: SensorReading[];
     connected: boolean;
 } | null = null;
 
@@ -279,51 +278,38 @@ function BinTank({ fill, color }: { fill: number; color: string }) {
 export default function IoTMonitorPage() {
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
-    const [latest,    setLatest]    = useState<SensorReading | null>(() => iotCache?.latest ?? null);
-    const [history,   setHistory]   = useState<SensorReading[]>(() => iotCache?.history ?? []);
-    const [connected, setConnected] = useState(() => iotCache?.connected ?? false);
-    const [loading,   setLoading]   = useState(() => !iotCache?.latest);
-    const [bins, setBins] = useState<BinLocation[]>([]);
+    const [rawReadings,      setRawReadings]      = useState<SensorReading[]>(() => iotCache?.rawReadings ?? []);
+    const [connected,        setConnected]        = useState(() => iotCache?.connected ?? false);
+    const [loading,          setLoading]          = useState(() => (iotCache?.rawReadings.length ?? 0) === 0);
+    const [bins,             setBins]             = useState<BinLocation[]>([]);
+    const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
 
     // Redirect anonymous users
     useEffect(() => {
-        if (!authLoading && user?.isAnonymous) {
-            router.replace('/dashboard');
-        }
+        if (!authLoading && user?.isAnonymous) router.replace('/dashboard');
     }, [user, authLoading, router]);
 
     useEffect(() => {
-        if (!user || user.isAnonymous) {
-            return;
-        }
+        if (!user || user.isAnonymous) return;
         const currentUser = user;
-
         let cancelled = false;
+
         async function fetchReadings() {
             try {
                 const idToken = await currentUser.getIdToken();
                 const res = await fetch('/api/sensor-readings', {
-                    headers: {
-                        Authorization: `Bearer ${idToken}`,
-                    },
+                    headers: { Authorization: `Bearer ${idToken}` },
                 });
                 if (!res.ok) return;
                 const { readings } = await res.json() as { readings: SensorReading[] };
                 if (cancelled) return;
-                if (readings.length > 0) {
-                    const nextLatest = readings[0];
-                    const nextHistory = readings.slice(1, 20);
-                    setLatest(nextLatest);
-                    setHistory(nextHistory);
-                    setConnected(true);
-                    iotCache = { latest: nextLatest, history: nextHistory, connected: true };
-                } else {
-                    setConnected(false);
-                    iotCache = { latest: null, history: [], connected: false };
-                }
+                setRawReadings(readings);
+                setConnected(readings.length > 0);
+                iotCache = { rawReadings: readings, connected: readings.length > 0 };
                 setLoading(false);
             } catch { if (!cancelled) setLoading(false); }
         }
+
         fetchReadings();
         const interval = setInterval(fetchReadings, 5000);
         return () => { cancelled = true; clearInterval(interval); };
@@ -359,6 +345,30 @@ export default function IoTMonitorPage() {
             clearInterval(interval);
         };
     }, [user]);
+
+    // ── Per-device derivation ─────────────────────────────────────────────────
+    const deviceIds = [...new Set(rawReadings.map(r => r.deviceId))];
+
+    // Auto-select first device; keep current selection if it's still present
+    useEffect(() => {
+        setSelectedDeviceId(prev => {
+            if (deviceIds.length === 0) return null;
+            if (prev && deviceIds.includes(prev)) return prev;
+            return deviceIds[0];
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deviceIds.join(',')]);
+
+    const deviceReadings = selectedDeviceId
+        ? rawReadings.filter(r => r.deviceId === selectedDeviceId)
+        : rawReadings;
+
+    const latest  = deviceReadings[0] ?? null;
+    const history = deviceReadings.slice(1, 20);
+
+    // Map deviceId → display name using the bin locations list
+    const binDisplayName = (id: string) =>
+        bins.find(b => b.deviceId === id)?.displayName ?? id;
 
     const fillColor = !latest ? '#84cc16'
         : latest.fillLevel > 80 ? '#EF4444'
@@ -413,6 +423,41 @@ export default function IoTMonitorPage() {
                 </div>
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Live smart bin sensor readings — updates every 5 seconds</p>
             </div>
+
+            {/* ── Device Selector — shown only when 2+ bins are reporting ── */}
+            {deviceIds.length > 1 && (
+                <div className="mx-5 lg:mx-10 mt-3 mb-1 rounded-2xl p-3"
+                    style={{ background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.25)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#60A5FA] animate-pulse" />
+                            <span className="text-xs font-semibold" style={{ color: '#60A5FA' }}>
+                                {deviceIds.length} Bins Connected — Select a bin to view its live data
+                            </span>
+                        </div>
+                        <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Map shows all</span>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                        {deviceIds.map(id => (
+                            <button
+                                key={id}
+                                onClick={() => setSelectedDeviceId(id)}
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                                style={selectedDeviceId === id
+                                    ? { background: 'rgba(96,165,250,0.2)', border: '1px solid rgba(96,165,250,0.5)', color: '#93C5FD' }
+                                    : { background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }
+                                }
+                            >
+                                <Cpu size={12} />
+                                {binDisplayName(id)}
+                                {selectedDeviceId === id && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#60A5FA] ml-0.5" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* ── Content ───────────────────────────────────────── */}
             {loading ? (

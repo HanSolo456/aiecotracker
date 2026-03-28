@@ -1,216 +1,195 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" style=""><head>
+<html lang="en"><head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>AI-EcoTrack Key Features</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IoT Smart Bins & Fleet Route Optimization</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0A0F1E;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        .font-heading {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        .text-eco-green {
-            color: #00FF88;
-        }
-        .text-eco-cyan {
-            color: #00D4FF;
-        }
-        .bg-eco-green {
-            background-color: #00FF88;
-        }
-        .bg-eco-cyan {
-            background-color: #00D4FF;
-        }
-        
-        /* Circuit pattern */
-        .circuit-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L20 10 L20 20' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Cpath d='M80 80 L70 80 L70 90' stroke='%231F2937' stroke-width='1' fill='none'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23374151'/%3E%3Ccircle cx='70' cy='90' r='1.5' fill='%23374151'/%3E%3C/svg%3E");
-            opacity: 0.3;
-            z-index: 1;
-        }
-
-        /* Ambient Glow Orbs */
-        .glow-orb-1 {
-            position: absolute;
-            top: -10%;
-            right: -5%;
-            width: 600px;
-            height: 600px;
-            background-color: #00D4FF;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.05;
-            z-index: 0;
-        }
-        .glow-orb-2 {
-            position: absolute;
-            bottom: -10%;
-            left: -5%;
-            width: 500px;
-            height: 500px;
-            background-color: #00FF88;
-            border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.05;
-            z-index: 0;
-        }
-
-        /* Glassmorphism Cards */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
-        }
-        
-        .icon-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Feature Card Hover Effect (simulated static style) */
-        .feature-accent-green {
-            border-top: 2px solid #00FF88;
-        }
-        .feature-accent-cyan {
-            border-top: 2px solid #00D4FF;
-        }
-        .feature-accent-purple {
-            border-top: 2px solid #A78BFA;
-        }
-
-        .grid-layout {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-    </style>
+  :root { --green:#00FF88; --cyan:#00D4FF; --purple:#A78BFA; --yellow:#FBBF24; --red:#FF5555; }
+  body { font-family:'Inter',sans-serif; background:#0A0F1E; color:#fff; margin:0; overflow:hidden; width:100vw; height:100vh; }
+  .font-heading { font-family:'Space Grotesk',sans-serif; }
+  .glass { background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); border-radius:14px; }
+  .grid-bg { position:absolute; top:0; left:0; width:100%; height:100%; background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px); background-size:40px 40px; z-index:0; }
+  .glow { position:absolute; border-radius:50%; filter:blur(160px); z-index:0; }
+  .sensor-chip { display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); }
+  .fill-bar-outer { height:10px; border-radius:5px; background:rgba(255,255,255,0.06); overflow:hidden; }
+  .fill-bar-inner { height:100%; border-radius:5px; }
+  .divider { width:1px; background:rgba(255,255,255,0.08); margin:0 4px; }
+  .step-box { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); }
+</style>
 </head>
-<body style="">
-<div class="relative flex flex-col w-full h-full overflow-hidden" style="width: 100vw; height: 100vh;">
-<!-- Background Elements -->
-<div class="circuit-overlay"></div>
-<div class="glow-orb-1"></div>
-<div class="glow-orb-2"></div>
-<!-- Header -->
-<div class="relative z-10 w-full px-12 pt-8 pb-4 flex justify-between items-end border-b border-gray-800">
-<div>
-<div class="flex items-center gap-2 mb-1">
-<i class="fas fa-recycle text-eco-green"></i>
-<p class="font-mono text-xs text-eco-green tracking-widest uppercase">AI-EcoTrack</p>
-</div>
-<h2 class="font-heading text-4xl font-bold text-white tracking-tight">What Makes AI-EcoTrack Powerful</h2>
-</div>
-<div class="flex flex-col items-end">
-<p class="font-mono text-xs text-gray-500 mb-1">KEY FEATURES</p>
-<p class="font-heading text-4xl font-bold text-gray-700">06</p>
-</div>
-</div>
-<!-- Main Content: Feature Grid -->
-<div class="relative z-10 flex-1 p-12 flex items-center justify-center">
-<div class="grid-layout w-full h-full">
-<!-- Card 1: AI Part ID -->
-<div class="glass-card feature-accent-green rounded-xl p-6 flex flex-col justify-start relative group">
-<div class="absolute top-4 right-4 text-gray-700">
-<i class="fas fa-microchip fa-2x opacity-20"></i>
-</div>
-<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-green">
-<i class="fas fa-brain text-xl"></i>
-</div>
-<h3 class="font-heading text-xl font-bold text-white mb-2">AI Part ID</h3>
-<p class="text-gray-400 text-sm leading-relaxed">
-                        Llama 4 Scout identifies part type, material, and hazard level instantly from a single photo, eliminating manual sorting errors.
-                    </p>
-</div>
-<!-- Card 2: Digital Passport -->
-<div class="glass-card feature-accent-cyan rounded-xl p-6 flex flex-col justify-start relative">
-<div class="absolute top-4 right-4 text-gray-700">
-<i class="fas fa-file-code fa-2x opacity-20"></i>
-</div>
-<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-cyan">
-<i class="fas fa-passport text-xl"></i>
-</div>
-<h3 class="font-heading text-xl font-bold text-white mb-2">Digital Passport</h3>
-<p class="text-gray-400 text-sm leading-relaxed">
-                        Every scan generates a Digital Product Passport (DPP) ensuring full material traceability from bin to recycling center.
-                    </p>
-</div>
-<!-- Card 3: WRI Score -->
-<div class="glass-card feature-accent-green rounded-xl p-6 flex flex-col justify-start relative">
-<div class="absolute top-4 right-4 text-gray-700">
-<i class="fas fa-chart-bar fa-2x opacity-20"></i>
-</div>
-<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-green">
-<i class="fas fa-balance-scale text-xl"></i>
-</div>
-<h3 class="font-heading text-xl font-bold text-white mb-2">WRI Score</h3>
-<p class="text-gray-400 text-sm leading-relaxed">
-                        Calculates Weighted Recyclability Index automatically, assigning an A/B/C grade and estimating USD recovery value.
-                    </p>
-</div>
-<!-- Card 4: Live IoT -->
-<div class="glass-card feature-accent-cyan rounded-xl p-6 flex flex-col justify-start relative">
-<div class="absolute top-4 right-4 text-gray-700">
-<i class="fas fa-wifi fa-2x opacity-20"></i>
-</div>
-<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-eco-cyan">
-<i class="fas fa-satellite-dish text-xl"></i>
-</div>
-<h3 class="font-heading text-xl font-bold text-white mb-2">Live IoT</h3>
-<p class="text-gray-400 text-sm leading-relaxed">
-                        Real-time telemetry for fill level, toxic gas (MQ-135), CO (MQ-7), and temp/humidity streamed directly to Firestore.
-                    </p>
-</div>
-<!-- Card 5: Multi-key AI -->
-<div class="glass-card feature-accent-purple rounded-xl p-6 flex flex-col justify-start relative">
-<div class="absolute top-4 right-4 text-gray-700">
-<i class="fas fa-server fa-2x opacity-20"></i>
-</div>
-<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="color: #A78BFA;">
-<i class="fas fa-key text-xl"></i>
-</div>
-<h3 class="font-heading text-xl font-bold text-white mb-2">Multi-key AI</h3>
-<p class="text-gray-400 text-sm leading-relaxed">
-                        Robust backend with automatic Groq API key rotation ensures the vision system never goes down due to rate limits.
-                    </p>
-</div>
-<!-- Card 6: Secure Architecture -->
-<div class="glass-card feature-accent-purple rounded-xl p-6 flex flex-col justify-start relative">
-<div class="absolute top-4 right-4 text-gray-700">
-<i class="fas fa-shield-alt fa-2x opacity-20"></i>
-</div>
-<div class="icon-box w-12 h-12 rounded-lg flex items-center justify-center mb-4" style="color: #A78BFA;">
-<i class="fas fa-lock text-xl"></i>
-</div>
-<h3 class="font-heading text-xl font-bold text-white mb-2">Secure</h3>
-<p class="text-gray-400 text-sm leading-relaxed">
-                        Enterprise-grade security with strict Firestore rules, Admin SDK for writes, and anonymous auth for client-side reads.
-                    </p>
-</div>
-</div>
-</div>
-<!-- Footer -->
-<div class="absolute bottom-0 w-full px-12 py-4 flex justify-between items-center text-xs text-gray-600 font-mono uppercase tracking-widest bg-opacity-20 bg-black">
-<p>Project: AI-EcoTrack</p>
-<p><span class="text-eco-green">●</span> Operational</p>
-</div>
-</div>
+<body>
+<div class="relative flex flex-col" style="width:100vw;height:100vh;">
+  <div class="grid-bg"></div>
+  <div class="glow" style="top:-60px;left:15%;width:450px;height:300px;background:var(--green);opacity:0.06"></div>
+  <div class="glow" style="bottom:-60px;right:15%;width:450px;height:300px;background:var(--cyan);opacity:0.06"></div>
 
+  <!-- Header -->
+  <header class="relative z-10 w-full px-10 pt-8 pb-4 flex justify-between items-center border-b border-gray-800 border-opacity-50">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-recycle text-xl" style="color:var(--green)"></i>
+      <h2 class="font-heading text-lg font-bold">AI-EcoTrack</h2>
+    </div>
+    <div class="text-sm font-mono text-gray-500">06 / 12</div>
+  </header>
+
+  <main class="relative z-10 flex-1 flex flex-row px-10 pt-5 pb-5 gap-8">
+
+    <!-- Left: IoT Smart Bin -->
+    <div class="flex-1 flex flex-col">
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-1">
+          <i class="fas fa-wifi text-sm" style="color:var(--green)"></i>
+          <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--green)">IoT Smart Bin Network</span>
+        </div>
+        <h1 class="font-heading text-2xl font-bold text-white">Real-Time Waste Intelligence at the Source</h1>
+        <p class="text-gray-400 text-xs mt-1">Arduino UNO sensors → ESP32 Gateway → Firebase → Live Dashboard · updates every 5s</p>
+      </div>
+
+      <!-- Sensor chips -->
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <div class="sensor-chip">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(0,255,136,0.1)">
+            <i class="fas fa-trash text-xs" style="color:var(--green)"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">HC-SR04 Ultrasonic</p>
+            <p class="text-xs text-gray-500">Fill Level (0–100%)</p>
+          </div>
+        </div>
+        <div class="sensor-chip">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(255,85,85,0.1)">
+            <i class="fas fa-wind text-xs" style="color:var(--red)"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">MQ-135 Gas Sensor</p>
+            <p class="text-xs text-gray-500">Air Quality (PPM)</p>
+          </div>
+        </div>
+        <div class="sensor-chip">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(0,212,255,0.1)">
+            <i class="fas fa-thermometer-half text-xs" style="color:var(--cyan)"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">DHT11/22 Sensor</p>
+            <p class="text-xs text-gray-500">Temp (°C) + Humidity (%)</p>
+          </div>
+        </div>
+        <div class="sensor-chip">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(167,139,250,0.1)">
+            <i class="fas fa-dot-circle text-xs" style="color:var(--purple)"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">IR Sensor</p>
+            <p class="text-xs text-gray-500">Item Drop Detection</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live bin demo cards -->
+      <div class="glass p-4 mb-3">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Live Bin Status Example</p>
+        <div class="flex gap-6">
+          <div class="flex-1">
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-400">BIN - 1 · Recyclable</span>
+              <span class="font-bold" style="color:var(--yellow)">78%</span>
+            </div>
+            <div class="fill-bar-outer"><div class="fill-bar-inner" style="width:78%;background:var(--yellow)"></div></div>
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-400">BIN - 2 · Hazardous</span>
+              <span class="font-bold" style="color:var(--red)">91%</span>
+            </div>
+            <div class="fill-bar-outer"><div class="fill-bar-inner" style="width:91%;background:var(--red)"></div></div>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full animate-pulse" style="background:var(--red)"></span>
+          <span class="text-xs" style="color:var(--red)">BIN-2 at 91% — flagged for collection (threshold: 80%)</span>
+        </div>
+      </div>
+
+      <!-- Multi-bin support note -->
+      <div class="p-3 rounded-xl" style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.18)">
+        <p class="text-xs font-bold" style="color:var(--cyan)"><i class="fas fa-layer-group mr-1"></i>Multi-Bin Support</p>
+        <p class="text-xs text-gray-400 mt-0.5">Tab selector appears when 2+ ESP32s connected. Each bin's sensor data, sparklines & history scoped independently.</p>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider self-stretch"></div>
+
+    <!-- Right: Route Optimization -->
+    <div class="flex-1 flex flex-col">
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-1">
+          <i class="fas fa-route text-sm" style="color:var(--cyan)"></i>
+          <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--cyan)">Fleet Route Optimization</span>
+        </div>
+        <h1 class="font-heading text-2xl font-bold text-white">Smarter Routes. Less Fuel. Less CO₂.</h1>
+        <p class="text-gray-400 text-xs mt-1">Greedy nearest-neighbor algorithm · Haversine distance · One-click Google Maps export</p>
+      </div>
+
+      <!-- Algorithm steps -->
+      <div class="flex flex-col gap-2 mb-4">
+        <div class="step-box">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:rgba(0,212,255,0.15);color:var(--cyan)">1</div>
+          <div>
+            <p class="text-xs font-bold text-white">Identify collection-ready bins</p>
+            <p class="text-xs text-gray-500">Fill ≥ 80% + GPS coordinates available</p>
+          </div>
+        </div>
+        <div class="step-box">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:rgba(0,255,136,0.15);color:var(--green)">2</div>
+          <div>
+            <p class="text-xs font-bold text-white">Start from driver GPS or fullest bin</p>
+            <p class="text-xs text-gray-500">One-click browser geolocation for driver start</p>
+          </div>
+        </div>
+        <div class="step-box">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:rgba(167,139,250,0.15);color:var(--purple)">3</div>
+          <div>
+            <p class="text-xs font-bold text-white">Nearest-neighbor ordering</p>
+            <p class="text-xs text-gray-500">Haversine great-circle distance per leg</p>
+          </div>
+        </div>
+        <div class="step-box">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style="background:rgba(251,191,36,0.15);color:var(--yellow)">4</div>
+          <div>
+            <p class="text-xs font-bold text-white">Open optimized route in Google Maps</p>
+            <p class="text-xs text-gray-500">All waypoints auto-filled · one tap away</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impact metrics -->
+      <div class="glass p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">What the Algorithm Computes</p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="text-center p-2 rounded-lg" style="background:rgba(0,255,136,0.06)">
+            <p class="font-heading text-xl font-bold" style="color:var(--green)">0.21 kg</p>
+            <p class="text-xs text-gray-500">CO₂/km van baseline</p>
+          </div>
+          <div class="text-center p-2 rounded-lg" style="background:rgba(0,212,255,0.06)">
+            <p class="font-heading text-xl font-bold" style="color:var(--cyan)">24 km/h</p>
+            <p class="text-xs text-gray-500">Avg collection speed</p>
+          </div>
+          <div class="text-center p-2 rounded-lg" style="background:rgba(167,139,250,0.06)">
+            <p class="font-heading text-xl font-bold" style="color:var(--purple)">4 min</p>
+            <p class="text-xs text-gray-500">Service time per stop</p>
+          </div>
+          <div class="text-center p-2 rounded-lg" style="background:rgba(251,191,36,0.06)">
+            <p class="font-heading text-xl font-bold" style="color:var(--yellow)">CO₂ saved</p>
+            <p class="text-xs text-gray-500">vs urgency-sorted baseline</p>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-3 text-center">Route map shows all bins on Leaflet.js · Collection-ready bins highlighted red</p>
+      </div>
+    </div>
+  </main>
+</div>
 </body></html>
