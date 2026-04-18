@@ -24,7 +24,7 @@ export default function SidebarNav() {
     ];
 
     // Hide sidebar on auth page
-    if (pathname === '/' || pathname.startsWith('/auth') || pathname.startsWith('/join')) return null;
+    if (pathname === '/' || pathname.startsWith('/auth') || pathname.startsWith('/join') || pathname.startsWith('/impact')) return null;
 
     const sidebarName =
         profile?.displayName?.trim() ||

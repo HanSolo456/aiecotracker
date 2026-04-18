@@ -13,6 +13,10 @@
 // Pins:
 //   GPIO16 = Serial2 RX (← Arduino D11)
 //   GPIO17 = Serial2 TX (→ Arduino D12)
+//
+// HC-SR04 Ultrasonic (wired directly to ESP32 via female-to-female jumpers):
+//   GPIO25 = TRIG
+//   GPIO26 = ECHO
 // ─────────────────────────────────────────────────────────────────────────────
 
 #include <ArduinoJson.h>
@@ -21,12 +25,18 @@
 #include <WebServer.h>
 #include <WiFi.h>
 
+// ── HC-SR04 Ultrasonic Sensor (on ESP32 directly) ─────────────────────────────
+#define TRIG_PIN     25
+#define ECHO_PIN     26
+#define BIN_EMPTY_CM 25   // cm reading when bin is EMPTY
+#define BIN_FULL_CM   5   // cm reading when bin is FULL
+
 // ── Extern: g_device_token is defined in provisioning.ino ──
 extern String g_device_token;
 
 // ── Factory-Burned Settings ────────────────────────────────────────────────
-const char *DEVICE_ID_FACTORY      = "bin_green_1";
-const char *DEVICE_TOKEN_BOOTSTRAP = "e175967cde6d0ba66ddc3df46bcc501582b6c1b3928e9eb88280837860224341";
+const char *DEVICE_ID_FACTORY      = "bin_1";
+const char *DEVICE_TOKEN_BOOTSTRAP = "814b6af52fc2bb7a5f12fcdc088d7393e5078b7bce99a8e532a85eb2d04699d7";
 const char *SERVER_URL             = "https://aiecotracker.vercel.app/api/sensor-data";
 
 // ── SoftAP config ────────────────────────────────────────────────────────────
@@ -41,6 +51,15 @@ const char *NVS_SETUP_PASS  = "setup_pass";
 WebServer    apServer(80);
 Preferences  prefs;
 String       serialBuffer = "";
+int          g_fill_pct   = 0;     // latest bin fill % from ultrasonic
+
+// ── Last known Arduino sensor values (cache — never reset to 0) ───────────────
+float g_last_temp     = 0.0f;
+float g_last_humidity = 0.0f;
+int   g_last_gas_ppm  = 0;
+bool  g_last_dropped  = false;
+bool  g_last_gasAlert = false;
+bool  g_arduino_ever_received = false;  // only post fallback after first packet
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SoftAP config page HTML
@@ -188,9 +207,42 @@ void startConfigAP() {
 // ─────────────────────────────────────────────────────────────────────────────
 // setup()
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// HC-SR04 helpers (runs on ESP32 directly)
+// ─────────────────────────────────────────────────────────────────────────────
+int readUltrasonicCm() {
+  long total = 0;
+  int  valid = 0;
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(TRIG_PIN, LOW);
+    delayMicroseconds(2);
+    digitalWrite(TRIG_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG_PIN, LOW);
+    long dur = pulseIn(ECHO_PIN, HIGH, 30000UL);
+    int  cm  = (dur == 0) ? -1 : (int)(dur * 0.034f / 2.0f);
+    if (cm > 0 && cm < 400) {
+      total += cm;
+      valid++;
+    }
+    delay(30);
+  }
+  return valid > 0 ? (int)(total / valid) : -1;
+}
+
+int cmToFillPct(int cm) {
+  if (cm < 0) return 0;  // no reading → assume empty
+  return (int)constrain(map(cm, BIN_EMPTY_CM, BIN_FULL_CM, 0, 100), 0, 100);
+}
+
 void setup() {
   Serial.begin(115200);
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
+
+  // Ultrasonic sensor pins
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  digitalWrite(TRIG_PIN, LOW);
 
   // Read setup WiFi from NVS
   prefs.begin(NVS_NS, true);
@@ -260,16 +312,38 @@ void loop() {
     orgWifiLoaded = true;
   }
 
-  // Normal sensor data processing
+  // ── Read ultrasonic sensor locally on ESP32 ─────────────────────────────
+  static unsigned long lastUltrasonicRead = 0;
+  if (millis() - lastUltrasonicRead >= 1000) {  // sample every 1 s
+    lastUltrasonicRead = millis();
+    int cm = readUltrasonicCm();
+    g_fill_pct = cmToFillPct(cm);
+    Serial.printf("[ESP32] Ultrasonic: %d cm → fill %d%%\n", cm, g_fill_pct);
+  }
+
+  // ── Receive remaining sensor data from Arduino over Serial2 ────────────
+  bool gotArduinoData = false;
   while (Serial2.available()) {
     char c = Serial2.read();
     if (c == '\n') {
       if (serialBuffer.length() > 2) {
         processArduinoData(serialBuffer);
+        gotArduinoData = true;
       }
       serialBuffer = "";
     } else {
       serialBuffer += c;
+    }
+  }
+
+  // ── Fallback: post cached data every 5s if Arduino hasn't sent this tick ──
+  // Uses last known good values — never sends 0s for real sensor fields.
+  static unsigned long lastFallbackPost = 0;
+  if (!gotArduinoData && g_arduino_ever_received && (millis() - lastFallbackPost >= 5000)) {
+    lastFallbackPost = millis();
+    if (WiFi.isConnected()) {
+      Serial.println("[ESP32] Arduino silent — posting cached sensor + ultrasonic data");
+      postSensorData(g_last_temp, g_last_humidity, g_last_gas_ppm, g_last_dropped, g_last_gasAlert, g_fill_pct);
     }
   }
 
@@ -280,7 +354,7 @@ void loop() {
 // Process Arduino sensor data and post to server
 // ─────────────────────────────────────────────────────────────────────────────
 void processArduinoData(String jsonStr) {
-  Serial.println("[ESP32] Received: " + jsonStr);
+  Serial.println("[ESP32] Received from Arduino: " + jsonStr);
 
   StaticJsonDocument<256> doc;
   DeserializationError err = deserializeJson(doc, jsonStr);
@@ -289,19 +363,31 @@ void processArduinoData(String jsonStr) {
     return;
   }
 
-  float temp     = doc["temperature"];
-  float humidity = doc["humidity"];
-  float ec       = doc["ec"];
-  float ph       = doc["ph"];
+  // Arduino sends: temperature, humidity, gas_ppm, item_dropped, gas_alert
+  // fill_pct is now read locally by the ESP32 ultrasonic sensor
+  float temp      = doc["temperature"]  | 0.0f;
+  float humidity  = doc["humidity"]     | 0.0f;
+  int   gas_ppm   = doc["gas_ppm"]      | 0;
+  bool  dropped   = doc["item_dropped"] | false;
+  bool  gasAlert  = doc["gas_alert"]    | false;
+
+  // Cache valid readings — only update if the value looks real
+  if (temp     > 0.0f) g_last_temp     = temp;
+  if (humidity > 0.0f) g_last_humidity = humidity;
+  if (gas_ppm  > 0)    g_last_gas_ppm  = gas_ppm;
+  g_last_dropped  = dropped;
+  g_last_gasAlert = gasAlert;
+  g_arduino_ever_received = true;
 
   if (WiFi.isConnected()) {
-    postSensorData(temp, humidity, ec, ph);
+    postSensorData(g_last_temp, g_last_humidity, g_last_gas_ppm, dropped, gasAlert, g_fill_pct);
   } else {
     Serial.println("[ESP32] WiFi not connected; skipping POST");
   }
 }
 
-void postSensorData(float temp, float humidity, float ec, float ph) {
+void postSensorData(float temp, float humidity, int gas_ppm,
+                    bool item_dropped, bool gas_alert, int fill_pct) {
   if (g_device_token.length() == 0) {
     String tok = "";
     getProvisionedDeviceToken(tok);
@@ -313,13 +399,15 @@ void postSensorData(float temp, float humidity, float ec, float ph) {
     return;
   }
 
-  StaticJsonDocument<256> payload;
-  payload["device_id"]             = DEVICE_ID_FACTORY;
-  payload["timestamp"]             = millis();
-  payload["temperature"]           = temp;
-  payload["humidity"]              = humidity;
-  payload["electricalConductivity"] = ec;
-  payload["pH"]                    = ph;
+  StaticJsonDocument<300> payload;
+  payload["device_id"]    = DEVICE_ID_FACTORY;
+  payload["timestamp"]    = millis();
+  payload["temperature"]  = temp;
+  payload["humidity"]     = humidity;
+  payload["gas_ppm"]      = gas_ppm;
+  payload["item_dropped"] = item_dropped;
+  payload["gas_alert"]    = gas_alert;
+  payload["fill_level"]   = fill_pct;  // API field name is fill_level
 
   String body;
   serializeJson(payload, body);
@@ -334,7 +422,7 @@ void postSensorData(float temp, float humidity, float ec, float ph) {
   http.end();
 
   if (httpCode == 200 || httpCode == 201) {
-    Serial.println("[ESP32] Data posted (HTTP " + String(httpCode) + ")");
+    Serial.println("[ESP32] Data posted (HTTP " + String(httpCode) + ") fill=" + String(fill_pct) + "%");
   } else {
     Serial.println("[ESP32] POST failed (HTTP " + String(httpCode) + "): " + response);
   }

@@ -116,7 +116,7 @@ Every scan generates a permanent, compliant DPP containing:
      ▼
 [Safety Gatekeeper]  ←  Deterministic Rule Engine (4 rules: OSHA, REACH, ATEX, EPA)
      │
-     ├── Confidence < 0.92 → ESCALATE TO HUMAN (never guesses on safety)
+     ├── Confidence < 0.92 → ESCALATE TO HUMAN (never guesses on safet y)
      │
      ▼
 [RAG Query Layer]  ←  6 Local Knowledge Bases:

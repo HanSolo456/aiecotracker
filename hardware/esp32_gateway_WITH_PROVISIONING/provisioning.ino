@@ -152,6 +152,19 @@ bool provisioningLoop(const char *device_id_factory, const char *server_url) {
                         g_prov_state = PROV_FETCH_WIFI;
                         break;
                     }
+                    // Device already fully claimed & active (e.g. after a reboot)
+                    // If WiFi is not yet in NVS, fetch it; otherwise go straight to normal ops.
+                    if (status == "active") {
+                        String storedSsid = g_nvsStorage.getString("wifi_ssid", "");
+                        if (storedSsid.length() > 0) {
+                            Serial.println("[PROV] Status=active and WiFi in NVS. Going to NORMAL_OPERATION.");
+                            g_prov_state = NORMAL_OPERATION;
+                        } else {
+                            Serial.println("[PROV] Status=active but no WiFi in NVS. Fetching WiFi...");
+                            g_prov_state = PROV_FETCH_WIFI;
+                        }
+                        break;
+                    }
                 }
             }
 

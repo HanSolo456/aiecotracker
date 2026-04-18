@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Wifi, Wind, Thermometer, Droplets, Package, AlertTriangle, CheckCircle, Activity, Cpu, ChevronLeft, MapPin, Route } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
@@ -284,6 +284,10 @@ export default function IoTMonitorPage() {
     const [bins,             setBins]             = useState<BinLocation[]>([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
 
+    // Last-known-good cache: prevents fields from flickering to 0 when a
+    // fallback/partial reading arrives with 0s for Arduino-sourced fields.
+    const lastGoodRef = useRef<Record<string, Partial<SensorReading>>>({});
+
     // Redirect anonymous users
     useEffect(() => {
         if (!authLoading && user?.isAnonymous) router.replace('/dashboard');
@@ -366,22 +370,45 @@ export default function IoTMonitorPage() {
     const latest  = deviceReadings[0] ?? null;
     const history = deviceReadings.slice(1, 20);
 
+    // Merge latest reading with last-known-good values so fields never flicker
+    // to 0 when a partial/fallback reading arrives.
+    const displayLatest = (() => {
+        if (!latest) return null;
+        const cached = lastGoodRef.current[latest.deviceId] ?? {};
+        const merged: SensorReading = {
+            ...latest,
+            gasPpm:      latest.gasPpm      > 0 ? latest.gasPpm      : (cached.gasPpm      ?? 0),
+            temperature: latest.temperature > 0 ? latest.temperature : (cached.temperature ?? 0),
+            humidity:    latest.humidity    > 0 ? latest.humidity    : (cached.humidity    ?? 0),
+            coPpm:       latest.coPpm       > 0 ? latest.coPpm       : (cached.coPpm       ?? 0),
+        };
+        // Update cache with any non-zero values
+        lastGoodRef.current[latest.deviceId] = {
+            ...cached,
+            ...(merged.gasPpm      > 0 ? { gasPpm:      merged.gasPpm }      : {}),
+            ...(merged.temperature > 0 ? { temperature: merged.temperature } : {}),
+            ...(merged.humidity    > 0 ? { humidity:    merged.humidity }    : {}),
+            ...(merged.coPpm       > 0 ? { coPpm:       merged.coPpm }       : {}),
+        };
+        return merged;
+    })();
+
     // Map deviceId → display name using the bin locations list
     const binDisplayName = (id: string) =>
         bins.find(b => b.deviceId === id)?.displayName ?? id;
 
-    const fillColor = !latest ? '#84cc16'
-        : latest.fillLevel > 80 ? '#EF4444'
-        : latest.fillLevel > 50 ? '#F59E0B'
+    const fillColor = !displayLatest ? '#84cc16'
+        : displayLatest.fillLevel > 80 ? '#EF4444'
+        : displayLatest.fillLevel > 50 ? '#F59E0B'
         : '#84cc16';
 
     // Device considered offline if last reading is older than 5 minutes
-    const isStale = !!latest && (Date.now() - new Date(latest.createdAt).getTime()) > 5 * 60 * 1000;
+    const isStale = !!displayLatest && (Date.now() - new Date(displayLatest.createdAt).getTime()) > 5 * 60 * 1000;
     const isLive  = connected && !isStale;
 
-    const gasStatus = !latest ? 'normal'
-        : latest.gasPpm > 400 ? 'danger'
-        : latest.gasPpm > 250 ? 'warning'
+    const gasStatus = !displayLatest ? 'normal'
+        : displayLatest.gasPpm > 400 ? 'danger'
+        : displayLatest.gasPpm > 250 ? 'warning'
         : 'normal';
 
     const gasColor = gasStatus === 'danger' ? '#EF4444' : gasStatus === 'warning' ? '#F59E0B' : '#84cc16';
@@ -466,7 +493,7 @@ export default function IoTMonitorPage() {
                         <div key={i} className="card h-20 animate-pulse" style={{ background: 'var(--bg-elevated)' }} />
                     ))}
                 </div>
-            ) : !latest ? (
+            ) : !displayLatest ? (
                 <div className="px-5 lg:px-10 flex flex-col items-center justify-center gap-4 pt-24 text-center">
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
                         style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
@@ -481,7 +508,7 @@ export default function IoTMonitorPage() {
                 <div className="px-5 lg:px-10 mt-4">
 
                     {/* Gas Alert Banner */}
-                    {latest.gasAlert && (
+                    {displayLatest.gasAlert && (
                         <div className="mb-4 p-4 rounded-xl flex items-center gap-3 animate-fade-in"
                             style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.4)' }}>
                             <AlertTriangle size={18} className="text-red-400 shrink-0" />
@@ -497,7 +524,7 @@ export default function IoTMonitorPage() {
 
                         {/* Bin Tank Visual */}
                         <div className="hidden lg:flex items-start justify-center">
-                            <BinTank fill={latest.fillLevel} color={fillColor} />
+                            <BinTank fill={displayLatest.fillLevel} color={fillColor} />
                         </div>
 
                         {/* Sensor Cards Grid */}
@@ -510,18 +537,18 @@ export default function IoTMonitorPage() {
                                         <span className="text-sm font-semibold text-white">Bin Fill Level</span>
                                     </div>
                                     <span className="font-heading text-2xl font-700" style={{ color: fillColor }}>
-                                        {latest.fillLevel}%
+                                        {displayLatest.fillLevel}%
                                     </span>
                                 </div>
                                 <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                                     <div
                                         className="h-full rounded-full transition-all duration-700"
-                                        style={{ width: `${latest.fillLevel}%`, background: fillColor }}
+                                        style={{ width: `${displayLatest.fillLevel}%`, background: fillColor }}
                                     />
                                 </div>
                                 <p className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
-                                    {latest.fillLevel > 80 ? '⚠️ Bin almost full — needs collection'
-                                        : latest.fillLevel > 50 ? 'Bin at moderate capacity'
+                                    {displayLatest.fillLevel > 80 ? '⚠️ Bin almost full — needs collection'
+                                        : displayLatest.fillLevel > 50 ? 'Bin at moderate capacity'
                                         : 'Bin has ample space'}
                                 </p>
                             </div>
@@ -537,10 +564,10 @@ export default function IoTMonitorPage() {
                                             <Wind size={14} style={{ color: gasColor }} />
                                             <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Air Quality</span>
                                         </div>
-                                        <GasWaveform ppm={latest.gasPpm} status={gasStatus} />
+                                        <GasWaveform ppm={displayLatest.gasPpm} status={gasStatus} />
                                     </div>
                                     <p className="font-heading text-3xl font-700" style={{ color: gasColor }}>
-                                        {latest.gasPpm}
+                                        {displayLatest.gasPpm}
                                     </p>
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>PPM · MQ-135</p>
                                     <div className="mt-2 inline-flex px-2 py-0.5 rounded-full text-xs font-semibold"
@@ -560,7 +587,7 @@ export default function IoTMonitorPage() {
                                         <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Temperature</span>
                                     </div>
                                     <p className="font-heading text-3xl font-700 text-white">
-                                        {latest.temperature.toFixed(1)}°
+                                        {displayLatest.temperature.toFixed(1)}°
                                     </p>
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Celsius · DHT-11</p>
                                 </div>
@@ -572,30 +599,30 @@ export default function IoTMonitorPage() {
                                         <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Humidity</span>
                                     </div>
                                     <p className="font-heading text-3xl font-700 text-white">
-                                        {latest.humidity.toFixed(1)}%
+                                        {displayLatest.humidity.toFixed(1)}%
                                     </p>
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Relative · DHT-11</p>
                                 </div>
 
                                 {/* IR Sensor */}
                                 <div className="stat-card p-4"
-                                    style={{ borderColor: latest.itemDropped ? 'rgba(132,204,22,0.3)' : undefined }}>
+                                    style={{ borderColor: displayLatest.itemDropped ? 'rgba(132,204,22,0.3)' : undefined }}>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <Activity size={14} style={{ color: latest.itemDropped ? '#84cc16' : '#60A5FA' }} />
+                                        <Activity size={14} style={{ color: displayLatest.itemDropped ? '#84cc16' : '#60A5FA' }} />
                                         <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>IR Sensor</span>
                                     </div>
                                     <p className="font-heading text-3xl font-700"
-                                        style={{ color: latest.itemDropped ? '#84cc16' : 'var(--text-primary)' }}>
-                                        {latest.itemDropped ? 'ON' : 'OFF'}
+                                        style={{ color: displayLatest.itemDropped ? '#84cc16' : 'var(--text-primary)' }}>
+                                        {displayLatest.itemDropped ? 'ON' : 'OFF'}
                                     </p>
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Item Detection</p>
                                     <div className="mt-2 inline-flex px-2 py-0.5 rounded-full text-xs font-semibold"
                                         style={{
-                                            background: latest.itemDropped ? 'rgba(132,204,22,0.1)' : 'var(--bg-elevated)',
-                                            border: `1px solid ${latest.itemDropped ? 'rgba(132,204,22,0.3)' : 'var(--border)'}`,
-                                            color: latest.itemDropped ? '#84cc16' : '#60A5FA',
+                                            background: displayLatest.itemDropped ? 'rgba(132,204,22,0.1)' : 'var(--bg-elevated)',
+                                            border: `1px solid ${displayLatest.itemDropped ? 'rgba(132,204,22,0.3)' : 'var(--border)'}`,
+                                            color: displayLatest.itemDropped ? '#84cc16' : '#60A5FA',
                                         }}>
-                                        {latest.itemDropped ? 'Detected' : 'Clear'}
+                                        {displayLatest.itemDropped ? 'Detected' : 'Clear'}
                                     </div>
                                 </div>
                             </div>
@@ -604,26 +631,26 @@ export default function IoTMonitorPage() {
 
                     {/* Item Deposit Status */}
                     <div className="mb-4 card flex items-center gap-3 p-4"
-                        style={{ borderColor: latest.itemDropped ? 'rgba(132,204,22,0.3)' : undefined }}>
+                        style={{ borderColor: displayLatest.itemDropped ? 'rgba(132,204,22,0.3)' : undefined }}>
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                             style={{
-                                background: latest.itemDropped ? 'rgba(132,204,22,0.1)' : 'var(--bg-elevated)',
-                                border: `1px solid ${latest.itemDropped ? 'rgba(132,204,22,0.3)' : 'var(--border)'}`,
+                                background: displayLatest.itemDropped ? 'rgba(132,204,22,0.1)' : 'var(--bg-elevated)',
+                                border: `1px solid ${displayLatest.itemDropped ? 'rgba(132,204,22,0.3)' : 'var(--border)'}`,
                             }}>
-                            {latest.itemDropped
+                            {displayLatest.itemDropped
                                 ? <CheckCircle size={18} style={{ color: '#84cc16' }} />
                                 : <Package size={18} style={{ color: 'var(--text-muted)' }} />
                             }
                         </div>
                         <div className="flex-1">
-                            <p className="text-sm font-semibold" style={{ color: latest.itemDropped ? '#84cc16' : 'var(--text-secondary)' }}>
-                                {latest.itemDropped ? 'Item Deposited!' : 'Awaiting Deposit'}
+                            <p className="text-sm font-semibold" style={{ color: displayLatest.itemDropped ? '#84cc16' : 'var(--text-secondary)' }}>
+                                {displayLatest.itemDropped ? 'Item Deposited!' : 'Awaiting Deposit'}
                             </p>
                             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                                {latest.itemDropped ? 'E-waste detected — scan initiated' : 'No item detected in bin'}
+                                {displayLatest.itemDropped ? 'E-waste detected — scan initiated' : 'No item detected in bin'}
                             </p>
                         </div>
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{relativeTime(latest.createdAt)}</span>
+                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{relativeTime(displayLatest.createdAt)}</span>
                     </div>
 
                     {/* Device Info */}
@@ -631,12 +658,12 @@ export default function IoTMonitorPage() {
                         <Wifi size={14} style={{ color: '#60A5FA' }} className="shrink-0" />
                         <div className="flex-1">
                             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                Device: <span className="text-white font-medium">{latest.deviceId}</span>
+                                Device: <span className="text-white font-medium">{displayLatest.deviceId}</span>
                             </p>
                             <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                                Stream: <span style={{ color: wasteCategoryColor(latest.wasteCategory) }}>{wasteCategoryLabel(latest.wasteCategory)}</span>
+                                Stream: <span style={{ color: wasteCategoryColor(displayLatest.wasteCategory) }}>{wasteCategoryLabel(displayLatest.wasteCategory)}</span>
                             </p>
-                            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Last update: {relativeTime(latest.createdAt)}</p>
+                            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Last update: {relativeTime(displayLatest.createdAt)}</p>
                         </div>
                         <div className="status-online">
                             <span className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-[#84cc16] animate-pulse' : 'bg-red-400'}`} />

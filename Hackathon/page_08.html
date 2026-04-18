@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" style=""><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Team &amp; Roadmap</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
+<html lang="en" data-theme="light" style="">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Team &amp; Roadmap</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0A0F1E;
@@ -15,15 +19,31 @@
             padding: 0;
             overflow: hidden;
         }
+
         .font-heading {
             font-family: 'Space Grotesk', sans-serif;
         }
-        .text-eco-green { color: #00FF88; }
-        .text-eco-cyan { color: #00D4FF; }
-        .bg-eco-green { background-color: #00FF88; }
-        .bg-eco-cyan { background-color: #00D4FF; }
-        .border-eco-green { border-color: #00FF88; }
-        
+
+        .text-eco-green {
+            color: #00FF88;
+        }
+
+        .text-eco-cyan {
+            color: #00D4FF;
+        }
+
+        .bg-eco-green {
+            background-color: #00FF88;
+        }
+
+        .bg-eco-cyan {
+            background-color: #00D4FF;
+        }
+
+        .border-eco-green {
+            border-color: #00FF88;
+        }
+
         /* Circuit pattern */
         .circuit-overlay {
             position: absolute;
@@ -50,6 +70,7 @@
             opacity: 0.15;
             z-index: 0;
         }
+
         .glow-orb-2 {
             position: absolute;
             bottom: -100px;
@@ -76,11 +97,12 @@
             color: #00FF88;
             border: 1px solid rgba(0, 255, 136, 0.3);
         }
-        
+
         .roadmap-item {
             position: relative;
             padding-left: 2rem;
         }
+
         .roadmap-item::before {
             content: '';
             position: absolute;
@@ -90,9 +112,11 @@
             width: 2px;
             background-color: #374151;
         }
+
         .roadmap-item:last-child::before {
             display: none;
         }
+
         .roadmap-dot {
             position: absolute;
             left: 0;
@@ -106,136 +130,153 @@
         }
     </style>
 </head>
-<body style="">
-<div class="relative w-full h-full flex flex-col overflow-hidden" style="width: 100vw; height: 100vh;">
-<!-- Background -->
-<div class="circuit-overlay"></div>
-<div class="glow-orb-1"></div>
-<div class="glow-orb-2"></div>
-<!-- Header -->
-<header class="relative z-10 flex justify-between items-center px-12 py-6 border-b border-gray-800 bg-opacity-80 bg-gray-900">
-<div class="flex items-center space-x-3">
-<i class="fas fa-recycle text-eco-green text-2xl"></i>
-<p class="font-heading text-xl font-bold tracking-tight">AI-EcoTrack</p>
-</div>
-<div class="text-gray-400 font-mono text-sm">SLIDE 08 / 08</div>
-</header>
-<!-- Main Content -->
-<main class="relative z-10 flex flex-1 p-12 gap-12">
-<!-- Left Column: Team -->
-<div class="w-1/3 flex flex-col">
-<div class="mb-6">
-<p class="text-eco-green font-mono text-xs uppercase tracking-widest mb-2">The Builders</p>
-<h2 class="font-heading text-4xl font-bold text-white">Meet the Team</h2>
-</div>
-<div class="flex flex-col gap-5 flex-1 justify-center">
-<!-- Team Member 1 -->
-<div class="glass-card p-5 rounded-xl flex items-center gap-4 transition-transform hover:translate-x-2 duration-300">
-<div class="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
-<i class="fas fa-microchip text-eco-cyan text-xl"></i>
-</div>
-<div>
-<p class="font-heading font-bold text-lg text-white">Satyam Anand</p>
-<span class="role-badge px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider inline-block mt-1">Hardware / IoT</span>
-</div>
-</div>
-<!-- Team Member 2 -->
-<div class="glass-card p-5 rounded-xl flex items-center gap-4 transition-transform hover:translate-x-2 duration-300">
-<div class="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
-<i class="fas fa-layer-group text-purple-400 text-xl"></i>
-</div>
-<div>
-<p class="font-heading font-bold text-lg text-white">Saumitra Matta</p>
-<span class="role-badge px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider inline-block mt-1" style="border-color: #A78BFA; color: #A78BFA; background: rgba(167, 139, 250, 0.1);">Full Stack</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Vertical Divider -->
-<div class="w-px bg-gray-800 h-full"></div>
-<!-- Right Column: Roadmap -->
-<div class="flex-1 flex flex-col">
-<div class="mb-6">
-<p class="text-eco-cyan font-mono text-xs uppercase tracking-widest mb-2">Vision</p>
-<h2 class="font-heading text-4xl font-bold text-white">The Road Ahead</h2>
-</div>
-<div class="glass-card rounded-2xl p-8 flex-1 flex flex-col justify-center">
-<div class="space-y-6">
-<!-- Item 1 -->
-<div class="roadmap-item">
-<div class="roadmap-dot"></div>
-<div class="flex items-start">
-<div class="bg-gray-800 p-2 rounded mr-4">
-<i class="fas fa-robot text-eco-green"></i>
-</div>
-<div>
-<p class="font-bold text-lg text-white">On-device ML Model</p>
-<p class="text-sm text-gray-400">Offline part identification for zero-latency sorting</p>
-</div>
-</div>
-</div>
-<!-- Item 2 -->
-<div class="roadmap-item">
-<div class="roadmap-dot"></div>
-<div class="flex items-start">
-<div class="bg-gray-800 p-2 rounded mr-4">
-<i class="fas fa-map-marked-alt text-eco-cyan"></i>
-</div>
-<div>
-<p class="font-bold text-lg text-white">Multi-bin Map Dashboard</p>
-<p class="text-sm text-gray-400">City-wide view for municipal waste management</p>
-</div>
-</div>
-</div>
-<!-- Item 3 -->
-<div class="roadmap-item">
-<div class="roadmap-dot"></div>
-<div class="flex items-start">
-<div class="bg-gray-800 p-2 rounded mr-4">
-<i class="fas fa-building text-purple-400"></i>
-</div>
-<div>
-<p class="font-bold text-lg text-white">Enterprise API</p>
-<p class="text-sm text-gray-400">Direct integration for large-scale recycling facilities</p>
-</div>
-</div>
-</div>
-<!-- Item 4 -->
-<div class="roadmap-item">
-<div class="roadmap-dot"></div>
-<div class="flex items-start">
-<div class="bg-gray-800 p-2 rounded mr-4">
-<i class="fas fa-qrcode text-yellow-400"></i>
-</div>
-<div>
-<p class="font-bold text-lg text-white">QR Digital Passport</p>
-<p class="text-sm text-gray-400">Scan to see full material chain traceability</p>
-</div>
-</div>
-</div>
-<!-- Item 5 -->
-<div class="roadmap-item">
-<div class="roadmap-dot"></div>
-<div class="flex items-start">
-<div class="bg-gray-800 p-2 rounded mr-4">
-<i class="fas fa-handshake text-pink-400"></i>
-</div>
-<div>
-<p class="font-bold text-lg text-white">EPR Compliance Integration</p>
-<p class="text-sm text-gray-400">Automated reporting for government regulations</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer Tagline -->
-<div class="z-10 py-6 text-center bg-gray-900 bg-opacity-50 border-t border-gray-800">
-<p class="font-heading text-xl md:text-2xl text-white tracking-wide" style="position: relative; transform: translate(1.34958px, -12.1462px);">
-                AI-Eco Track — Built for a Planet That <span class="text-eco-green border-b-2 border-eco-green pb-1">Can't Afford to Wait.</span>
-</p>
-</div>
-</div>
 
-</body></html>
+<body style="">
+    <div class="relative w-full h-full flex flex-col overflow-hidden" style="width: 100vw; height: 100vh;">
+        <!-- Background -->
+        <div class="circuit-overlay"></div>
+        <div class="glow-orb-1"></div>
+        <div class="glow-orb-2"></div>
+        <!-- Header -->
+        <header
+            class="relative z-10 flex justify-between items-center px-12 py-6 border-b border-gray-800 bg-opacity-80 bg-gray-900">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-recycle text-eco-green text-2xl"></i>
+                <p class="font-heading text-xl font-bold tracking-tight">AI-EcoTrack</p>
+            </div>
+            <div class="text-gray-400 font-mono text-sm">SLIDE 08 / 08</div>
+        </header>
+        <!-- Main Content -->
+        <main class="relative z-10 flex flex-1 p-12 gap-12">
+            <!-- Left Column: Team -->
+            <div class="w-1/3 flex flex-col">
+                <div class="mb-6">
+                    <p class="text-eco-green font-mono text-xs uppercase tracking-widest mb-2">The Builders</p>
+                    <h2 class="font-heading text-4xl font-bold text-white">Meet the Team</h2>
+                </div>
+                <div class="flex flex-col gap-5 flex-1 justify-center">
+                    <!-- Team Member 1 -->
+                    <div
+                        class="glass-card p-5 rounded-xl flex items-center gap-4 transition-transform hover:translate-x-2 duration-300">
+                        <div
+                            class="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                            <i class="fas fa-microchip text-eco-cyan text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-heading font-bold text-lg text-white">Satyam Anand</p>
+                            <span
+                                class="role-badge px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider inline-block mt-1">Hardware
+                                / IoT</span>
+                        </div>
+                    </div>
+                    <!-- Team Member 2 -->
+                    <div
+                        class="glass-card p-5 rounded-xl flex items-center gap-4 transition-transform hover:translate-x-2 duration-300">
+                        <div
+                            class="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                            <i class="fas fa-layer-group text-purple-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-heading font-bold text-lg text-white">Saumitra Matta</p>
+                            <span
+                                class="role-badge px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider inline-block mt-1"
+                                style="border-color: #A78BFA; color: #A78BFA; background: rgba(167, 139, 250, 0.1);">Full
+                                Stack</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Vertical Divider -->
+            <div class="w-px bg-gray-800 h-full"></div>
+            <!-- Right Column: Roadmap -->
+            <div class="flex-1 flex flex-col">
+                <div class="mb-6">
+                    <p class="text-eco-cyan font-mono text-xs uppercase tracking-widest mb-2">Vision</p>
+                    <h2 class="font-heading text-4xl font-bold text-white">The Road Ahead</h2>
+                </div>
+                <div class="glass-card rounded-2xl p-8 flex-1 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <!-- Item 1 -->
+                        <div class="roadmap-item">
+                            <div class="roadmap-dot"></div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-800 p-2 rounded mr-4">
+                                    <i class="fas fa-robot text-eco-green"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-lg text-white">On-device ML Model</p>
+                                    <p class="text-sm text-gray-400">Offline part identification for zero-latency
+                                        sorting</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="roadmap-item">
+                            <div class="roadmap-dot"></div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-800 p-2 rounded mr-4">
+                                    <i class="fas fa-map-marked-alt text-eco-cyan"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-lg text-white">Multi-bin Map Dashboard</p>
+                                    <p class="text-sm text-gray-400">City-wide view for municipal waste management</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="roadmap-item">
+                            <div class="roadmap-dot"></div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-800 p-2 rounded mr-4">
+                                    <i class="fas fa-building text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-lg text-white">Enterprise API</p>
+                                    <p class="text-sm text-gray-400">Direct integration for large-scale recycling
+                                        facilities</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 4 -->
+                        <div class="roadmap-item">
+                            <div class="roadmap-dot"></div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-800 p-2 rounded mr-4">
+                                    <i class="fas fa-qrcode text-yellow-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-lg text-white">QR Digital Passport</p>
+                                    <p class="text-sm text-gray-400">Scan to see full material chain traceability</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Item 5 -->
+                        <div class="roadmap-item">
+                            <div class="roadmap-dot"></div>
+                            <div class="flex items-start">
+                                <div class="bg-gray-800 p-2 rounded mr-4">
+                                    <i class="fas fa-handshake text-pink-400"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-lg text-white">EPR Compliance Integration</p>
+                                    <p class="text-sm text-gray-400">Automated reporting for government regulations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer Tagline -->
+        <div class="z-10 py-6 text-center bg-gray-900 bg-opacity-50 border-t border-gray-800">
+            <p class="font-heading text-xl md:text-2xl text-white tracking-wide"
+                style="position: relative; transform: translate(1.34958px, -12.1462px);">
+                AI-Eco Track — Built for a Planet That <span
+                    class="text-eco-green border-b-2 border-eco-green pb-1">Can't Afford to Wait.</span>
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>

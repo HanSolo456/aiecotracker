@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import SidebarNav from '@/components/SidebarNav';
 import PageTransition from '@/components/PageTransition';
 
-const PUBLIC_CHROMELESS_ROUTES = ['/', '/auth', '/join'];
+const PUBLIC_CHROMELESS_ROUTES = ['/', '/auth', '/join', '/impact'];
 
 function matchesRoute(pathname: string, route: string) {
     if (route === '/') return pathname === '/';

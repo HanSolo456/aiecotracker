@@ -5,8 +5,83 @@ import { useEffect, useRef, useState } from 'react';
 import {
     ArrowRight, Camera, QrCode, Leaf, Shield, Zap, BarChart2,
     MapPin, Award, CheckCircle2, ChevronRight, Cpu, Globe2,
-    TrendingUp, Users, Menu, X,
+    TrendingUp, Users, Menu, X, Recycle, Factory,
 } from 'lucide-react';
+
+// ── Platform stats ─────────────────────────────────────────────────────────
+interface PlatformTotals {
+    scans: number;
+    massKg: number;
+    co2Kg: number;
+    valueINR: number;
+    activeOrgs: number;
+}
+
+function usePlatformStats() {
+    const [data, setData] = useState<PlatformTotals | null>(null);
+    useEffect(() => {
+        fetch('/api/platform-stats')
+            .then(r => r.ok ? r.json() : null)
+            .then(d => d?.totals && setData(d.totals))
+            .catch(() => {});
+    }, []);
+    return data;
+}
+
+// ── Impact ticker in nav ────────────────────────────────────────────────────
+function ImpactTicker() {
+    const stats = usePlatformStats();
+    const [open, setOpen] = useState(false);
+
+    if (!stats) return null;
+
+    function fmtINR(n: number) {
+        if (n >= 10_000_000) return `₹${(n / 10_000_000).toFixed(1)}Cr`;
+        if (n >= 100_000)    return `₹${(n / 100_000).toFixed(1)}L`;
+        if (n >= 1_000)      return `₹${(n / 1_000).toFixed(0)}K`;
+        return `₹${n}`;
+    }
+
+    return (
+        <div className="relative">
+            <button
+                onClick={() => setOpen(v => !v)}
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all hover:opacity-90"
+                style={{ background: 'rgba(132,204,22,0.1)', border: '1px solid rgba(132,204,22,0.25)', color: 'var(--lime)' }}
+            >
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse" />
+                <span>Impact</span>
+                <ChevronRight size={10} className={`transition-transform ${open ? 'rotate-90' : ''}`} />
+            </button>
+
+            {open && (
+                <div className="absolute top-full right-0 mt-2 w-72 rounded-2xl p-4 z-50 space-y-3"
+                    style={{ background: 'var(--bg-card)', border: '1px solid rgba(132,204,22,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--lime)' }}>Live Platform Impact</p>
+                    {[
+                        { label: 'Items classified', value: stats.scans.toLocaleString('en-IN'), color: '#84cc16' },
+                        { label: 'CO₂ diverted', value: `${stats.co2Kg.toFixed(1)} kg`, color: '#34d399' },
+                        { label: 'Recovery value', value: fmtINR(stats.valueINR), color: '#60a5fa' },
+                        { label: 'Mass processed', value: `${stats.massKg.toFixed(0)} kg`, color: '#a78bfa' },
+                        { label: 'Active organisations', value: `${stats.activeOrgs}`, color: '#f59e0b' },
+                    ].map(({ label, value, color }) => (
+                        <div key={label} className="flex items-center justify-between">
+                            <span className="text-xs" style={{ color: 'var(--text-dim)' }}>{label}</span>
+                            <span className="text-xs font-bold" style={{ color }}>{value}</span>
+                        </div>
+                    ))}
+                    <Link href="/impact"
+                        className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold transition-all hover:opacity-90 mt-2"
+                        style={{ background: 'rgba(132,204,22,0.12)', color: 'var(--lime)', border: '1px solid rgba(132,204,22,0.2)' }}
+                        onClick={() => setOpen(false)}>
+                        View full impact dashboard
+                        <ArrowRight size={11} />
+                    </Link>
+                </div>
+            )}
+        </div>
+    );
+}
 
 type ScrollFadeProps = {
     children: React.ReactNode;
@@ -185,6 +260,86 @@ function StatCard({ target, suffix, label }: { target: number; suffix: string; l
     );
 }
 
+// ── Live Impact Strip ─────────────────────────────────────────────────────────
+function ImpactStrip() {
+    const stats = usePlatformStats();
+
+    function fmtINR(n: number) {
+        if (n >= 10_000_000) return `₹${(n / 10_000_000).toFixed(1)}Cr`;
+        if (n >= 100_000)    return `₹${(n / 100_000).toFixed(1)}L`;
+        if (n >= 1_000)      return `₹${(n / 1_000).toFixed(0)}K`;
+        return `₹${n}`;
+    }
+
+    const items = stats ? [
+        { icon: BarChart2, label: 'Items AI-classified', value: stats.scans.toLocaleString('en-IN'), accent: '#84cc16' },
+        { icon: Globe2,    label: 'CO₂ Diverted',        value: `${stats.co2Kg.toFixed(0)} kg`,      accent: '#34d399' },
+        { icon: TrendingUp, label: 'Recovery Value',    value: fmtINR(stats.valueINR),              accent: '#60a5fa' },
+        { icon: Factory,   label: 'Active Orgs',         value: `${stats.activeOrgs}`,               accent: '#a78bfa' },
+    ] : null;
+
+    return (
+        <section className="relative z-10 px-5 pb-4 sm:px-8 lg:px-12">
+            <div className="mx-auto max-w-6xl">
+                <div className="rounded-3xl overflow-hidden"
+                    style={{ background: 'var(--bg-card)', border: '1px solid rgba(132,204,22,0.18)' }}>
+                    {/* Header */}
+                    <div className="px-6 pt-5 pb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                        style={{ borderBottom: '1px solid var(--border)' }}>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
+                            <p className="text-sm font-semibold text-white" style={{ fontFamily: 'Space Grotesk' }}>
+                                Platform Impact — Live
+                            </p>
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(132,204,22,0.1)', color: 'var(--lime)' }}>
+                                Updated every 10 min
+                            </span>
+                        </div>
+                        <Link href="/impact"
+                            className="flex items-center gap-1.5 text-xs font-semibold transition-all hover:opacity-80"
+                            style={{ color: 'var(--lime)' }}>
+                            View full dashboard
+                            <ArrowRight size={12} />
+                        </Link>
+                    </div>
+                    {/* Stats row */}
+                    <div className="grid grid-cols-2 md:grid-cols-4">
+                        {items ? items.map(({ icon: Icon, label, value, accent }, i) => (
+                            <div key={label}
+                                className={`px-6 py-5 flex flex-col gap-2 ${i < items.length - 1 ? 'border-r' : ''} ${i >= 2 ? 'border-t md:border-t-0' : ''}`}
+                                style={{ borderColor: 'var(--border)' }}>
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                    style={{ background: `${accent}18`, border: `1px solid ${accent}30` }}>
+                                    <Icon size={15} style={{ color: accent }} />
+                                </div>
+                                <p className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk' }}>{value}</p>
+                                <p className="text-xs" style={{ color: 'var(--text-dim)' }}>{label}</p>
+                            </div>
+                        )) : (
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="px-6 py-5 flex flex-col gap-3">
+                                    <div className="w-8 h-8 rounded-lg shimmer" />
+                                    <div className="w-16 h-5 rounded shimmer" />
+                                    <div className="w-24 h-3 rounded shimmer" />
+                                </div>
+                            ))
+                        )}
+                    </div>
+                    {/* Footer context */}
+                    <div className="px-6 py-3 flex items-center gap-2"
+                        style={{ background: 'var(--bg-elevated)', borderTop: '1px solid var(--border)' }}>
+                        <Recycle size={12} style={{ color: 'var(--text-muted)' }} />
+                        <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                            India generates 3.2M tonnes of e-waste/year — only 22% formally recycled.
+                            AI-EcoTrack creates a traceable, EPR-compliant path for every item.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const features = [
@@ -340,6 +495,7 @@ export default function LandingPage() {
                             <a key={label} href={href} className="text-sm font-medium transition-colors hover:text-white"
                                 style={{ color: 'var(--text-dim)' }}>{label}</a>
                         ))}
+                        <ImpactTicker />
                     </div>
                     <div className="flex items-center gap-2">
                         <Link href="/auth" className="hidden sm:inline-flex items-center justify-center h-10 px-4 rounded-full text-sm font-semibold transition-all hover:opacity-80"
@@ -457,7 +613,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ════════════════════════════ FEATURES ═══════════════════════════ */}
+            {/* ════════════════════════════════════════════ FEATURES ═══════════════════════ */}
             <section id="features" className="relative z-10 px-5 py-16 sm:px-8 lg:px-12">
                 <div className="mx-auto max-w-6xl">
                     <div className="text-center mb-12">
@@ -637,6 +793,28 @@ export default function LandingPage() {
                     </div>
                 </div>
             </section>
+
+            {/* ════════════════════════ LIVE IMPACT STRIP ═══════════════════ */}
+            <section className="relative z-10 px-5 pt-6 pb-2 sm:px-8 lg:px-12">
+                <div className="mx-auto max-w-6xl">
+                    <ScrollFade>
+                        <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'var(--lime)' }}>
+                            Real-World Impact
+                        </p>
+                    </ScrollFade>
+                    <ScrollFade delayMs={60}>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1" style={{ fontFamily: 'Space Grotesk' }}>
+                            Every scan moves the needle
+                        </h2>
+                    </ScrollFade>
+                    <ScrollFade delayMs={110}>
+                        <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+                            Aggregated platform-wide data — across every organisation, every scan, every item recovered.
+                        </p>
+                    </ScrollFade>
+                </div>
+            </section>
+            <ImpactStrip />
 
             {/* ════════════════════════════ BENEFITS ═══════════════════════════ */}
             <section id="benefits" className="relative z-10 px-5 py-16 sm:px-8 lg:px-12">

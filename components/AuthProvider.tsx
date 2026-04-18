@@ -31,9 +31,9 @@ function PostAuthRedirect() {
 }
 
 // Public routes that don't require auth
-const PUBLIC_ROUTES = ['/', '/auth', '/auth/desktop-google', '/join'];
+const PUBLIC_ROUTES = ['/', '/auth', '/auth/desktop-google', '/join', '/impact'];
 // Routes exempt from the org-setup redirect
-const ORG_EXEMPT = ['/', '/auth', '/auth/desktop-google', '/org/setup', '/org/onboarding', '/join'];
+const ORG_EXEMPT = ['/', '/auth', '/auth/desktop-google', '/org/setup', '/org/onboarding', '/join', '/impact'];
 
 function matchesRoute(pathname: string, route: string) {
     if (route === '/') return pathname === '/';
