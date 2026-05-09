@@ -195,9 +195,13 @@ export default function DropOffPage() {
             const res = await fetch(`/api/overpass?data=${encodeURIComponent(q)}`, { signal });
             if (res.ok) {
                 data = await res.json();
+            } else {
+                const body = await res.json().catch(() => ({}));
+                console.warn('[drop-off] overpass proxy returned', res.status, body);
             }
         } catch (err) {
             if ((err as Error)?.name === 'AbortError') return; // superceded by a newer call
+            console.warn('[drop-off] proxy fetch threw:', (err as Error)?.message);
             // Proxy failed — data stays null, fallback kicks in below
         }
 
