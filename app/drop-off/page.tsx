@@ -185,29 +185,20 @@ export default function DropOffPage() {
 
         setGeoState('loading');
 
-        const MIRRORS = [
-            'https://overpass.kumi.systems/api/interpreter',
-            'https://overpass.openstreetmap.ru/api/interpreter',
-            'https://overpass-api.de/api/interpreter',
-        ];
-
         const q = `[out:json][timeout:8];(node["amenity"="recycling"](around:5000,${lat},${lon});node["shop"="recycling"](around:5000,${lat},${lon});node["recycling:electrical_appliances"="yes"](around:5000,${lat},${lon}););out body 20;`;
 
         let data: { elements: { id: number; lat: number; lon: number; tags?: Record<string, string> }[] } | null = null;
 
-        // Race all mirrors in parallel — first successful response wins
+        // Use our server-side proxy (/api/overpass) to avoid CORS & 406 errors.
+        // Direct browser → overpass-api.de calls are blocked by CORS policy.
         try {
-            data = await Promise.any(
-                MIRRORS.map(mirror =>
-                    fetch(`${mirror}?data=${encodeURIComponent(q)}`, { signal }).then(res => {
-                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                        return res.json() as Promise<typeof data>;
-                    })
-                )
-            );
+            const res = await fetch(`/api/overpass?data=${encodeURIComponent(q)}`, { signal });
+            if (res.ok) {
+                data = await res.json();
+            }
         } catch (err) {
             if ((err as Error)?.name === 'AbortError') return; // superceded by a newer call
-            // All mirrors failed — data stays null, fallback kicks in below
+            // Proxy failed — data stays null, fallback kicks in below
         }
 
         try {
