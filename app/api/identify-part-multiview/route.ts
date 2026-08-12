@@ -134,7 +134,7 @@ async function analyseOne(b64: string, mimeType: string): Promise<PartMetadataPa
         try {
             const res = await groqWithFallback((groq) =>
                 groq.chat.completions.create({
-                    model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+                    model: 'qwen/qwen3.6-27b',
                     messages: [
                         { role: 'system', content: SYSTEM_PROMPT },
                         {

@@ -44,7 +44,7 @@ No barcode. No label. No lab. Just a photo.
 
 | Layer | Technology |
 |-------|-----------|
-| **AI Vision** | Llama 4 Scout (`meta-llama/llama-4-scout-17b-16e-instruct`) via Groq |
+| **AI Vision** | Qwen 3.6 27B (`qwen/qwen3.6-27b`) via Groq |
 | **AI Fallback** | Gemini 1.5 Flash (Google) |
 | **Frontend** | Next.js 16 — PWA, works on any phone |
 | **Database** | Firebase Firestore (real-time) |

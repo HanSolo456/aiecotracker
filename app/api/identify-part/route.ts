@@ -92,7 +92,7 @@ function extractJSON(text: string): PartMetadataPayload {
 async function callGroq(cleanBase64: string, mimeType: string): Promise<PartMetadataPayload> {
     const response = await groqWithFallback((groq) =>
         groq.chat.completions.create({
-            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+            model: 'qwen/qwen3.6-27b',
             messages: [
                 { role: 'system', content: SYSTEM_PROMPT },
                 {

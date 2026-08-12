@@ -155,7 +155,7 @@ Every scan generates a permanent, compliant DPP containing:
 
 | Layer | Technology | Role |
 |-------|-----------|------|
-| **Primary VLM** | Llama 4 Scout 17B (`meta-llama/llama-4-scout-17b-16e-instruct`) via Groq | Vision + text inference |
+| **Primary VLM** | Qwen 3.6 27B (`qwen/qwen3.6-27b`) via Groq | Vision + text inference |
 | **Fallback VLM** | Google Gemini 1.5 Flash | Automatic failover |
 | **Key Rotation** | Up to 10 Groq API keys (GROQ_API_KEY_1 … GROQ_API_KEY_10) | Zero-downtime, auto-rotates on 429/401 |
 | **Multi-View Merge** | Custom `mergeVLMResults()` algorithm | Highest-confidence multi-angle consensus |
