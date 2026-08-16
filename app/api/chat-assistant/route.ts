@@ -370,7 +370,7 @@ RESPONSE RULES
         try {
             const res = await groqWithFallback((groq) =>
                 groq.chat.completions.create({
-                    model: 'qwen/qwen3.6-27b',
+                    model: 'llama-3.3-70b-versatile',
                     messages: [
                         { role: 'system', content: SYSTEM_PROMPT },
                         // Inject prior conversation turns for memory

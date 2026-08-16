@@ -128,7 +128,7 @@ async function callAI<T>(prompt: string): Promise<T> {
         try {
             const res = await groqWithFallback((groq) =>
                 groq.chat.completions.create({
-                    model: 'qwen/qwen3.6-27b',
+                    model: 'llama-3.3-70b-versatile',
                     messages: [{ role: 'user', content: prompt }],
                     temperature: 0.2,
                     max_tokens: 1000,
