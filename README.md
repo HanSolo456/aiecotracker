@@ -10,7 +10,7 @@
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.1.6-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.0.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Groq AI](https://img.shields.io/badge/Groq-Llama%203.3%20%7C%20Qwen%203.6-F55036?style=flat-square&logo=groq&logoColor=white)](https://groq.com/)
+[![Groq AI](https://img.shields.io/badge/Groq-GPT%20OSS%20120B%20%7C%20Qwen%203.6-F55036?style=flat-square&logo=groq&logoColor=white)](https://groq.com/)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-3.5%20Flash-4285F4?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev/)
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Auth-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2%20(Rust)-24C8D8?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app/)
@@ -119,8 +119,8 @@ flowchart TD
 
     subgraph AI["2. AI Vision & Inference Pipeline"]
         B1["Groq API Client (3-Key Round-Robin Rotation)"]
-        B2["Llama 3.3 70B / Qwen 3.6 27B / Llama 4 Scout"]
-        B3["Google Gemini 3.5 Flash (Automatic Failover)"]
+        B2["GPT OSS 120B / Qwen 3.6 27B / Whisper Large v3"]
+        B3["Google Gemini 1.5 Flash (Automatic Failover)"]
         B4["Multi-View Fusion Layer (Merge 3 Angles)"]
         B1 --> B2
         B2 -. Failure Fallback .-> B3
@@ -165,8 +165,8 @@ flowchart TD
 
 ### 1. Multi-Tiered AI Architecture & Load Balancing
 AI-EcoTrack implements high-availability zero-downtime inference:
-- **Primary Tier:** Groq Cloud running `llama-3.3-70b-versatile` and `qwen/qwen3.6-27b` with a **3-Key Round-Robin Rotation** pool to maximize throughput and eliminate rate limits.
-- **Failover Tier:** Automatic, transparent failover to **Google Gemini 3.5 Flash** (`@google/generative-ai`) if Groq encounters 429/500 errors.
+- **Primary Tier:** Groq Cloud running `openai/gpt-oss-120b` (text/chat reasoning) and `qwen/qwen3.6-27b` (multimodal vision) along with `whisper-large-v3` (speech-to-text), powered by a **Multi-Key Round-Robin Rotation** pool to maximize throughput and eliminate rate limits.
+- **Failover Tier:** Automatic, transparent failover to **Google Gemini 1.5 Flash** (`@google/generative-ai`) if Groq encounters 429/500 errors.
 - **Multi-View Result Merging:** Combines feature vectors across 1 to 3 distinct angles of a physical item to eliminate blind spots and calculate aggregate confidence.
 
 ### 2. Structured JSON Inference Schema (`PartMetadataPayload`)

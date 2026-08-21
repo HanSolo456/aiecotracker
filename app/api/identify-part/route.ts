@@ -11,7 +11,7 @@ import type { PartMetadataPayload, IdentifyPartResponse } from '@/types';
 // POST /api/identify-part
 //
 // Provider priority:
-//   1. GROQ_API_KEY  → Llama 3.2 Vision (free, fast, generous limits)
+//   1. GROQ_API_KEY  → Qwen 3.6 27B Vision (qwen/qwen3.6-27b)
 //   2. GEMINI_API_KEY → Gemini 1.5 Flash Latest
 //   3. No key or imageBase64 === 'DEMO' → realistic mock payload
 // ─────────────────────────────────────────────────────────────────────────────
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<IdentifyP
         if (groqKey) {
             try {
                 rawPayload = await callGroq(cleanBase64, mimeType);
-                console.log('[identify-part] Provider: Groq Llama Vision ✓');
+                console.log('[identify-part] Provider: Groq Qwen 3.6 Vision ✓');
             } catch (err) {
                 console.warn('[identify-part] Groq failed, trying Gemini:', err);
             }

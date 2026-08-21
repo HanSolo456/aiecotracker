@@ -106,7 +106,7 @@ Every scan generates a permanent, compliant DPP containing:
 [Multi-View Camera Capture]  ←  Raspberry Pi edge station or mobile device (1–3 angles)
      │
      ▼
-[Groq API → Llama 4 Scout VLM]  ←  Primary AI (with 3-key rotation for 0 downtime)
+[Groq API → Qwen 3.6 27B VLM]  ←  Primary AI (with 3-key rotation for 0 downtime)
      │    ↕ if rate-limited or fails
      │  [Google Gemini 1.5 Flash]  ←  Automatic seamless fallback
      │
@@ -116,7 +116,7 @@ Every scan generates a permanent, compliant DPP containing:
      ▼
 [Safety Gatekeeper]  ←  Deterministic Rule Engine (4 rules: OSHA, REACH, ATEX, EPA)
      │
-     ├── Confidence < 0.92 → ESCALATE TO HUMAN (never guesses on safet y)
+     ├── Confidence < 0.92 → ESCALATE TO HUMAN (never guesses on safety)
      │
      ▼
 [RAG Query Layer]  ←  6 Local Knowledge Bases:
@@ -139,8 +139,8 @@ Every scan generates a permanent, compliant DPP containing:
      │
      ▼
 [Collection Fleet Optimization]  ←  80% fill threshold triggers route planning
-     │                                 Haversine distance + nearest-neighbor algorithm
-     │                                 CO₂ savings computed vs. unoptimized baseline
+                                Haversine distance + nearest-neighbor algorithm
+                                CO₂ savings computed vs. unoptimized baseline
      ▼
 [Firebase Firestore]  ←  Permanent record: DPP, scan history, sensor readings, route plans
 ```
@@ -156,7 +156,8 @@ Every scan generates a permanent, compliant DPP containing:
 | Layer | Technology | Role |
 |-------|-----------|------|
 | **Primary VLM** | Qwen 3.6 27B (`qwen/qwen3.6-27b`) via Groq | Vision inference |
-| **Primary LLM** | Llama 3.3 70B (`llama-3.3-70b-versatile`) via Groq | Text inference & Chat |
+| **Primary LLM** | GPT OSS 120B (`openai/gpt-oss-120b`) via Groq | Text inference & Chat |
+| **Speech-to-Text** | Whisper Large v3 (`whisper-large-v3`) via Groq | Multilingual voice transcription |
 | **Fallback VLM** | Google Gemini 1.5 Flash | Automatic failover |
 | **Key Rotation** | Up to 10 Groq API keys (GROQ_API_KEY_1 … GROQ_API_KEY_10) | Zero-downtime, auto-rotates on 429/401 |
 | **Multi-View Merge** | Custom `mergeVLMResults()` algorithm | Highest-confidence multi-angle consensus |
@@ -352,15 +353,17 @@ The platform has a built-in **purity-linked compensation system:**
     │              │              │                    │
     ▼              ▼              ▼                    ▼
  [Groq API]   [Gemini API]  [Firestore]        [RAG Layer]
- Llama 4      Gemini 1.5    Real-time DB       6 JSON KBs
- Scout VLM    Flash         Auth + Storage     (offline, fast)
+ Qwen 3.6 /   Gemini 1.5    Real-time DB       6 JSON KBs
+ GPT OSS 120B Flash         Auth + Storage     (offline, fast)
 ```
 
 ### Tech Choices
 
 | Layer | Tech | Why |
 |-------|------|-----|
-| **AI Vision** | Llama 4 Scout (Groq) | State-of-art VLM, ultra-fast inference |
+| **AI Vision** | Qwen 3.6 27B (`qwen/qwen3.6-27b` via Groq) | State-of-art VLM, ultra-fast 500 T/s visual inference |
+| **AI Text / LLM** | GPT OSS 120B (`openai/gpt-oss-120b` via Groq) | 500 T/s high-reasoning LLM, 131k context window |
+| **Voice STT** | Whisper Large v3 (`whisper-large-v3` via Groq) | Low-latency multilingual speech-to-text |
 | **AI Fallback** | Gemini 1.5 Flash | Automatic, zero-config failover |
 | **Key Rotation** | Up to 10 GROQ keys | Zero downtime even at rate limits |
 | **Frontend** | Next.js 16 + TypeScript | SSR + PWA + type safety |

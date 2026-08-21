@@ -159,6 +159,13 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── /sensor_readings ────────────────────────────────────────────────────────
+    // IoT telemetry readings (fill level, gas PPM, temperature)
+    match /sensor_readings/{readingId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Writes come from IoT gateway via Admin SDK
+    }
+
     // ── /bins ────────────────────────────────────────────────────────────────────
     // Smart dustbin IoT device — data written by ESP32 via Admin SDK
     match /bins/{binId} {

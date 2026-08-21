@@ -19,6 +19,7 @@
     "firebase": "^11.4.0",
     "firebase-admin": "^12.7.0",
     "framer-motion": "^12.4.10",
+    "google-auth-library": "^11.0.2",
     "groq-sdk": "^0.37.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.476.0",

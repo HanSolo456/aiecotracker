@@ -25,7 +25,10 @@ export default function AuthPage() {
 
     // Post-login routing is handled globally by PostAuthRedirect in AuthProvider.
 
-    function friendlyError(code: string): string {
+    function friendlyError(code: string, fallbackMessage?: string): string {
+        if (fallbackMessage && fallbackMessage.includes('Firebase is not configured')) {
+            return fallbackMessage;
+        }
         const map: Record<string, string> = {
             'auth/user-not-found': 'No account found with this email.',
             'auth/wrong-password': 'Incorrect password.',
@@ -43,7 +46,7 @@ export default function AuthPage() {
                 'Google provider is disabled in Firebase Authentication → Sign-in method. Enable it and retry.',
             'auth/redirect-failed': 'Google redirect failed before Firebase could complete sign-in.',
         };
-        return map[code] ?? 'Something went wrong. Please try again.';
+        return map[code] ?? fallbackMessage ?? 'Something went wrong. Please try again.';
     }
 
     useEffect(() => {
@@ -65,7 +68,7 @@ export default function AuthPage() {
         } catch (e: unknown) {
             const err = e as { code?: string; message?: string };
             console.error('[Google Sign-In error]', err.code, err.message);
-            setError(friendlyError(err.code ?? ''));
+            setError(friendlyError(err.code ?? '', err.message));
         } finally {
             if (!navigatesAway) setSubmitting(false);
         }
@@ -86,8 +89,8 @@ export default function AuthPage() {
                 // Auth effect will route based on role/org state.
             }
         } catch (e: unknown) {
-            const err = e as { code?: string };
-            setError(friendlyError(err.code ?? ''));
+            const err = e as { code?: string; message?: string };
+            setError(friendlyError(err.code ?? '', err.message));
         } finally { setSubmitting(false); }
     }
 
@@ -97,8 +100,8 @@ export default function AuthPage() {
             await signInAsGuest();
             router.push('/dashboard');
         } catch (e: unknown) {
-            const err = e as { code?: string };
-            setError(friendlyError(err.code ?? ''));
+            const err = e as { code?: string; message?: string };
+            setError(friendlyError(err.code ?? '', err.message));
         } finally { setSubmitting(false); }
     }
 

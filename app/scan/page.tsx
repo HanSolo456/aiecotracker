@@ -348,7 +348,7 @@ export default function ScanPage() {
                                 {ANALYSIS_STEPS[analysisStep]}
                             </p>
                             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                                {t('common.loading')} · Llama 4 Scout VLM
+                                {t('common.loading')} · Qwen 3.6 VLM
                             </p>
                         </div>
                         {/* Step dots */}
@@ -511,7 +511,7 @@ export default function ScanPage() {
                             <div className="flex flex-col gap-2">
                                 {[
                                     '📷 Capture 1–3 angle photos',
-                                    '🤖 Parallel Llama/Gemini VLM per angle',
+                                    '🤖 Parallel Qwen/Gemini VLM per angle',
                                     '🔀 Merge results → highest confidence',
                                     '🔒 Safety Gatekeeper rule engine',
                                     '📚 RAG disassembly guide retrieval',

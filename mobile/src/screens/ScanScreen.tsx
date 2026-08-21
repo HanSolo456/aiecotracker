@@ -128,7 +128,7 @@ export default function ScanScreen() {
           <Text style={styles.flowTitle}>Golden Thread Flow</Text>
           {[
             'Capture 1–3 angle photos',
-            'Parallel Llama/Gemini VLM per angle',
+            'Parallel Qwen/Gemini VLM per angle',
             'Merge results → highest confidence',
             'Safety Gatekeeper rule engine',
             'RAG disassembly guide retrieval',
