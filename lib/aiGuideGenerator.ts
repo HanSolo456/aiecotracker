@@ -125,18 +125,22 @@ async function callAI<T>(prompt: string): Promise<T> {
     const geminiKey = process.env.GEMINI_API_KEY;
 
     if (groqAvailable) {
-        try {
-            const res = await groqWithFallback((groq) =>
-                groq.chat.completions.create({
-                    model: 'openai/gpt-oss-120b',
-                    messages: [{ role: 'user', content: prompt }],
-                    temperature: 0.2,
-                    max_tokens: 1000,
-                })
-            );
-            return extractJSON<T>(res.choices[0]?.message?.content ?? '');
-        } catch (e) {
-            console.warn('[aiGuideGenerator] Groq failed, trying Gemini:', e);
+        const GROQ_GUIDE_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+        for (const modelName of GROQ_GUIDE_MODELS) {
+            try {
+                const res = await groqWithFallback((groq) =>
+                    groq.chat.completions.create({
+                        model: modelName,
+                        messages: [{ role: 'user', content: prompt }],
+                        temperature: 0.2,
+                        max_tokens: 1000,
+                    })
+                );
+                const content = res.choices[0]?.message?.content ?? '';
+                if (content) return extractJSON<T>(content);
+            } catch (e) {
+                console.warn(`[aiGuideGenerator] Groq model ${modelName} failed:`, e);
+            }
         }
     }
 

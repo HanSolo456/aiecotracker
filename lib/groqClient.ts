@@ -34,21 +34,40 @@ function getGroqKeys(): string[] {
 /** Errors that mean "this key is exhausted / wrong — try the next one" */
 function isKeyExhausted(err: unknown): boolean {
     if (err && typeof err === 'object') {
-        const e = err as { status?: number; statusCode?: number; message?: string };
+        const e = err as { status?: number; statusCode?: number; message?: string; code?: string; type?: string };
         const status = e.status ?? e.statusCode ?? 0;
         // 429 = rate limited, 401 = bad/expired key
         if (status === 429 || status === 401) return true;
+        // Stream / connection errors from Groq's vision endpoint
+        const code = e.code ?? '';
+        const type = e.type ?? '';
+        if (
+            code === 'ERR_STREAM_PREMATURE_CLOSE' ||
+            code === 'ECONNRESET' ||
+            code === 'ECONNREFUSED' ||
+            type === 'system'
+        ) return true;
         // String check for edge cases
         if (typeof e.message === 'string') {
             const msg = e.message.toLowerCase();
-            if (msg.includes('rate limit') || msg.includes('quota') || msg.includes('invalid api key')) return true;
+            if (
+                msg.includes('rate limit') ||
+                msg.includes('quota') ||
+                msg.includes('invalid api key') ||
+                msg.includes('premature close') ||
+                msg.includes('premature_close') ||
+                msg.includes('invalid response body')
+            ) return true;
         }
     }
     return false;
 }
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
  * Runs `fn` with each Groq key in turn, stopping at the first success.
+ * On stream/network errors, retries the same key once with a short delay before moving on.
  * Throws if all keys fail or if a non-key-related error occurs.
  */
 export async function groqWithFallback<T>(
@@ -59,18 +78,30 @@ export async function groqWithFallback<T>(
 
     let lastError: unknown;
     for (let i = 0; i < keys.length; i++) {
-        try {
-            const groq = new Groq({ apiKey: keys[i] });
-            const result = await fn(groq);
-            if (i > 0) console.info(`[groqClient] Succeeded with key #${i + 1}`);
-            return result;
-        } catch (err) {
-            if (isKeyExhausted(err)) {
-                console.warn(`[groqClient] Key #${i + 1} exhausted (${(err as { status?: number }).status ?? 'err'}), trying next…`);
-                lastError = err;
-                continue; // try next key
+        // Try each key up to 2 times (once retry on stream drop)
+        for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+                const groq = new Groq({ apiKey: keys[i] });
+                const result = await fn(groq);
+                if (i > 0) console.info(`[groqClient] Succeeded with key #${i + 1}`);
+                return result;
+            } catch (err) {
+                if (isKeyExhausted(err)) {
+                    const status = (err as { status?: number }).status;
+                    const isRateLimit = status === 429 || status === 401;
+                    if (attempt === 0 && !isRateLimit) {
+                        // Stream/network drop — wait 800ms then retry same key once
+                        console.warn(`[groqClient] Key #${i + 1} stream error (attempt 1), retrying in 800ms…`);
+                        await sleep(800);
+                        lastError = err;
+                        continue;
+                    }
+                    console.warn(`[groqClient] Key #${i + 1} exhausted (${status ?? 'err'}), trying next key…`);
+                    lastError = err;
+                    break; // move to next key
+                }
+                throw err; // non-retryable error — surface immediately
             }
-            throw err; // non-key error — surface immediately
         }
     }
     throw lastError ?? new Error('[groqClient] All Groq keys exhausted.');

@@ -170,7 +170,7 @@ export default function ScanPage() {
     // ── Image compression ─────────────────────────────────────────────────────
     // Groq vision API rejects payloads >4 MB. Resize to max 1024px and re-encode
     // as JPEG @ 0.75 quality before sending — keeps every image well under 300 KB.
-    const compressImage = (dataUrl: string, maxPx = 1024, quality = 0.75): Promise<string> =>
+    const compressImage = (dataUrl: string, maxPx = 768, quality = 0.65): Promise<string> =>
         new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
@@ -348,7 +348,7 @@ export default function ScanPage() {
                                 {ANALYSIS_STEPS[analysisStep]}
                             </p>
                             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                                {t('common.loading')} · Qwen 3.6 VLM
+                                {t('common.loading')} · Gemini 3.5 Flash
                             </p>
                         </div>
                         {/* Step dots */}
@@ -511,7 +511,7 @@ export default function ScanPage() {
                             <div className="flex flex-col gap-2">
                                 {[
                                     '📷 Capture 1–3 angle photos',
-                                    '🤖 Parallel Qwen/Gemini VLM per angle',
+                                    '🤖 Parallel Gemini 3.5 Flash per angle',
                                     '🔀 Merge results → highest confidence',
                                     '🔒 Safety Gatekeeper rule engine',
                                     '📚 RAG disassembly guide retrieval',

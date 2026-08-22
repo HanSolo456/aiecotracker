@@ -456,36 +456,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<GenerateD
         };
 
         // ── Persist to Firestore if configured  ──────────────────────────────────
-        const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+        const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID ?? process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
         if (projectId && projectId !== '') {
             try {
-                const { initializeApp, getApps, cert } = await import('firebase-admin/app');
+                const { initializeAdmin } = await import('@/lib/firebaseAdmin');
                 const { getFirestore } = await import('firebase-admin/firestore');
 
-                if (!getApps().length) {
-                    // Robust service account parser:
-                    // - strips leading/trailing quotes added by some dotenv parsers
-                    // - converts literal \n sequences to real newlines (needed for private_key)
-                    let rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON ?? '{}';
-                    rawJson = rawJson.trim();
-                    if ((rawJson.startsWith("'") && rawJson.endsWith("'")) ||
-                        (rawJson.startsWith('"') && rawJson.endsWith('"'))) {
-                        rawJson = rawJson.slice(1, -1);
-                    }
-                    rawJson = rawJson.replace(/\\n/g, '\n');
-                    const serviceAccount = JSON.parse(rawJson) as Record<string, unknown>;
-                    if (serviceAccount.project_id) {
-                        initializeApp({ credential: cert(serviceAccount as Parameters<typeof cert>[0]) });
-                    } else {
-                        initializeApp({ projectId });
-                    }
-                    // settings() MUST be called before any other Firestore method
-                    // and only once — so it lives here inside the first-init block.
-                    getFirestore().settings({ ignoreUndefinedProperties: true });
-                }
+                initializeAdmin();
 
                 const adminDb = getFirestore();
                 await adminDb.collection('passports').doc(passportId).set(dpp);
+                console.log('[generate-dpp] Passport written to Firestore:', passportId);
             } catch (fbErr) {
                 // Non-fatal: log and continue
                 console.warn('[generate-dpp] Firestore write skipped:', fbErr);

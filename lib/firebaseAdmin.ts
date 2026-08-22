@@ -1,4 +1,5 @@
 import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Firebase Admin SDK initialisation — singleton, safe to call multiple times.
@@ -10,6 +11,7 @@ import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
 // ─────────────────────────────────────────────────────────────────────────────
 
 let adminApp: App | null = null;
+let firestoreSettingsApplied = false;
 
 export function initializeAdmin(): App {
     if (adminApp) return adminApp;
@@ -35,6 +37,12 @@ export function initializeAdmin(): App {
         credential: cert({ projectId, clientEmail, privateKey }),
         projectId,
     });
+
+    // settings() must be called before any Firestore operation and only once
+    if (!firestoreSettingsApplied) {
+        getFirestore().settings({ ignoreUndefinedProperties: true });
+        firestoreSettingsApplied = true;
+    }
 
     return adminApp;
 }
