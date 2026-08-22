@@ -379,14 +379,21 @@ export default function DashboardPage() {
             unsub = () => { };
         }
 
-        const sensorQ = query(collection(db, 'sensor_readings'), orderBy('createdAt', 'desc'), limit(1));
-        const unsubSensor = onSnapshot(sensorQ, (snap) => {
-            if (!snap.empty) {
-                const d = snap.docs[0].data();
-                const createdAt = d.createdAt?.toMillis ? d.createdAt.toMillis() : Date.now();
-                setSensor({ fillLevel: d.fillLevel ?? 0, gasPpm: d.gasPpm ?? 0, temperature: d.temperature ?? 0, gasAlert: d.gasAlert ?? false, lastSeenMs: createdAt });
-            }
-        }, (err) => console.warn('[dashboard] sensor error:', err.code));
+        let unsubSensor: () => void = () => { };
+        if (user?.uid) {
+            const sensorQ = query(collection(db, 'sensor_readings'), orderBy('createdAt', 'desc'), limit(1));
+            unsubSensor = onSnapshot(sensorQ, (snap) => {
+                if (!snap.empty) {
+                    const d = snap.docs[0].data();
+                    const createdAt = d.createdAt?.toMillis ? d.createdAt.toMillis() : Date.now();
+                    setSensor({ fillLevel: d.fillLevel ?? 0, gasPpm: d.gasPpm ?? 0, temperature: d.temperature ?? 0, gasAlert: d.gasAlert ?? false, lastSeenMs: createdAt });
+                }
+            }, (err) => {
+                if (err.code !== 'permission-denied') {
+                    console.warn('[dashboard] sensor error:', err.code);
+                }
+            });
+        }
         return () => { unsub(); unsubOrg?.(); unsubSensor(); };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [profile?.orgId, profile?.role, user?.uid]);
