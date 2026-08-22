@@ -290,6 +290,10 @@ function buildFallbackAnswer(
 
     // ── Hazards & Safety ──────────────────────────────────────────────────────
     if (lower.includes('hazard') || lower.includes('safe') || lower.includes('ppe') || lower.includes('fluid') || lower.includes('risk')) {
+        const isBattery = part.includes('battery') || part.includes('cell') || part.includes('lipo') || part.includes('lithium') || material.includes('lithium') || material.includes('electrolyte');
+        if (isBattery) {
+            return `For this ${part}: Primary hazards include thermal runaway risk, puncture/short-circuit fire danger, and toxic/corrosive electrolyte leakage. Never crush, incinerate, or short the terminals. Tape exposed leads, store in a fire-safe non-conductive container, and route strictly through authorized battery e-waste recyclers under Battery Waste Management Rules 2022.`;
+        }
         const protocols = guide?.safety_protocols.length
             ? guide.safety_protocols.map(normaliseLabel).join(', ')
             : 'standard industrial safety protocols';
@@ -446,19 +450,51 @@ RESPONSE RULES
 - Be specific with numbers and regulations when you know them.
 - If uncertain about a specific regulation, say so.`;
 
-    const groqAvailable = !!(process.env.GROQ_API_KEY_1 ?? process.env.GROQ_API_KEY);
     const geminiKey = process.env.GEMINI_API_KEY;
+    const groqAvailable = !!(process.env.GROQ_API_KEY_1 ?? process.env.GROQ_API_KEY);
 
     // Build message history for LLMs (cap at last 6 turns to control token usage)
     const recentHistory = history.slice(-6);
 
-    const GROQ_TEXT_MODELS = [
-        'llama-3.3-70b-versatile',
-        'llama-3.1-8b-instant',
-        'mixtral-8x7b-32768',
-    ];
+    // ── 1. Gemini Primary (gemini-3.6-flash, gemini-3.7-flash) ─────────────────
+    if (geminiKey) {
+        const GEMINI_MODELS = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+        const genAI = new GoogleGenerativeAI(geminiKey);
 
+        for (const gModel of GEMINI_MODELS) {
+            try {
+                const model = genAI.getGenerativeModel({ model: gModel });
+
+                const geminiHistory = recentHistory.map(turn => ({
+                    role: turn.role === 'assistant' ? 'model' as const : 'user' as const,
+                    parts: [{ text: turn.content }],
+                }));
+
+                const chat = model.startChat({
+                    systemInstruction: SYSTEM_PROMPT,
+                    history: geminiHistory,
+                });
+
+                const result = await chat.sendMessage(userMessage);
+                const answer = result.response.text().trim();
+                if (answer) {
+                    console.log(`[chat-assistant] Answered via Gemini (${gModel}) ✓`);
+                    return answer;
+                }
+            } catch (error) {
+                console.warn(`[chat-assistant] Gemini model ${gModel} failed:`, (error as Error).message);
+            }
+        }
+    }
+
+    // ── 2. Groq Fallback ───────────────────────────────────────────────────────
     if (groqAvailable) {
+        const GROQ_TEXT_MODELS = [
+            'llama-3.3-70b-versatile',
+            'llama-3.1-8b-instant',
+            'mixtral-8x7b-32768',
+        ];
+
         for (const modelName of GROQ_TEXT_MODELS) {
             try {
                 const res = await groqWithFallback((groq) =>
@@ -477,35 +513,12 @@ RESPONSE RULES
                     }),
                 );
                 const answer = res.choices[0]?.message?.content?.trim();
-                if (answer) return answer;
+                if (answer) {
+                    console.log(`[chat-assistant] Answered via Groq (${modelName}) ✓`);
+                    return answer;
+                }
             } catch (error) {
-                console.warn(`[chat-assistant] Groq model ${modelName} failed, trying next:`, error);
-            }
-        }
-    }
-
-    if (geminiKey) {
-        const GEMINI_MODELS = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-2.0-flash'];
-        for (const gModel of GEMINI_MODELS) {
-            try {
-                const genAI = new GoogleGenerativeAI(geminiKey);
-                const model = genAI.getGenerativeModel({ model: gModel });
-
-                const geminiHistory = recentHistory.map(turn => ({
-                    role: turn.role === 'assistant' ? 'model' as const : 'user' as const,
-                    parts: [{ text: turn.content }],
-                }));
-
-                const chat = model.startChat({
-                    systemInstruction: SYSTEM_PROMPT,
-                    history: geminiHistory,
-                });
-
-                const result = await chat.sendMessage(userMessage);
-                const answer = result.response.text().trim();
-                if (answer) return answer;
-            } catch (error) {
-                console.warn(`[chat-assistant] Gemini model ${gModel} failed:`, error);
+                console.warn(`[chat-assistant] Groq model ${modelName} failed, trying next:`, (error as Error).message);
             }
         }
     }

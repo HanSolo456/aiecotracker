@@ -121,12 +121,29 @@ function extractJSON<T>(text: string): T {
 // ── Core AI caller ───────────────────────────────────────────────────────────
 
 async function callAI<T>(prompt: string): Promise<T> {
-    const groqAvailable = !!(process.env.GROQ_API_KEY_1 ?? process.env.GROQ_API_KEY);
     const geminiKey = process.env.GEMINI_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY_1 ?? process.env.GROQ_API_KEY;
+    const GROQ_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
 
-    if (groqAvailable) {
-        const GROQ_GUIDE_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
-        for (const modelName of GROQ_GUIDE_MODELS) {
+    // ── 1. Try Gemini first (primary) ─────────────────────────────────────────
+    if (geminiKey) {
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const geminiModels = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+        for (const gModel of geminiModels) {
+            try {
+                const model = genAI.getGenerativeModel({ model: gModel });
+                const result = await model.generateContent(prompt);
+                const text = result.response.text().trim();
+                if (text) return extractJSON<T>(text);
+            } catch (e) {
+                console.warn(`[aiGuideGenerator] Gemini model ${gModel} failed:`, (e as Error).message);
+            }
+        }
+    }
+
+    // ── 2. Try Groq fallback ──────────────────────────────────────────────────
+    if (groqKey) {
+        for (const modelName of GROQ_MODELS) {
             try {
                 const res = await groqWithFallback((groq) =>
                     groq.chat.completions.create({
@@ -139,16 +156,9 @@ async function callAI<T>(prompt: string): Promise<T> {
                 const content = res.choices[0]?.message?.content ?? '';
                 if (content) return extractJSON<T>(content);
             } catch (e) {
-                console.warn(`[aiGuideGenerator] Groq model ${modelName} failed:`, e);
+                console.warn(`[aiGuideGenerator] Groq model ${modelName} failed:`, (e as Error).message);
             }
         }
-    }
-
-    if (geminiKey) {
-        const genAI = new GoogleGenerativeAI(geminiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
-        const result = await model.generateContent(prompt);
-        return extractJSON<T>(result.response.text().trim());
     }
 
     throw new Error('[aiGuideGenerator] No AI provider available');

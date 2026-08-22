@@ -58,6 +58,22 @@ async function analyseOne(b64: string, mimeType: string): Promise<PartMetadataPa
     const hasGroqKey = !!(process.env.GROQ_API_KEY_1 ?? process.env.GROQ_API_KEY);
     const geminiKey = process.env.GEMINI_API_KEY;
 
+    // ── 1. Gemini primary ───────────────────────────────────────────────────
+    if (geminiKey) {
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const geminiModels = ['gemini-3.6-flash', 'gemini-3.7-flash'];
+        for (const gModel of geminiModels) {
+            try {
+                const model = genAI.getGenerativeModel({ model: gModel });
+                const result = await model.generateContent([`${SYSTEM_PROMPT}\n\n${USER_PROMPT}`, { inlineData: { data: b64, mimeType } }]);
+                return extractJSON(result.response.text().trim());
+            } catch (e) {
+                console.warn(`[pi-scan] Gemini ${gModel} failed:`, e);
+            }
+        }
+    }
+
+    // ── 2. Groq fallback ──────────────────────────────────────────────────────
     if (hasGroqKey) {
         try {
             const res = await groqWithFallback((groq) =>
@@ -65,22 +81,19 @@ async function analyseOne(b64: string, mimeType: string): Promise<PartMetadataPa
                     model: 'qwen/qwen3.6-27b',
                     messages: [
                         { role: 'system', content: SYSTEM_PROMPT },
-                        { role: 'user', content: [{ type: 'text', text: USER_PROMPT }, { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } }] },
+                        {
+                            role: 'user',
+                            content: [
+                                { type: 'text', text: USER_PROMPT },
+                                { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } },
+                            ],
+                        },
                     ],
                     temperature: 0.1, max_tokens: 1024,
                 })
             );
             return extractJSON(res.choices[0]?.message?.content ?? '');
         } catch (e) { console.warn('[pi-scan] All Groq keys exhausted:', e); }
-    }
-
-    if (geminiKey) {
-        try {
-            const genAI = new GoogleGenerativeAI(geminiKey);
-            const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
-            const result = await model.generateContent([`${SYSTEM_PROMPT}\n\n${USER_PROMPT}`, { inlineData: { data: b64, mimeType } }]);
-            return extractJSON(result.response.text().trim());
-        } catch (e) { console.warn('[pi-scan] Gemini failed:', e); }
     }
 
     return MOCK_PART_PAYLOAD;

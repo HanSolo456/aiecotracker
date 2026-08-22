@@ -142,8 +142,8 @@ async function callGroq(cleanBase64: string, mimeType: string): Promise<PartMeta
 async function callGemini(cleanBase64: string, mimeType: string): Promise<PartMetadataPayload> {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const geminiModels = [
-        { id: 'gemini-3.5-flash', timeout: 35_000 },
-        { id: 'gemini-2.0-flash', timeout: 50_000 },
+        { id: 'gemini-3.6-flash', timeout: 35_000 },
+        { id: 'gemini-3.7-flash', timeout: 50_000 },
     ];
     let lastErr: unknown;
     for (const { id, timeout } of geminiModels) {

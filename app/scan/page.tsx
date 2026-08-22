@@ -348,7 +348,7 @@ export default function ScanPage() {
                                 {ANALYSIS_STEPS[analysisStep]}
                             </p>
                             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                                {t('common.loading')} · Gemini 3.5 Flash
+                                {t('common.loading')} · Gemini 3.6 Flash
                             </p>
                         </div>
                         {/* Step dots */}

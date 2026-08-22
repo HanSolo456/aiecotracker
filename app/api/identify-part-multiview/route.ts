@@ -188,8 +188,8 @@ async function analyseOne(b64: string, mimeType: string): Promise<PartMetadataPa
         const genAI = new GoogleGenerativeAI(geminiKey);
         // Try models in order — if one hangs or isn't on the tier, move to the next
         const geminiModels = [
-            { id: 'gemini-3.5-flash', timeout: 35_000 },
-            { id: 'gemini-2.0-flash', timeout: 50_000 },
+            { id: 'gemini-3.6-flash', timeout: 35_000 },
+            { id: 'gemini-3.7-flash', timeout: 50_000 },
         ];
         for (const { id, timeout } of geminiModels) {
             try {
