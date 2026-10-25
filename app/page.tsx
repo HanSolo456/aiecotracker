@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import AIComparisonSection from '@/components/AIComparisonSection';
 import {
     ArrowRight, Camera, QrCode, Leaf, Shield, Zap, BarChart2,
     MapPin, Award, CheckCircle2, ChevronRight, Cpu, Globe2,
@@ -459,6 +461,7 @@ export default function LandingPage() {
     const navLinks: Array<{ label: string; href: string }> = [
         { label: 'Features', href: '#features' },
         { label: 'How it Works', href: '#how' },
+        { label: 'vs General AI', href: '#comparison' },
         { label: 'Benefits', href: '#benefits' },
     ];
 
@@ -480,16 +483,22 @@ export default function LandingPage() {
             <nav className="fixed top-0 inset-x-0 z-40 px-4 pt-4 sm:px-8 lg:px-12">
                 <div className="mx-auto max-w-6xl flex items-center justify-between rounded-2xl px-3 py-2 sm:px-5 sm:py-3"
                     style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', backdropFilter: 'blur(20px)' }}>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0"
-                            style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.25)' }}>
-                            <Leaf size={18} style={{ color: 'var(--lime)' }} />
+                    <Link href="/" className="flex items-center gap-2.5 min-w-0 group">
+                        <div className="w-10 h-10 rounded-[14px] overflow-hidden flex items-center justify-center shrink-0 border border-[rgba(132,204,22,0.3)] bg-black/40 shadow-[0_0_15px_rgba(132,204,22,0.15)] transition-transform group-hover:scale-105">
+                            <Image
+                                src="/icons/icon-192.png"
+                                alt="AI-EcoTrack Logo"
+                                width={40}
+                                height={40}
+                                priority
+                                className="w-full h-full object-cover"
+                            />
                         </div>
                         <div className="flex flex-col justify-center min-w-0">
                             <p className="font-bold text-white text-[15px] leading-tight" style={{ fontFamily: 'Space Grotesk' }}>AI-EcoTrack</p>
                             <p className="hidden sm:block text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--text-muted)' }}>Circular Recovery Intelligence</p>
                         </div>
-                    </div>
+                    </Link>
                     <div className="hidden sm:flex items-center gap-6">
                         {navLinks.map(({ label, href }) => (
                             <a key={label} href={href} className="text-sm font-medium transition-colors hover:text-white"
@@ -815,6 +824,7 @@ export default function LandingPage() {
                 </div>
             </section>
             <ImpactStrip />
+            <AIComparisonSection />
 
             {/* ════════════════════════════ BENEFITS ═══════════════════════════ */}
             <section id="benefits" className="relative z-10 px-5 py-16 sm:px-8 lg:px-12">

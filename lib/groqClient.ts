@@ -15,7 +15,7 @@
 import Groq from 'groq-sdk';
 
 /** Collect all configured keys in priority order. */
-function getGroqKeys(): string[] {
+export function getGroqKeys(): string[] {
     const keys: string[] = [];
 
     // Numbered keys: GROQ_API_KEY_1, GROQ_API_KEY_2, GROQ_API_KEY_3 …

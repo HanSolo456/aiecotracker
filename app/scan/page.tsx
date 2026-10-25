@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Upload, X, ChevronLeft, Zap, Plus, Layers, SwitchCamera } from 'lucide-react';
+import { Camera, Upload, X, ChevronLeft, Zap, Layers, SwitchCamera, Battery } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import type { DigitalProductPassport, PartMetadataPayload } from '@/types';
 import { saveScan, type ScanContext } from '@/lib/scanService';
@@ -19,6 +19,10 @@ interface CapturedAngle {
 }
 
 const ANGLE_LABELS = ['Front View', 'Side View', 'Top / Detail'];
+const BATTERY_EXAMPLE: CapturedAngle[] = [1, 2, 3].map((number, index) => ({
+    dataUrl: `/examples/battery/battery${number}.jpg`,
+    label: ANGLE_LABELS[index],
+}));
 
 const ANALYSIS_STEPS = [
     'Initialising VLM inference engine…',
@@ -168,10 +172,9 @@ export default function ScanPage() {
     }, []);
 
     // ── Image compression ─────────────────────────────────────────────────────
-    // Groq vision API rejects payloads >4 MB. Resize to max 1024px and re-encode
-    // as JPEG @ 0.75 quality before sending — keeps every image well under 300 KB.
+    // Keep uploads and bundled examples small enough for every vision provider.
     const compressImage = (dataUrl: string, maxPx = 768, quality = 0.65): Promise<string> =>
-        new Promise((resolve) => {
+        new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => {
                 const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
@@ -180,9 +183,12 @@ export default function ScanPage() {
                 const canvas = document.createElement('canvas');
                 canvas.width = w;
                 canvas.height = h;
-                canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+                const context = canvas.getContext('2d');
+                if (!context) { reject(new Error('Could not prepare this photo. Please try again.')); return; }
+                context.drawImage(img, 0, 0, w, h);
                 resolve(canvas.toDataURL('image/jpeg', quality));
             };
+            img.onerror = () => reject(new Error('Could not load a photo. Please try again or upload another image.'));
             img.src = dataUrl;
         });
 
@@ -222,7 +228,7 @@ export default function ScanPage() {
             }
 
             // ── Confidence gate ───────────────────────────────────────────
-            // If Groq can't identify the part (unknown class or confidence < 35%),
+            // If AI can't identify the part (unknown class or confidence < 35%),
             // stop here — don't generate a fabricated guide or passport.
             const { visual_id } = identifyData.payload;
             const isUnknown = visual_id.part_class === 'unknown' || visual_id.confidence_score < 0.35;
@@ -277,12 +283,12 @@ export default function ScanPage() {
             };
 
             const [scanId] = await Promise.all([
-                saveScan(identifyData.payload, previewImage, 'single', guideData.guide ?? {}, dppData.dpp, 'web', undefined, scanCtx).catch(async (err: unknown) => {
+                saveScan(identifyData.payload, previewImage, images.length > 1 ? 'multi-view' : 'single', guideData.guide ?? {}, dppData.dpp, 'web', undefined, scanCtx).catch(async (err: unknown) => {
                     console.error('[EcoTrack] Firestore save failed:', (err as Error)?.message ?? err);
                     // If offline, queue for later upload
                     if (!navigator.onLine) {
                         enqueueOfflineScan(
-                            identifyData.payload!, previewImage, 'single',
+                            identifyData.payload!, previewImage, images.length > 1 ? 'multi-view' : 'single',
                             guideData.guide ?? {}, dppData.dpp, 'web', undefined, scanCtx
                         );
                         setOfflineQueued(true);
@@ -348,7 +354,7 @@ export default function ScanPage() {
                                 {ANALYSIS_STEPS[analysisStep]}
                             </p>
                             <p className="text-xs mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                                {t('common.loading')} · Gemini 3.6 Flash
+                                {t('common.loading')} · Analysing your photos
                             </p>
                         </div>
                         {/* Step dots */}
@@ -417,6 +423,33 @@ export default function ScanPage() {
                 {(scanState === 'idle' || scanState === 'error') && (
 
                     <>
+                        <div className="card p-4" style={{ borderColor: 'rgba(132,204,22,0.25)' }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <Battery size={17} style={{ color: '#84cc16' }} />
+                                <h2 className="text-sm font-semibold text-white">Try an example</h2>
+                            </div>
+                            <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>
+                                Nothing to scan? Use these three photos of a battery to see its identification, safety guidance and Digital Product Passport.
+                            </p>
+                            <div className="grid grid-cols-3 gap-2 mb-3">
+                                {BATTERY_EXAMPLE.map((photo, index) => (
+                                    <div key={photo.dataUrl} className="rounded-lg overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={photo.dataUrl} alt={`Sample battery — ${photo.label.toLowerCase()}`} className="w-full h-24 object-contain" />
+                                        <p className="text-[10px] text-center py-1.5" style={{ color: 'var(--text-muted)' }}>Photo {index + 1}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <button className="btn-primary w-full" onClick={() => {
+                                setAngles([...BATTERY_EXAMPLE]);
+                                void runAnalysis(BATTERY_EXAMPLE);
+                            }}>
+                                <Zap size={15} />
+                                Try battery example
+                            </button>
+                            <p className="text-[10px] text-center mt-2" style={{ color: 'var(--text-muted)' }}>Runs a live AI scan using all 3 photos.</p>
+                        </div>
+
                         {/* Photo Slot Grid */}
                         <div>
                             <div className="flex items-center justify-between mb-3">
@@ -511,7 +544,7 @@ export default function ScanPage() {
                             <div className="flex flex-col gap-2">
                                 {[
                                     '📷 Capture 1–3 angle photos',
-                                    '🤖 Parallel Gemini 3.5 Flash per angle',
+                                    '🤖 AI classification with automatic backup',
                                     '🔀 Merge results → highest confidence',
                                     '🔒 Safety Gatekeeper rule engine',
                                     '📚 RAG disassembly guide retrieval',

@@ -511,6 +511,10 @@ Access the operator console at **`http://<pi-ip-or-device-id>.local:8080`**.
 
 ## ⚙️ Environment Configuration
 
+The scan page includes a **Try battery example** button using the three bundled battery photos. It runs the same live identification → safety → guide → passport flow as uploaded photos.
+
+Web and mobile identification endpoints try Gemini first (20s primary, 10s alternate), then Groq vision with key rotation (25s total budget). Configure `GROQ_API_KEY` or `GROQ_API_KEY_1` through `GROQ_API_KEY_10` on the server to enable the independent fallback. `GROQ_VISION_MODEL` can override the default `qwen/qwen3.8-27b` vision model ([Groq vision documentation](https://console.groq.com/docs/vision)); `GEMINI_VISION_MODEL` and `GEMINI_VISION_FALLBACK_MODEL` override the existing Gemini models. Responses are validated before use; failed angles are omitted if other angles succeed. If all providers fail or no keys are configured, real scans return a retryable 503 and keep the photos for retry. Only explicit `DEMO`/`MOCK` requests return canned data.
+
 Create a `.env.local` file in the root directory:
 
 ```env

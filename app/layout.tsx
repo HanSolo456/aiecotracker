@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
+import 'lenis/dist/lenis.css';
 import './globals.css';
 import AuthProvider from '@/components/AuthProvider';
 import RoutePrefetcher from '@/components/RoutePrefetcher';
@@ -7,12 +8,19 @@ import ThemeProvider from '@/components/ThemeProvider';
 import LanguageProvider from '@/components/LanguageProvider';
 import NotificationBootstrap from '@/components/NotificationBootstrap';
 import AppShell from '@/components/AppShell';
+import SmoothScroll from '@/components/SmoothScroll';
+import EcoCursorFollower from '@/components/EcoCursorFollower';
 
 export const metadata: Metadata = {
     title: 'AI-EcoTrack | Circular Waste Intelligence',
     description:
         'AI-vision waste classification and IoT-enabled tracking platform for PCBs, e-waste, industrial parts, and general waste. Promotes circular economy through data-driven insights.',
     manifest: '/manifest.json',
+    icons: {
+        icon: { url: '/icons/icon-192.png', type: 'image/png', sizes: '192x192' },
+        shortcut: '/icons/icon-192.png',
+        apple: '/icons/icon-192.png',
+    },
     appleWebApp: {
         capable: true,
         statusBarStyle: 'black-translucent',
@@ -37,22 +45,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <html
             lang="en"
             data-theme={initialTheme}
-            data-scroll-behavior="smooth"
             suppressHydrationWarning
         >
-            <head>
-                <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-            </head>
             <body className="antialiased" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-                <ThemeProvider>
-                    <LanguageProvider>
-                        <AuthProvider>
-                            <RoutePrefetcher />
-                            <NotificationBootstrap />
-                            <AppShell>{children}</AppShell>
-                        </AuthProvider>
-                    </LanguageProvider>
-                </ThemeProvider>
+                <SmoothScroll>
+                    <EcoCursorFollower />
+                    <ThemeProvider>
+                        <LanguageProvider>
+                            <AuthProvider>
+                                <RoutePrefetcher />
+                                <NotificationBootstrap />
+                                <AppShell>{children}</AppShell>
+                            </AuthProvider>
+                        </LanguageProvider>
+                    </ThemeProvider>
+                </SmoothScroll>
             </body>
         </html>
     );

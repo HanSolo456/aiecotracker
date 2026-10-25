@@ -76,6 +76,7 @@ function allAgreeOnMaterial(results: PartMetadataPayload[]): boolean {
 }
 
 const FLUID_RISK_SEVERITY: Record<string, number> = {
+    'battery_electrolyte': 4,
     'chemical_likely': 4,
     'hydrocarbon_likely': 3,
     'coolant_likely': 2,
