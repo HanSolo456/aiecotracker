@@ -1,15 +1,15 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ScanLine, LayoutDashboard, BookOpen, Cpu, LogIn, Building2 } from 'lucide-react';
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useMemo } from 'react';
+import NavigationLink from '@/components/NavigationLink';
 import { useAuth } from '@/lib/authContext';
 import { useLanguage } from '@/components/LanguageProvider';
 
 function BottomNavInner() {
     const pathname     = usePathname();
     const searchParams = useSearchParams();
-    const router       = useRouter();
     const fromHistory  = searchParams.get('from') === 'history';
     const { user, profile } = useAuth();
     const { t } = useLanguage();
@@ -46,53 +46,6 @@ function BottomNavInner() {
     };
 
     const activeIndex = Math.max(0, tabs.findIndex(tab => isTabActive(tab.href)));
-    const [visualIndex, setVisualIndex] = useState(activeIndex);
-    const [animating, setAnimating] = useState(false);
-    const [indicatorDurationMs, setIndicatorDurationMs] = useState(180);
-
-    useEffect(() => {
-        if (!animating) setVisualIndex(activeIndex);
-    }, [activeIndex, animating]);
-
-    useEffect(() => {
-        // Route has changed; unlock nav interactions on the new page.
-        setAnimating(false);
-    }, [pathname]);
-
-    useEffect(() => {
-        // Warm route bundles/data to reduce perceived delay after indicator lands.
-        tabs.forEach(tab => {
-            router.prefetch(tab.href);
-        });
-    }, [router, tabs]);
-
-    const handleTabPress = async (targetHref: string, targetIndex: number) => {
-        if (animating) return;
-
-        // If already on this tab, navigate to its root (e.g. /org/settings → /org/profile)
-        if (targetIndex === activeIndex) {
-            if (pathname !== targetHref) {
-                router.push(targetHref);
-            }
-            return;
-        }
-
-        setAnimating(true);
-
-        // Ensure target route is warmed when user taps.
-        router.prefetch(targetHref);
-
-        const distance = Math.abs(targetIndex - visualIndex);
-        const duration = Math.min(460, 140 + distance * 80);
-        setIndicatorDurationMs(duration);
-        setVisualIndex(targetIndex);
-
-        // Let glide complete before navigating.
-        await new Promise(resolve => setTimeout(resolve, duration + 20));
-        router.push(targetHref);
-    };
-
-
     if (isPublicRoute) return null;
 
     return (
@@ -112,8 +65,8 @@ function BottomNavInner() {
                             bottom: 4,
                             left: 4,
                             width: `calc((100% - 8px) / ${tabs.length})`,
-                            transform: `translateX(${visualIndex * 100}%)`,
-                            transition: `transform ${indicatorDurationMs}ms cubic-bezier(0.22, 1, 0.36, 1)`,
+                            transform: `translateX(${activeIndex * 100}%)`,
+                            transition: 'transform 180ms cubic-bezier(0.22, 1, 0.36, 1)',
                             background: 'rgba(132,204,22,0.12)',
                         }}
                     />
@@ -123,18 +76,18 @@ function BottomNavInner() {
                         style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
                     >
                     {tabs.map(({ href, label, icon: Icon, tint }, idx) => {
-                        const active = idx === visualIndex;
+                        const active = idx === activeIndex;
                         return (
-                            <button
+                            <NavigationLink
                                 key={href}
-                                onClick={() => { void handleTabPress(href, idx); }}
-                                disabled={animating}
+                                href={href}
+                                aria-current={isTabActive(href) ? 'page' : undefined}
                                 className={`nav-tab active:scale-95 transition-all duration-150 ${active ? 'active' : ''}`}
                                 style={tint && !active ? { color: tint } : undefined}
                             >
                                 <Icon size={17} strokeWidth={active ? 2.5 : 1.5} />
                                 <span style={{ fontSize: '10px' }}>{label}</span>
-                            </button>
+                            </NavigationLink>
                         );
                     })}
                     </div>

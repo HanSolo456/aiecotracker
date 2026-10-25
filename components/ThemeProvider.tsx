@@ -18,10 +18,12 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 function getPreferredTheme(): Theme {
   if (typeof window === 'undefined') return 'dark';
 
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === 'dark' || stored === 'light') return stored;
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored === 'dark' || stored === 'light') return stored;
+  } catch { /* Storage may be disabled; keep the pre-paint theme. */ }
 
-  return 'dark';
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 }
 
 function applyTheme(theme: Theme) {
@@ -31,7 +33,7 @@ function applyTheme(theme: Theme) {
 
 function persistTheme(theme: Theme) {
   if (typeof window !== 'undefined') {
-    window.localStorage.setItem(STORAGE_KEY, theme);
+    try { window.localStorage.setItem(STORAGE_KEY, theme); } catch { /* Theme still works without storage. */ }
   }
 
   if (typeof document !== 'undefined') {

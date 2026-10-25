@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { cookies } from 'next/headers';
 import 'lenis/dist/lenis.css';
 import './globals.css';
 import AuthProvider from '@/components/AuthProvider';
@@ -10,6 +9,7 @@ import NotificationBootstrap from '@/components/NotificationBootstrap';
 import AppShell from '@/components/AppShell';
 import SmoothScroll from '@/components/SmoothScroll';
 import EcoCursorFollower from '@/components/EcoCursorFollower';
+import { THEME_INIT_SCRIPT } from '@/lib/themeBootstrap';
 
 export const metadata: Metadata = {
     title: 'AI-EcoTrack | Circular Waste Intelligence',
@@ -36,17 +36,17 @@ export const viewport: Viewport = {
     userScalable: false,
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const cookieStore = await cookies();
-    const themeCookie = cookieStore.get('aiecotrack-theme')?.value;
-    const initialTheme = themeCookie === 'light' || themeCookie === 'dark' ? themeCookie : 'dark';
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html
             lang="en"
-            data-theme={initialTheme}
+            data-theme="dark"
             suppressHydrationWarning
         >
+            <head>
+                {/* Apply the saved theme before paint without making every route dynamic. */}
+                <script id="theme-init" dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+            </head>
             <body className="antialiased" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
                 <SmoothScroll>
                     <EcoCursorFollower />

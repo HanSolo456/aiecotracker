@@ -9,7 +9,7 @@ import { exportCSV, exportPDF } from '@/lib/exportService';
 import { useAuth } from '@/lib/authContext';
 import { useLanguage } from '@/components/LanguageProvider';
 
-let historyCache: { orgId?: string; scans: ScanRecord[] } | null = null;
+let historyCache: { workerId: string; orgId?: string; scans: ScanRecord[] } | null = null;
 
 const gradeStyle: Record<string, string> = {
     A: 'text-lime-400 bg-lime-500/10 border-lime-500/30',
@@ -205,11 +205,11 @@ export default function HistoryPage() {
     const { profile, user } = useAuth();
     const { t } = useLanguage();
     const [scans, setScans] = useState<ScanRecord[]>(() => {
-        const cacheMatchesOrg = historyCache?.orgId === profile?.orgId;
+        const cacheMatchesOrg = !!user?.uid && historyCache?.workerId === user.uid && historyCache?.orgId === (profile?.orgId ?? undefined);
         return cacheMatchesOrg ? (historyCache?.scans ?? []) : [];
     });
     const [loading, setLoading] = useState(() => {
-        const cacheMatchesOrg = historyCache?.orgId === profile?.orgId;
+        const cacheMatchesOrg = !!user?.uid && historyCache?.workerId === user.uid && historyCache?.orgId === (profile?.orgId ?? undefined);
         return !cacheMatchesOrg;
     });
     const [exportOpen, setExportOpen] = useState(false);
@@ -243,7 +243,7 @@ export default function HistoryPage() {
         if (profile?.orgId) {
             const unsub = subscribeToOrgScans(profile.orgId, 200, (data) => {
                 setScans(data);
-                historyCache = { orgId: profile.orgId ?? undefined, scans: data };
+                if (user?.uid) historyCache = { workerId: user.uid, orgId: profile.orgId ?? undefined, scans: data };
                 setLoading(false);
             });
             return () => unsub();
@@ -251,7 +251,7 @@ export default function HistoryPage() {
             // Personal / guest / anonymous — show their own global recent scans
             const unsub = subscribeToRecentScans(100, (data) => {
                 setScans(data);
-                historyCache = { orgId: undefined, scans: data };
+                historyCache = { workerId: user.uid, orgId: undefined, scans: data };
                 setLoading(false);
             }, { workerId: user.uid });
             return () => unsub();

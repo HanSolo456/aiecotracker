@@ -2,30 +2,28 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/authContext';
 
 const CORE_ROUTES = [
   '/dashboard',
   '/scan',
   '/history',
-  '/iot-monitor',
-  '/passport',
-  '/guide',
-  '/org/profile',
-  '/org/dashboard',
-  '/org/workers',
-  '/org/setup',
-  '/auth',
 ];
 
 export default function RoutePrefetcher() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const hasPrefetched = useRef(false);
 
   useEffect(() => {
-    if (hasPrefetched.current) return;
-    hasPrefetched.current = true;
-
+    // Warm the three frequent destinations after sign-in. Visible links handle
+    // other routes, avoiding a burst of requests for every org/setup page.
+    if (loading || !user || hasPrefetched.current) return;
     const prefetchAll = () => {
+      // Mark only when work runs. Strict Mode cancels and reruns this effect;
+      // marking before scheduling would skip prefetching on the second setup.
+      if (hasPrefetched.current) return;
+      hasPrefetched.current = true;
       CORE_ROUTES.forEach(route => {
         router.prefetch(route);
       });
@@ -48,7 +46,7 @@ export default function RoutePrefetcher() {
 
     const timeoutId = setTimeout(prefetchAll, 120);
     return () => clearTimeout(timeoutId);
-  }, [router]);
+  }, [router, user?.uid, loading]);
 
   return null;
 }

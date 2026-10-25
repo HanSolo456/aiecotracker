@@ -13,7 +13,7 @@ import {
     type QueryConstraint,
     type Unsubscribe,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import type { PartMetadataPayload, DigitalProductPassport } from '@/types';
 import { removeSessionValue, setSessionValue } from '@/lib/sessionState';
 
@@ -46,7 +46,7 @@ export interface ScanRecord {
     deviceId?: string;                    // Pi device ID, if applicable
     passportId?: string;                  // DPP passport_metadata.passport_id for QR deep-links
     // ── Phase 4: Org / worker context ─────────────────────────────────────────
-    orgId?: string;       // Organisation that owns this scan
+    orgId?: string | null; // Explicit null for personal scans, so they can be queried safely
     workerId?: string;    // UID of the user who triggered the scan
     workerName?: string;  // Display name at time of scan
     // Full data for restoring the result page
@@ -155,6 +155,10 @@ export async function saveScan(
     deviceId?: string,
     ctx?: ScanContext,
 ): Promise<string> {
+    const workerId = auth.currentUser?.uid;
+    if (!workerId || (ctx?.workerId && ctx.workerId !== workerId)) {
+        throw new Error('Your session changed. Please sign in again before saving this scan.');
+    }
     const partConf = payload.visual_id.confidence_score;
     const matConf = payload.material_inference.confidence_score;
     const wri = computeWRI(partConf, matConf);
@@ -187,14 +191,14 @@ export async function saveScan(
         scanMode,
         source,
         ...(deviceId ? { deviceId } : {}),
-        // Phase 4 org context — only written when the user belongs to an org
-        ...(ctx?.orgId     ? { orgId:      ctx.orgId }      : {}),
-        ...(ctx?.workerId  ? { workerId:   ctx.workerId }   : {}),
+        // Personal queries must constrain orgId to null to match the access rules.
+        orgId: ctx?.orgId ?? null,
+        workerId,
         ...(ctx?.workerName ? { workerName: ctx.workerName } : {}),
         fullPayload: JSON.stringify(payload),
         guide: JSON.stringify(guide),
         dpp: JSON.stringify(dpp),
-        passportId: dpp?.passport_metadata?.passport_id ?? undefined,
+        ...(dpp?.passport_metadata?.passport_id ? { passportId: dpp.passport_metadata.passport_id } : {}),
     };
 
     const docRef = await addDoc(collection(db, 'scans'), record);
@@ -210,10 +214,15 @@ export function subscribeToRecentScans(
     onData: (scans: ScanRecord[]) => void,
     options?: { workerId?: string }
 ): Unsubscribe {
-    const constraints: QueryConstraint[] = [];
-    if (options?.workerId) {
-        constraints.push(where('workerId', '==', options.workerId));
+    const workerId = options?.workerId ?? auth.currentUser?.uid;
+    if (!workerId) {
+        onData([]);
+        return () => {};
     }
+    const constraints: QueryConstraint[] = [
+        where('workerId', '==', workerId),
+        where('orgId', '==', null),
+    ];
     constraints.push(orderBy('createdAt', 'desc'));
     constraints.push(limit(limitCount));
 
@@ -230,10 +239,11 @@ export function subscribeToRecentScans(
         (err) => {
             if (err.code === 'permission-denied') {
                 console.warn('[scanService] Firestore read permission denied — check security rules:', err.message);
-                onData([]);
             } else {
                 console.error('[scanService] Snapshot error:', err);
             }
+            // Failed listeners terminate; always release the page's loading state.
+            onData([]);
         }
     );
 }
@@ -265,10 +275,10 @@ export function subscribeToOrgScans(
         (err) => {
             if (err.code === 'permission-denied') {
                 console.warn('[scanService] Org scans permission denied:', err.message);
-                onData([]);
             } else {
                 console.error('[scanService] Org snapshot error:', err);
             }
+            onData([]);
         }
     );
 }
@@ -303,10 +313,10 @@ export function subscribeToWorkerScans(
         (err) => {
             if (err.code === 'permission-denied') {
                 console.warn('[scanService] Worker scans permission denied:', err.message);
-                onData([]);
             } else {
                 console.error('[scanService] Worker snapshot error:', err);
             }
+            onData([]);
         }
     );
 }

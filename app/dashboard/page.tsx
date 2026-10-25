@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ScanLine, Zap, Leaf, TrendingUp, ChevronRight, ShieldCheck, Activity, Wind, LogOut, Trophy, Star, Award, BarChart3, User, ArrowRight, Cpu, Package, Clock } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import NavigationLink from '@/components/NavigationLink';
 import { subscribeToRecentScans, subscribeToOrgScans, subscribeToWorkerScans, computeStats, getScanRecoveryValueINR, relativeTime, type ScanRecord } from '@/lib/scanService';
 import { computeLeaderboard } from '@/lib/incentiveService';
 import { flushOfflineQueue, getOfflineQueueSize } from '@/lib/offlineQueue';
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, limit, where } from 'firebase/firestore';
 import { useAuth } from '@/lib/authContext';
 import { useLanguage } from '@/components/LanguageProvider';
 
@@ -380,8 +381,8 @@ export default function DashboardPage() {
         }
 
         let unsubSensor: () => void = () => { };
-        if (user?.uid) {
-            const sensorQ = query(collection(db, 'sensor_readings'), orderBy('createdAt', 'desc'), limit(1));
+        if (orgId && user?.uid && !user.isAnonymous) {
+            const sensorQ = query(collection(db, 'sensor_readings'), where('orgId', '==', orgId), orderBy('createdAt', 'desc'), limit(1));
             unsubSensor = onSnapshot(sensorQ, (snap) => {
                 if (!snap.empty) {
                     const d = snap.docs[0].data();
@@ -564,32 +565,32 @@ export default function DashboardPage() {
                                 </span>
                             </div>
                         </div>
-                        <button onClick={() => router.push('/org/leaderboard')}
+                        <NavigationLink href="/org/leaderboard"
                             className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:opacity-90"
                             style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)' }}>
                             <Trophy size={16} style={{ color: '#FBBF24' }} />
-                        </button>
+                        </NavigationLink>
                     </div>
                 </div>
 
                 {/* ── Primary CTA + Quick Links ── */}
                 <div className="px-5 lg:px-10 mb-4">
                     {/* Big Scan Button */}
-                    <button
-                        onClick={() => router.push('/scan')}
+                    <NavigationLink
+                        href="/scan"
                         className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-bold text-base transition-all active:scale-[0.98] mb-3"
                         style={{ background: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)', color: '#020617', boxShadow: '0 4px 24px rgba(132,204,22,0.25)' }}
                     >
                         <ScanLine size={18} /> {t('dashboard.start_scan')}
-                    </button>
+                    </NavigationLink>
 
                     {/* Org Dashboard pill + streak */}
                     <div className="flex items-center gap-2">
-                        <button onClick={() => router.push('/org/dashboard')}
+                        <NavigationLink href="/org/dashboard"
                             className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-90"
                             style={{ background: 'rgba(96,165,250,0.07)', border: '1px solid rgba(96,165,250,0.18)', color: '#60A5FA' }}>
                             <Activity size={12} /> {t('dashboard.org_dashboard')}
-                        </button>
+                        </NavigationLink>
                         <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl"
                             style={{ background: streak > 0 ? 'rgba(251,146,60,0.08)' : 'var(--bg-card)', border: `1px solid ${streak > 0 ? 'rgba(251,146,60,0.25)' : 'var(--border)'}` }}>
                             <span className="text-base">{streak > 0 ? '🔥' : '💤'}</span>
@@ -725,10 +726,10 @@ export default function DashboardPage() {
                 <div className="px-5 lg:px-10 mb-4">
                     <div className="flex items-center justify-between mb-3">
                         <p className="page-label">{t('dashboard.recent_scans')}</p>
-                        <button onClick={() => router.push('/history')}
+                        <NavigationLink href="/history"
                             className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-dim)' }}>
                             {t('common.view_all')} <ChevronRight size={12} />
-                        </button>
+                        </NavigationLink>
                     </div>
                     {loading ? (
                         <div className="flex flex-col gap-2">
@@ -785,11 +786,11 @@ export default function DashboardPage() {
 
                 {/* ── Bottom Leaderboard shortcut ── */}
                 <div className="px-5 lg:px-10 mb-5">
-                    <button onClick={() => router.push('/org/leaderboard')}
+                    <NavigationLink href="/org/leaderboard"
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
                         style={{ background: 'var(--bg-card)', border: '1px solid rgba(251,191,36,0.2)', color: '#FBBF24' }}>
                         <Trophy size={14} /> {t('dashboard.leaderboard')}
-                    </button>
+                    </NavigationLink>
                 </div>
 
                 <BottomNav />
@@ -825,13 +826,13 @@ export default function DashboardPage() {
                                 Sign Out
                             </button>
                         ) : user?.isAnonymous ? (
-                            <button
-                                onClick={() => router.push('/auth')}
+                            <NavigationLink
+                                href="/auth"
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
                                 style={{ background: 'rgba(132,204,22,0.12)', border: '1px solid rgba(132,204,22,0.3)', color: '#84cc16' }}
                             >
                                 Sign In
-                            </button>
+                            </NavigationLink>
                         ) : null}
                     </div>
                 </div>
@@ -851,13 +852,13 @@ export default function DashboardPage() {
                     <p className="text-sm" style={{ color: '#93C5FD' }}>
                         👋 {t('dashboard.guest_banner')}
                     </p>
-                    <button
-                        onClick={() => router.push('/auth')}
+                    <NavigationLink
+                        href="/auth"
                         className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors hover:opacity-90"
                         style={{ background: '#60A5FA', color: 'var(--bg-primary)' }}
                     >
                         {t('nav.sign_in')}
-                    </button>
+                    </NavigationLink>
                 </div>
             )}
 
@@ -928,9 +929,9 @@ export default function DashboardPage() {
                     {/* Scan CTA */}
 
                     <div className="px-5 lg:px-0 mb-5">
-                        <button
-                            onClick={() => router.push('/scan')}
-                            className="relative w-full overflow-hidden rounded-2xl p-5 text-left group"
+                        <NavigationLink
+                            href="/scan"
+                            className="relative block w-full overflow-hidden rounded-2xl p-5 text-left group"
                             style={{
                                 background: 'linear-gradient(135deg, color-mix(in srgb, var(--lime) 24%, var(--bg-card) 76%) 0%, var(--bg-card) 60%, var(--bg-elevated) 100%)',
                                 border: '1px solid rgba(132,204,22,0.3)',
@@ -961,7 +962,7 @@ export default function DashboardPage() {
                                 <ScanLine size={16} className="ml-4" style={{ color: 'var(--bg-primary)' }} />
                                 <span className="ml-2 font-heading font-700 text-sm" style={{ color: 'var(--bg-primary)' }}>{t('dashboard.start_scanning')}</span>
                             </div>
-                        </button>
+                        </NavigationLink>
                     </div>
 
                     {/* Safety Banner */}
@@ -988,13 +989,13 @@ export default function DashboardPage() {
                     <div className="px-5 lg:px-0 mb-6">
                         <div className="flex items-center justify-between mb-3">
                             <h2 className="font-heading text-base font-700 text-white">{t('dashboard.recent_passports')}</h2>
-                            <button
+                            <NavigationLink
                                 className="flex items-center gap-1 text-xs"
                                 style={{ color: 'var(--text-secondary)' }}
-                                onClick={() => router.push('/history')}
+                                href="/history"
                             >
                                 {t('common.view_all')} <ChevronRight size={12} />
-                            </button>
+                            </NavigationLink>
                         </div>
 
                         {loading ? (
@@ -1018,10 +1019,10 @@ export default function DashboardPage() {
                         ) : (
                             <div className="flex flex-col gap-2">
                                 {recentScans.map((scan) => (
-                                    <button
+                                    <NavigationLink
                                         key={scan.id}
                                         className="card-hover p-4 text-left flex items-center gap-3 w-full"
-                                        onClick={() => router.push('/history')}
+                                        href="/history"
                                     >
                                         {/* WRI Ring */}
                                         <WRIRing score={scan.wriScore} />
@@ -1046,7 +1047,7 @@ export default function DashboardPage() {
                                             </div>
                                         </div>
                                         <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} className="shrink-0" />
-                                    </button>
+                                    </NavigationLink>
                                 ))}
                             </div>
                         )}
@@ -1059,9 +1060,9 @@ export default function DashboardPage() {
                     {/* Live IoT Widget */}
                     {sensor && (
                         <div className="mb-5">
-                            <button
-                                onClick={() => router.push('/iot-monitor')}
-                                className="w-full card-hover p-5 text-left"
+                            <NavigationLink
+                                href="/iot-monitor"
+                                className="block w-full card-hover p-5 text-left"
                                 style={{ border: sensor.gasAlert ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(96,165,250,0.2)' }}
                             >
                                 <div className="flex items-center justify-between mb-4">
@@ -1123,7 +1124,7 @@ export default function DashboardPage() {
                                 <div className="flex items-center justify-end gap-1 text-xs" style={{ color: '#60A5FA' }}>
                                     {t('dashboard.view_sensor')} <ArrowRight size={12} />
                                 </div>
-                            </button>
+                            </NavigationLink>
                         </div>
                     )}
 
@@ -1144,9 +1145,9 @@ export default function DashboardPage() {
             {/* Mobile-only IoT widget — hidden for anonymous guests */}
             {sensor && !user?.isAnonymous && (
                 <div className="px-5 mb-5 lg:hidden">
-                    <button
-                        onClick={() => router.push('/iot-monitor')}
-                        className="w-full card p-4 text-left"
+                    <NavigationLink
+                        href="/iot-monitor"
+                        className="block w-full card p-4 text-left"
                         style={{ border: sensor.gasAlert ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(96,165,250,0.2)' }}
                     >
                         <div className="flex items-center justify-between mb-3">
@@ -1191,7 +1192,7 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         <p className="text-xs mt-3 text-right" style={{ color: '#60A5FA' }}>{t('dashboard.view_sensor')} →</p>
-                    </button>
+                    </NavigationLink>
                 </div>
             )}
 

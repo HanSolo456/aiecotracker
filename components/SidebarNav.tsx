@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, ScanLine, Cpu, BookOpen, Leaf, LogOut, Building2, Users, BarChart2, Settings } from 'lucide-react';
 import { useAuth } from '@/lib/authContext';
 import { useLanguage } from '@/components/LanguageProvider';
+import NavigationLink from '@/components/NavigationLink';
 
 export default function SidebarNav() {
     const pathname         = usePathname();
@@ -73,14 +74,15 @@ export default function SidebarNav() {
                     .map(({ href, label, icon: Icon }) => {
                     const active = pathname === href || pathname.startsWith(`${href}/`);
                     return (
-                        <button
+                        <NavigationLink
                             key={href}
-                            onClick={() => router.push(href)}
+                            href={href}
+                            aria-current={active ? 'page' : undefined}
                             className={`sidebar-link ${active ? 'active' : ''}`}
                         >
                             <Icon size={16} strokeWidth={active ? 2.5 : 1.8} />
                             {label}
-                        </button>
+                        </NavigationLink>
                     );
                 })}
             </nav>

@@ -4,9 +4,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 /**
- * Wraps page content and plays a smooth fade+slide-up animation
- * every time the pathname changes (i.e. on every navigation).
- * Uses CSS only — no extra dependencies.
+ * A subtle transition after navigation commits, without hiding the page
+ * or forcing a synchronous layout of the entire dashboard.
  */
 export default function PageTransition({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -14,16 +13,16 @@ export default function PageTransition({ children }: { children: React.ReactNode
 
     useEffect(() => {
         const el = ref.current;
-        if (!el) return;
-        // Remove class so it can be re-applied to restart animation
-        el.classList.remove('page-enter');
-        // Force reflow to restart the animation
-        void el.offsetHeight;
-        el.classList.add('page-enter');
+        if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const animation = el.animate([{ opacity: 0.96 }, { opacity: 1 }], {
+            duration: 100,
+            easing: 'ease-out',
+        });
+        return () => animation.cancel();
     }, [pathname]);
 
     return (
-        <div ref={ref} className="page-enter">
+        <div ref={ref}>
             {children}
         </div>
     );
